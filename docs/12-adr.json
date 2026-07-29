@@ -1,0 +1,269 @@
+{
+  "title": "12 · Architecture Decision Records",
+  "description": "Short, dated records of the decisions that shaped LehroSol CLI, in the lightweight [ADR](https://adr.github.io/) format: Status / Context / Decision / Consequences. New ADRs are appended, never rewritten in place — if a decision changes, a new ADR supersedes the old one.",
+  "sourceFile": "12-adr.md",
+  "readingMinutes": 7,
+  "wordCount": 1414,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "How the decisions relate",
+      "id": "how-the-decisions-relate"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0001 — Zero-dependency core, npm dependencies confined to `gui/`",
+      "id": "adr-0001-zero-dependency-core-npm-dependencies-confined-to-gui"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0002 — License: GPL-3.0-or-later",
+      "id": "adr-0002-license-gpl-3-0-or-later"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0003 — Web-only GUI instead of Tauri or Electron",
+      "id": "adr-0003-web-only-gui-instead-of-tauri-or-electron"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0004 — Agent adapters shell out via `execFile` with argument arrays only",
+      "id": "adr-0004-agent-adapters-shell-out-via-execfile-with-argument-arrays-only"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0005 — Git worktrees, not clones, for parallel orchestration",
+      "id": "adr-0005-git-worktrees-not-clones-for-parallel-orchestration"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0006 — `node:sqlite` for session persistence, JSON file fallback",
+      "id": "adr-0006-node-sqlite-for-session-persistence-json-file-fallback"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0007 — MCP as the one control plane for CLI, GUI, and external agents",
+      "id": "adr-0007-mcp-as-the-one-control-plane-for-cli-gui-and-external-agents"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0008 — Auto-detect the base branch instead of assuming `main`",
+      "id": "adr-0008-auto-detect-the-base-branch-instead-of-assuming-main"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0009 — Docs are generated artifacts: `.md` is the only hand-edited source",
+      "id": "adr-0009-docs-are-generated-artifacts-md-is-the-only-hand-edited-source"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0010 — Rich terminal UI ported from gidevo-api-tool blueprint, still dependency-free",
+      "id": "adr-0010-rich-terminal-ui-ported-from-gidevo-api-tool-blueprint-still-dependency-free"
+    },
+    {
+      "level": 2,
+      "heading": "ADR-0011 — Audit hardening: documented behavior must execute exactly as documented",
+      "id": "adr-0011-audit-hardening-documented-behavior-must-execute-exactly-as-documented"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    A1[\"ADR-0001\\nZero-dependency core\"] --> A4[\"ADR-0004\\nexecFile-only adapters\"]\n    A1 --> A6[\"ADR-0006\\nnode:sqlite + JSON fallback\"]\n    A1 --> A10[\"ADR-0010\\nCLI UX from gidevo\\n(ANSI, no deps)\"]\n    A2[\"ADR-0002\\nGPL-3.0-or-later\"]\n    A3[\"ADR-0003\\nWeb-only GUI\\n(no Tauri/Electron)\"] --> A7[\"ADR-0007\\nMCP as shared control plane\"]\n    A5[\"ADR-0005\\nGit worktrees for orchestration\"] --> A8[\"ADR-0008\\nAuto-detect base branch\"]\n    A7 --> A3\n    A9[\"ADR-0009\\nDocs as code\\n(.md → .json + .html)\"]\n    A1 --> A9\n    A10 -.\"shares palette with\".-> A3\n    A11[\"ADR-0011\\nAudit hardening pass\\n(documented behavior must execute)\"]\n    A11 --> A1\n    A11 --> A8\n    A11 --> A10"
+  ],
+  "relatedDocs": [
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "02 · Competitive Landscape",
+      "href": "02-competitors.md"
+    },
+    {
+      "text": "MCP control plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "harness",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "docs/skills/orchestration.skill.md",
+      "href": "skills/orchestration.skill.md#common-pitfalls"
+    },
+    {
+      "text": "docs/skills/docs-authoring.skill.md",
+      "href": "skills/docs-authoring.skill.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md#the-terminal-ui-layer"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md#srccore--shared-primitives-dependency-free"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "ADR",
+      "href": "https://adr.github.io/"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "02 · Competitive Landscape",
+      "href": "02-competitors.md"
+    },
+    {
+      "text": "MCP control plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "harness",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "docs/skills/orchestration.skill.md",
+      "href": "skills/orchestration.skill.md#common-pitfalls"
+    },
+    {
+      "text": "docs/skills/docs-authoring.skill.md",
+      "href": "skills/docs-authoring.skill.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md#the-terminal-ui-layer"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md#srccore--shared-primitives-dependency-free"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ]
+}

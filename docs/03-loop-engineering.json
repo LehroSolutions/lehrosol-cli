@@ -1,0 +1,155 @@
+{
+  "title": "03 · Loop Engineering",
+  "description": "",
+  "sourceFile": "03-loop-engineering.md",
+  "readingMinutes": 2,
+  "wordCount": 482,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "What \"loop engineering\" means here",
+      "id": "what-loop-engineering-means-here"
+    },
+    {
+      "level": 2,
+      "heading": "The loop, as a state machine",
+      "id": "the-loop-as-a-state-machine"
+    },
+    {
+      "level": 2,
+      "heading": "Context the loop assembles every iteration",
+      "id": "context-the-loop-assembles-every-iteration"
+    },
+    {
+      "level": 2,
+      "heading": "The Score Agent",
+      "id": "the-score-agent"
+    },
+    {
+      "level": 2,
+      "heading": "Session persistence",
+      "id": "session-persistence"
+    },
+    {
+      "level": 2,
+      "heading": "CLI reference",
+      "id": "cli-reference"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nstateDiagram-v2\n    [*] --> SessionCreated: createSession()\n    SessionCreated --> Iterating\n    Iterating --> Invoking: pick adapter\n    Invoking --> Scanning: adapter returns changedFiles\n    Scanning --> Scoring: scanOwaspBasics()\n    Scoring --> Checkpointed: recordCheckpoint()\n    Checkpointed --> Iterating: verdict == continue\n    Checkpointed --> StopSuccess: score >= pass bar\n    Checkpointed --> StopBudget: iteration == maxIterations\n    StopBudget --> FixPlanAppended: appendFixPlanItem()\n    FixPlanAppended --> Finalized\n    StopSuccess --> Finalized: finalizeSession()\n    Finalized --> [*]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "OWASP rule packs",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "pass bar",
+      "href": "04-harness-engineering.md#pass-bars-by-capability-tier"
+    },
+    {
+      "text": "Harness's policy evaluation",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "OWASP scanner",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "GUI's Sessions panel",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "skills/loop-engineering.skill.md",
+      "href": "skills/loop-engineering.skill.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "OWASP rule packs",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "pass bar",
+      "href": "04-harness-engineering.md#pass-bars-by-capability-tier"
+    },
+    {
+      "text": "Harness's policy evaluation",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "OWASP scanner",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "GUI's Sessions panel",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "skills/loop-engineering.skill.md",
+      "href": "skills/loop-engineering.skill.md"
+    }
+  ]
+}

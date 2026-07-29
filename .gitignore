@@ -1,0 +1,9 @@
+node_modules/
+.lehro/
+*.log
+dist/
+gui/node_modules/
+gui/dist/
+.env
+.DS_Store
+*.gguf

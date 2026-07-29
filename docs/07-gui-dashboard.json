@@ -1,0 +1,118 @@
+{
+  "title": "07 · GUI Dashboard",
+  "description": "",
+  "sourceFile": "07-gui-dashboard.md",
+  "readingMinutes": 2,
+  "wordCount": 319,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "What it is",
+      "id": "what-it-is"
+    },
+    {
+      "level": 2,
+      "heading": "Panel map",
+      "id": "panel-map"
+    },
+    {
+      "level": 2,
+      "heading": "Design language (matches these docs' `.html` output)",
+      "id": "design-language-matches-these-docs-html-output"
+    },
+    {
+      "level": 2,
+      "heading": "Why the GUI and terminal never drift apart",
+      "id": "why-the-gui-and-terminal-never-drift-apart"
+    },
+    {
+      "level": 2,
+      "heading": "Running it",
+      "id": "running-it"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TB\n    APP[\"App.jsx — tab shell\"]\n    APP --> DOCTOR[\"DoctorPanel → doctor_check\"]\n    APP --> LOOPP[\"LoopPanel → loop_run\"]\n    APP --> ADAPT[\"AdaptersPanel → adapters_list\"]\n    APP --> SESS[\"SessionsPanel → sessions_list / sessions_show\"]\n    APP --> ORCH[\"OrchestratePanel → orchestrate_spawn / list / remove\"]\n    APP --> POL[\"PolicyPanel → policy_evaluate\"]\n    DOCTOR & LOOPP & ADAPT & SESS & ORCH & POL --> RPC[\"rpcClient.js — fetch('/rpc', ...)\"]\n    RPC --> PROXY[\"vite.config.js dev proxy\\n/rpc -> LEHRO_CONTROL_PLANE_URL\\n(default :4177)\"]\n    PROXY --> MCP[\"MCP HTTP server\\nsrc/mcp/server.js\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "MCP HTTP endpoint",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "tool registry",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "skills/gui-dashboard.skill.md",
+      "href": "skills/gui-dashboard.skill.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "MCP HTTP endpoint",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "tool registry",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "skills/gui-dashboard.skill.md",
+      "href": "skills/gui-dashboard.skill.md"
+    }
+  ]
+}

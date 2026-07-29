@@ -1,0 +1,72 @@
+{
+  "title": "Skill: GUI Dashboard",
+  "description": "**Use this skill when:** adding a new panel to the GUI, or wiring a new MCP tool into it.",
+  "sourceFile": "skills/gui-dashboard.skill.md",
+  "readingMinutes": 1,
+  "wordCount": 264,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Workflow",
+      "id": "workflow"
+    },
+    {
+      "level": 2,
+      "heading": "Common pitfalls",
+      "id": "common-pitfalls"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "../07-gui-dashboard.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "../07-gui-dashboard.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "../06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "../07-gui-dashboard.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "../07-gui-dashboard.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "../07-gui-dashboard.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "../06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "../07-gui-dashboard.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    }
+  ]
+}

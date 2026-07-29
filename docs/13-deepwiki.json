@@ -1,0 +1,355 @@
+{
+  "title": "13 · DeepWiki — Full Repository Reference",
+  "description": "A wiki-style, exhaustive reference to every module in this repository — one level deeper than the numbered guides, for when you need to know exactly what a specific file does and how it connects to everything else. Think of docs 01–12 as the tour; this page is the index card catalog.",
+  "sourceFile": "13-deepwiki.md",
+  "readingMinutes": 7,
+  "wordCount": 1395,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Whole-repo dependency graph",
+      "id": "whole-repo-dependency-graph"
+    },
+    {
+      "level": 2,
+      "heading": "Glossary",
+      "id": "glossary"
+    },
+    {
+      "level": 2,
+      "heading": "Module-by-module reference",
+      "id": "module-by-module-reference"
+    },
+    {
+      "level": 3,
+      "heading": "`bin/`",
+      "id": "bin"
+    },
+    {
+      "level": 3,
+      "heading": "`src/core/` — shared primitives, dependency-free",
+      "id": "src-core-shared-primitives-dependency-free"
+    },
+    {
+      "level": 3,
+      "heading": "`src/mcp/` — the control plane",
+      "id": "src-mcp-the-control-plane"
+    },
+    {
+      "level": 3,
+      "heading": "`src/harness/` — the verification gate",
+      "id": "src-harness-the-verification-gate"
+    },
+    {
+      "level": 3,
+      "heading": "`src/loop/` — the Ralph-style engine",
+      "id": "src-loop-the-ralph-style-engine"
+    },
+    {
+      "level": 3,
+      "heading": "`src/orchestrator/` — multi-agent supervision",
+      "id": "src-orchestrator-multi-agent-supervision"
+    },
+    {
+      "level": 3,
+      "heading": "`src/commands/` — CLI wiring (all upgraded with rich UI from `src/core/ui.js`)",
+      "id": "src-commands-cli-wiring-all-upgraded-with-rich-ui-from-src-core-ui-js"
+    },
+    {
+      "level": 3,
+      "heading": "`gui/` — the one npm-dependent surface",
+      "id": "gui-the-one-npm-dependent-surface"
+    },
+    {
+      "level": 3,
+      "heading": "`docs/` — this doc site",
+      "id": "docs-this-doc-site"
+    },
+    {
+      "level": 3,
+      "heading": "Repo-root agent files",
+      "id": "repo-root-agent-files"
+    },
+    {
+      "level": 2,
+      "heading": "Where to go from here",
+      "id": "where-to-go-from-here"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TB\n    BIN[\"bin/lehrosol.js\"] --> CMD[\"src/commands/*\"]\n    CMD --> CORE[\"src/core/*\\n(includes ui.js)\"]\n    CMD --> MCP[\"src/mcp/*\"]\n    CMD --> HARNESS[\"src/harness/*\"]\n    CMD --> LOOP[\"src/loop/*\"]\n    CMD --> ORCH[\"src/orchestrator/*\"]\n    MCP --> HARNESS\n    MCP --> LOOP\n    MCP --> ORCH\n    MCP --> CORE\n    LOOP --> ADAPTERS[\"src/loop/adapters/*\"]\n    LOOP --> HARNESS\n    LOOP --> CORE\n    ORCH --> CORE\n    GUI[\"gui/src/*\"] -->|HTTP JSON-RPC| MCP\n    ADAPTERS -->|execFile| EXTERNAL[(\"external agent\\nCLI binaries\")]\n    CORE --> HOME[(\"~/.lehro/*\\nconfig, sessions, worktrees\")]\n    BIN -.interactive mode.-> UI[\"src/core/ui.js\\n(themed banner, tables,\\nspinners, wizard mode)\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "03",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "08",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "ADR-0010",
+      "href": "12-adr.md#adr-0010--rich-terminal-ui-ported-from-gidevo-api-tool-blueprint-still-dependency-free"
+    },
+    {
+      "text": "09",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "ADR-0010",
+      "href": "12-adr.md#adr-0010--rich-terminal-ui-ported-from-gidevo-api-tool-blueprint-still-dependency-free"
+    },
+    {
+      "text": "06",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "04",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "ADR-0008",
+      "href": "12-adr.md#adr-0008--auto-detect-the-base-branch-instead-of-assuming-main"
+    },
+    {
+      "text": "05",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "ADR-0009",
+      "href": "12-adr.md#adr-0009--docs-are-generated-artifacts-md-is-the-only-hand-edited-source"
+    },
+    {
+      "text": "09",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "skill",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "03",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "08",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "ADR-0010",
+      "href": "12-adr.md#adr-0010--rich-terminal-ui-ported-from-gidevo-api-tool-blueprint-still-dependency-free"
+    },
+    {
+      "text": "09",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "ADR-0010",
+      "href": "12-adr.md#adr-0010--rich-terminal-ui-ported-from-gidevo-api-tool-blueprint-still-dependency-free"
+    },
+    {
+      "text": "06",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "04",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "ADR-0008",
+      "href": "12-adr.md#adr-0008--auto-detect-the-base-branch-instead-of-assuming-main"
+    },
+    {
+      "text": "05",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "ADR-0009",
+      "href": "12-adr.md#adr-0009--docs-are-generated-artifacts-md-is-the-only-hand-edited-source"
+    },
+    {
+      "text": "09",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "skill",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ]
+}

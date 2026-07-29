@@ -1,0 +1,88 @@
+{
+  "title": "Skill: Loop Engineering",
+  "description": "**Use this skill when:** you're adding or changing anything in `src/loop/`, tuning a loop run's behavior, or debugging why a loop stopped early/late.",
+  "sourceFile": "skills/loop-engineering.skill.md",
+  "readingMinutes": 1,
+  "wordCount": 240,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Workflow",
+      "id": "workflow"
+    },
+    {
+      "level": 2,
+      "heading": "Common pitfalls",
+      "id": "common-pitfalls"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    },
+    {
+      "text": "harness",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "../06-mcp-control-plane.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "skills/adapter-authoring.skill.md",
+      "href": "adapter-authoring.skill.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    },
+    {
+      "text": "harness",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "../06-mcp-control-plane.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "skills/adapter-authoring.skill.md",
+      "href": "adapter-authoring.skill.md"
+    }
+  ]
+}

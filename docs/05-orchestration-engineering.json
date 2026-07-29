@@ -1,0 +1,124 @@
+{
+  "title": "05 · Orchestration Engineering",
+  "description": "",
+  "sourceFile": "05-orchestration-engineering.md",
+  "readingMinutes": 2,
+  "wordCount": 444,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "What \"orchestration engineering\" means here",
+      "id": "what-orchestration-engineering-means-here"
+    },
+    {
+      "level": 2,
+      "heading": "Why git worktrees",
+      "id": "why-git-worktrees"
+    },
+    {
+      "level": 2,
+      "heading": "Spawn / list / remove lifecycle",
+      "id": "spawn-list-remove-lifecycle"
+    },
+    {
+      "level": 2,
+      "heading": "The supervisor's recovery strategies",
+      "id": "the-supervisor-s-recovery-strategies"
+    },
+    {
+      "level": 2,
+      "heading": "CLI reference",
+      "id": "cli-reference"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    },
+    {
+      "level": 2,
+      "heading": "CMUX-style threads",
+      "id": "cmux-style-threads"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart LR\n    REPO[(\"Shared .git\\nobject store\")]\n    subgraph W1[\".lehro-worktrees/lehro-worker-1\"]\n        B1[\"branch: lehro/lehro-worker-1\"]\n        A1[\"Agent adapter A\\n(e.g. claude-code)\"]\n    end\n    subgraph W2[\".lehro-worktrees/lehro-worker-2\"]\n        B2[\"branch: lehro/lehro-worker-2\"]\n        A2[\"Agent adapter B\\n(e.g. codex)\"]\n    end\n    subgraph W3[\".lehro-worktrees/lehro-worker-3\"]\n        B3[\"branch: lehro/lehro-worker-3\"]\n        A3[\"Agent adapter C\\n(e.g. aider)\"]\n    end\n    REPO --> B1 --> A1\n    REPO --> B2 --> A2\n    REPO --> B3 --> A3\n    A1 -. \"loop_run + policy_evaluate\\nper worker\" .-> REG[\"worktrees.json registry\\n~/.lehro/\"]\n    A2 -.-> REG\n    A3 -.-> REG",
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nsequenceDiagram\n    participant U as lehrosol orchestrate\n    participant W as worktree.js\n    participant G as git\n    participant R as ~/.lehro/worktrees.json\n\n    U->>W: spawnWorktree({count, baseBranch, taskPrefix})\n    W->>G: rev-parse current branch (if baseBranch omitted)\n    G-->>W: e.g. \"main\" or \"master\"\n    loop for each requested worker\n        W->>G: git worktree add -b lehro/<name> <dir> <baseBranch>\n        G-->>W: created (or error, recorded per-worker)\n    end\n    W->>R: write registry entries\n    U->>W: listWorktrees()\n    W->>R: read registry\n    R-->>U: active workers\n    U->>W: removeWorktree(name)\n    W->>G: git worktree remove <dir> --force\n    W->>R: delete registry entry"
+  ],
+  "relatedDocs": [
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "agent adapter",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "harness gate",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "skills/orchestration.skill.md",
+      "href": "skills/orchestration.skill.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "agent adapter",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "harness gate",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "skills/orchestration.skill.md",
+      "href": "skills/orchestration.skill.md"
+    }
+  ]
+}

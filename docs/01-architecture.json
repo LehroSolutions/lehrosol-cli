@@ -1,0 +1,220 @@
+{
+  "title": "01 · Architecture",
+  "description": "LehroSol CLI (bins `lehrosol` + short alias `lehr-sol`) is one npm package built from Node.js builtins only in its core, so `npm i -g`, `bunx`, and `curl | bash` all work with zero install friction. It unifies three disciplines behind one MCP control plane, all wrapped in a rich terminal UI layer (`src/core/ui.js`) ported from the gidevo-api-tool blueprint:",
+  "sourceFile": "01-architecture.md",
+  "readingMinutes": 4,
+  "wordCount": 820,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "System diagram",
+      "id": "system-diagram"
+    },
+    {
+      "level": 2,
+      "heading": "The terminal UI layer",
+      "id": "the-terminal-ui-layer"
+    },
+    {
+      "level": 2,
+      "heading": "A single loop iteration, end to end",
+      "id": "a-single-loop-iteration-end-to-end"
+    },
+    {
+      "level": 2,
+      "heading": "Phased roadmap",
+      "id": "phased-roadmap"
+    },
+    {
+      "level": 2,
+      "heading": "Why this split (vs. one monolith)",
+      "id": "why-this-split-vs-one-monolith"
+    },
+    {
+      "level": 2,
+      "heading": "Agent adapters at a glance",
+      "id": "agent-adapters-at-a-glance"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TB\n    subgraph Front_Ends[\"Front ends\"]\n        TERM[\"Terminal\\nbin/lehrosol.js\\n+ src/core/ui.js\"]\n        GUI[\"GUI dashboard\\ngui/ (React+Vite+Tailwind)\"]\n        EXT[\"External agent CLIs\\n(Claude Code, Codex, etc.\\nvia MCP stdio)\"]\n    end\n    subgraph Control_Plane[\"MCP control plane — src/mcp/\"]\n        RPC[\"JSON-RPC 2.0\\ntools/list, tools/call\"]\n        REG[\"Tool registry\\n(9 self-documenting tools)\"]\n    end\n    subgraph Engines[\"Engineering disciplines\"]\n        LOOP[\"Loop Engine\\nsrc/loop/\"]\n        HARNESS[\"Harness\\nsrc/harness/\"]\n        ORCH[\"Orchestrator\\nsrc/orchestrator/\"]\n    end\n    subgraph State[\"Shared state — ~/.lehro/\"]\n        DB[(\"sessions.sqlite\\n(node:sqlite, JSON fallback)\")]\n        CFG[(\"config.json\")]\n        WT[(\"worktrees.json\")]\n    end\n    ADAPTERS[\"7 real agent adapters\\n+ local dry-run\\nsrc/loop/adapters/\"]\n\n    TERM --> RPC\n    GUI -- \"HTTP JSON-RPC :4177\" --> RPC\n    EXT -- \"stdio JSON-RPC\" --> RPC\n    RPC --> REG\n    REG --> LOOP\n    REG --> HARNESS\n    REG --> ORCH\n    LOOP --> ADAPTERS\n    LOOP --> HARNESS\n    LOOP --> DB\n    ORCH --> WT\n    TERM --> CFG",
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nsequenceDiagram\n    participant U as User / Agent\n    participant CLI as bin/lehrosol.js + ui.js\n    participant LOOP as Loop Engine\n    participant AD as Agent Adapter\n    participant OW as OWASP Scanner\n    participant POL as Policy Engine\n    participant DB as Session Store\n\n    U->>CLI: lehrosol loop run --prompt \"...\"\n    CLI->>LOOP: runLoop(options)\n    LOOP->>DB: createSession(id, prompt, adapter)\n    loop until stop-success or budget exhausted\n        LOOP->>AD: invoke(context)\n        AD-->>LOOP: changedFiles + policyInput\n        LOOP->>OW: scanOwaspBasics(changedFiles)\n        OW-->>LOOP: findings[]\n        LOOP->>POL: evaluatePolicy(policyInput + findings)\n        POL-->>LOOP: score, verdict\n        LOOP->>DB: recordCheckpoint(iteration)\n    end\n    LOOP->>DB: finalizeSession(summary)\n    LOOP-->>CLI: summary\n    CLI-->>U: themed report (table + progress bars + next steps)"
+  ],
+  "relatedDocs": [
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "02 · Competitive Landscape",
+      "href": "02-competitors.md"
+    },
+    {
+      "text": "Loop engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Harness engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "Orchestration engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "MCP JSON-RPC tools",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "Real agent adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "Full OWASP rule packs + heuristic scanner",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "12 · ADRs",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "02 · Competitive Landscape",
+      "href": "02-competitors.md"
+    },
+    {
+      "text": "Loop engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Harness engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "Orchestration engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "MCP JSON-RPC tools",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "Real agent adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "Full OWASP rule packs + heuristic scanner",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "12 · ADRs",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    }
+  ]
+}

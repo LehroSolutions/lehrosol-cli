@@ -1,0 +1,32 @@
+{
+  "title": "Missions, the Journal, and Self-Tuning",
+  "description": "Every `lehrosol code` run is a **mission**. Since v3.1.0 each mission is",
+  "sourceFile": "10-missions-and-journal.md",
+  "readingMinutes": 1,
+  "wordCount": 239,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "The journal",
+      "id": "the-journal"
+    },
+    {
+      "level": 2,
+      "heading": "Backups and undo",
+      "id": "backups-and-undo"
+    },
+    {
+      "level": 2,
+      "heading": "Adaptive context (self-tuning)",
+      "id": "adaptive-context-self-tuning"
+    },
+    {
+      "level": 2,
+      "heading": "Plan-first mode",
+      "id": "plan-first-mode"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [],
+  "allLinks": []
+}

@@ -1,0 +1,64 @@
+{
+  "name": "lehrosol-cli",
+  "version": "3.1.0",
+  "description": "LehroSol CLI v3 — truly agentic engineering console: autonomous goal→plan→execute→verify→adapt missions with recovery, guided onboarding, Grok/local model profiles, task-graph supervision, safe marketplace, release integrity, MCP, and the HELIX TUI.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "lehrosol": "./bin/lehrosol.js",
+    "lehr-sol": "./bin/lehrosol.js"
+  },
+  "main": "./src/core/index.js",
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "scripts",
+    "extensions",
+    "packaging"
+  ],
+  "scripts": {
+    "start": "node bin/lehrosol.js",
+    "doctor": "node bin/lehrosol.js doctor",
+    "mcp": "node bin/lehrosol.js mcp start",
+    "gui": "node bin/lehrosol.js gui",
+    "docs:build": "node docs/tools/build-docs.mjs",
+    "test": "node --test \"test/*.test.js\"",
+    "check": "find bin src docs/tools -name \"*.js\" -print0 | xargs -0 -n1 node --check",
+    "prepack": "npm run check && npm test && npm run docs:build",
+    "tui": "node bin/lehrosol.js tui --mode advanced",
+    "release:prepare": "node scripts/release.mjs dist",
+    "completion:bash": "node bin/lehrosol.js completions bash"
+  },
+  "keywords": [
+    "agentic",
+    "cli",
+    "mcp",
+    "loop-engineering",
+    "ralph-engineering",
+    "orchestration",
+    "harness-engineering",
+    "ai-agent",
+    "opensource",
+    "gpl",
+    "production-ready",
+    "tui",
+    "local-models",
+    "worktrees",
+    "tool-calling",
+    "agentic-missions",
+    "autonomous"
+  ],
+  "author": "Lehro Solutions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lehrosolutions/lehrosol-cli"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

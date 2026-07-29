@@ -1,0 +1,220 @@
+{
+  "title": "11 · Improving Your Workflow Using This Tool",
+  "description": "Installing LehroSol and running one command is easy; getting real leverage from it is a habit. This page collects the patterns worth adopting once the [Quickstart](10-how-to-use.md) is behind you.",
+  "sourceFile": "11-improving-your-workflow.md",
+  "readingMinutes": 4,
+  "wordCount": 811,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "The core habit loop",
+      "id": "the-core-habit-loop"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 1 — Start with `lehrosol -i` when you're exploring",
+      "id": "pattern-1-start-with-lehrosol-i-when-you-re-exploring"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 2 — Treat `fix_plan.md` as a queue, not a diary",
+      "id": "pattern-2-treat-fix-plan-md-as-a-queue-not-a-diary"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 3 — Match `--capabilityTier` to the adapter, not to your hopes",
+      "id": "pattern-3-match-capabilitytier-to-the-adapter-not-to-your-hopes"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 4 — Use orchestration for exploration, not just parallelism",
+      "id": "pattern-4-use-orchestration-for-exploration-not-just-parallelism"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 5 — Let the GUI be your supervision surface, not your driving seat",
+      "id": "pattern-5-let-the-gui-be-your-supervision-surface-not-your-driving-seat"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 6 — Widen `--owasp-scope` as the task gets more sensitive",
+      "id": "pattern-6-widen-owasp-scope-as-the-task-gets-more-sensitive"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 7 — Read the skill file before the deep-dive doc",
+      "id": "pattern-7-read-the-skill-file-before-the-deep-dive-doc"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 8 — Use the CLI's next-steps guidance",
+      "id": "pattern-8-use-the-cli-s-next-steps-guidance"
+    },
+    {
+      "level": 2,
+      "heading": "Pattern 9 — Use the Terminal GUI as your cockpit",
+      "id": "pattern-9-use-the-terminal-gui-as-your-cockpit"
+    },
+    {
+      "level": 2,
+      "heading": "Anti-patterns worth naming",
+      "id": "anti-patterns-worth-naming"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart LR\n    WRITE[\"Write a tight prompt\\n+ update fix_plan.md\"] --> RUN[\"lehrosol loop run\\n(or lehrosol -i for the wizard)\\n(pick adapter + capabilityTier)\"]\n    RUN --> GATE{\"Cleared the\\nharness pass bar?\"}\n    GATE -->|yes| SHIP[\"Review diff → merge\\n(never straight to main —\\nsee harness policy)\"]\n    GATE -->|no, budget left| RUN\n    GATE -->|no, budget exhausted| PLAN[\"fix_plan.md entry\\nauto-appended\"]\n    PLAN --> WRITE\n    SHIP --> RETRO[\"Skim docs/skills/*\\nfor the area you touched\\n+ check CLI output's\\nnext-steps guidance\"]\n    RETRO --> WRITE"
+  ],
+  "relatedDocs": [
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "Quickstart",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Loop Engine",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md#pass-bars-by-capability-tier"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "the GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "terminal UI layer",
+      "href": "01-architecture.md#the-terminal-ui-layer"
+    },
+    {
+      "text": "05 · Orchestration",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "docs/skills/README.md",
+      "href": "skills/README.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "Quickstart",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Loop Engine",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md#pass-bars-by-capability-tier"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "the GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "terminal UI layer",
+      "href": "01-architecture.md#the-terminal-ui-layer"
+    },
+    {
+      "text": "05 · Orchestration",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "docs/skills/README.md",
+      "href": "skills/README.md"
+    }
+  ]
+}

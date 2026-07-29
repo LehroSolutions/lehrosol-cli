@@ -1,0 +1,72 @@
+{
+  "title": "Skill: Docs Authoring",
+  "description": "**Use this skill when:** adding or updating any file under `docs/`, so it matches this design system and its `.json`/`.html` counterparts stay in sync.",
+  "sourceFile": "skills/docs-authoring.skill.md",
+  "readingMinutes": 2,
+  "wordCount": 316,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Workflow",
+      "id": "workflow"
+    },
+    {
+      "level": 2,
+      "heading": "Common pitfalls",
+      "id": "common-pitfalls"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "docs/README.md",
+      "href": "../README.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "../README.md"
+    },
+    {
+      "text": "docs/README.md",
+      "href": "../README.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "../09-agents-and-skills.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "docs/README.md",
+      "href": "../README.md"
+    },
+    {
+      "text": "Previous doc",
+      "href": "..."
+    },
+    {
+      "text": "Docs home",
+      "href": "../README.md"
+    },
+    {
+      "text": "Next doc",
+      "href": "..."
+    },
+    {
+      "text": "docs/README.md",
+      "href": "../README.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "../09-agents-and-skills.md"
+    }
+  ]
+}

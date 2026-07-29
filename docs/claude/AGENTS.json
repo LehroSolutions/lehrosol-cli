@@ -1,0 +1,113 @@
+{
+  "title": "Claude Code — deep-dive agent guide",
+  "description": "",
+  "sourceFile": "claude/AGENTS.md",
+  "readingMinutes": 3,
+  "wordCount": 536,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Two hats Claude Code wears in this repo",
+      "id": "two-hats-claude-code-wears-in-this-repo"
+    },
+    {
+      "level": 2,
+      "heading": "Role A — Claude Code editing LehroSol itself",
+      "id": "role-a-claude-code-editing-lehrosol-itself"
+    },
+    {
+      "level": 2,
+      "heading": "Role B — Claude Code as an adapter",
+      "id": "role-b-claude-code-as-an-adapter"
+    },
+    {
+      "level": 2,
+      "heading": "Permission & safety notes",
+      "id": "permission-safety-notes"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart LR\n    subgraph Role_A[\"Role A: Claude Code edits LehroSol\"]\n        H[Human] --> CC1[Claude Code]\n        CC1 -->|reads| CLAUDEmd[CLAUDE.md]\n        CLAUDEmd -->|points to| AGENTSmd[AGENTS.md]\n        CC1 -->|edits| REPO[(lehrosol-cli repo)]\n    end\n    subgraph Role_B[\"Role B: LehroSol drives Claude Code\"]\n        LOOP[Loop Engine] -->|execFile| ADAPTER[claudeCode.js adapter]\n        ADAPTER -->|\"claude --print --output-format json\"| CC2[Claude Code]\n        CC2 -->|edits| TARGET[(target repo)]\n        CC2 -->|json result| ADAPTER\n        ADAPTER -->|policyInput| HARNESS[Harness / Score Agent]\n    end"
+  ],
+  "relatedDocs": [
+    {
+      "text": "docs/README.md",
+      "href": "../README.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    },
+    {
+      "text": "docs/08-agent-adapters.md",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "docs/04-harness-engineering.md",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "docs/09-agents-and-skills.md",
+      "href": "../09-agents-and-skills.md"
+    },
+    {
+      "text": "docs/08-agent-adapters.md",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "docs/03-loop-engineering.md",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "`CLAUDE.md`",
+      "href": "../../CLAUDE.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "docs/README.md",
+      "href": "../README.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    },
+    {
+      "text": "docs/08-agent-adapters.md",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "docs/04-harness-engineering.md",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "docs/09-agents-and-skills.md",
+      "href": "../09-agents-and-skills.md"
+    },
+    {
+      "text": "docs/08-agent-adapters.md",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "docs/03-loop-engineering.md",
+      "href": "../03-loop-engineering.md"
+    },
+    {
+      "text": "`CLAUDE.md`",
+      "href": "../../CLAUDE.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    }
+  ]
+}

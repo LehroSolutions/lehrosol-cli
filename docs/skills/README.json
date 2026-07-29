@@ -1,0 +1,87 @@
+{
+  "title": "Skills index",
+  "description": "Each file here is a short, task-scoped workflow (a \"skill\") any agent can be pointed at to do one specific job in this repo end to end, without needing the full [`AGENTS.md`](../../AGENTS.md) re-read every time. All skills assume `AGENTS.md`'s ground rules are already in effect.",
+  "sourceFile": "skills/README.md",
+  "readingMinutes": 1,
+  "wordCount": 104,
+  "sections": [],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart LR\n    AGENTS[\"AGENTS.md\\n(ground rules)\"] --> S1[loop-engineering.skill.md]\n    AGENTS --> S2[harness-verification.skill.md]\n    AGENTS --> S3[orchestration.skill.md]\n    AGENTS --> S4[adapter-authoring.skill.md]\n    AGENTS --> S5[gui-dashboard.skill.md]\n    AGENTS --> S6[docs-authoring.skill.md]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "../09-agents-and-skills.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "../README.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    },
+    {
+      "text": "loop-engineering.skill.md",
+      "href": "loop-engineering.skill.md"
+    },
+    {
+      "text": "harness-verification.skill.md",
+      "href": "harness-verification.skill.md"
+    },
+    {
+      "text": "orchestration.skill.md",
+      "href": "orchestration.skill.md"
+    },
+    {
+      "text": "adapter-authoring.skill.md",
+      "href": "adapter-authoring.skill.md"
+    },
+    {
+      "text": "gui-dashboard.skill.md",
+      "href": "gui-dashboard.skill.md"
+    },
+    {
+      "text": "docs-authoring.skill.md",
+      "href": "docs-authoring.skill.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "../09-agents-and-skills.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "../README.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    },
+    {
+      "text": "loop-engineering.skill.md",
+      "href": "loop-engineering.skill.md"
+    },
+    {
+      "text": "harness-verification.skill.md",
+      "href": "harness-verification.skill.md"
+    },
+    {
+      "text": "orchestration.skill.md",
+      "href": "orchestration.skill.md"
+    },
+    {
+      "text": "adapter-authoring.skill.md",
+      "href": "adapter-authoring.skill.md"
+    },
+    {
+      "text": "gui-dashboard.skill.md",
+      "href": "gui-dashboard.skill.md"
+    },
+    {
+      "text": "docs-authoring.skill.md",
+      "href": "docs-authoring.skill.md"
+    }
+  ]
+}

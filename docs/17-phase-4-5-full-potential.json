@@ -1,0 +1,58 @@
+{
+  "title": "17 · Phase 4, Phase 5 & Full-Potential Layer",
+  "description": "",
+  "sourceFile": "17-phase-4-5-full-potential.md",
+  "readingMinutes": 1,
+  "wordCount": 229,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Phase 4 — supervisor scale-out",
+      "id": "phase-4-supervisor-scale-out"
+    },
+    {
+      "level": 2,
+      "heading": "Phase 5 — trusted distribution and editor handoff",
+      "id": "phase-5-trusted-distribution-and-editor-handoff"
+    },
+    {
+      "level": 2,
+      "heading": "Beyond the roadmap",
+      "id": "beyond-the-roadmap"
+    },
+    {
+      "level": 2,
+      "heading": "Verification",
+      "id": "verification"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "Orchestration",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "MCP",
+      "href": "06-mcp-control-plane.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "Orchestration",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "MCP",
+      "href": "06-mcp-control-plane.md"
+    }
+  ]
+}

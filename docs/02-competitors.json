@@ -1,0 +1,143 @@
+{
+  "title": "02 · Competitive Landscape",
+  "description": "| Tool | License | Focus | Gap LehroSol fills |",
+  "sourceFile": "02-competitors.md",
+  "readingMinutes": 2,
+  "wordCount": 377,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Where each competitor sits",
+      "id": "where-each-competitor-sits"
+    },
+    {
+      "level": 2,
+      "heading": "LehroSol's differentiation",
+      "id": "lehrosol-s-differentiation"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nquadrantChart\n    title Coverage: single-agent vs multi-agent, no-harness vs verification-gated\n    x-axis \"Single agent\" --> \"Multi-agent orchestration\"\n    y-axis \"No verification gate\" --> \"Harness / policy verification gate\"\n    quadrant-1 \"Orchestrated + verified\"\n    quadrant-2 \"Single-agent + verified\"\n    quadrant-3 \"Single-agent, no gate\"\n    quadrant-4 \"Orchestrated, no gate\"\n    \"Claude Code / Codex CLI\": [0.15, 0.2]\n    \"OpenCode\": [0.2, 0.15]\n    \"Goose\": [0.25, 0.1]\n    \"cmux (craigsc)\": [0.55, 0.15]\n    \"mux (coder/mux)\": [0.6, 0.2]\n    \"cmux (manaflow-ai)\": [0.5, 0.35]\n    \"AWS CLI Agent Orchestrator\": [0.65, 0.3]\n    \"Hermes Agent\": [0.7, 0.25]\n    \"LehroSol CLI\": [0.85, 0.9]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Orchestrator",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "Ralph-style loop engine",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "harness/policy verification gate (OWASP-scoped)",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "git-worktree multi-agent orchestration",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "MCP endpoint",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Orchestrator",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "Ralph-style loop engine",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "harness/policy verification gate (OWASP-scoped)",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "git-worktree multi-agent orchestration",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "MCP endpoint",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ]
+}

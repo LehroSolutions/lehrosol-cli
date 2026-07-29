@@ -1,0 +1,213 @@
+{
+  "title": "LehroSol CLI — Docs",
+  "description": "",
+  "sourceFile": "README.md",
+  "readingMinutes": 4,
+  "wordCount": 795,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Map of the docs",
+      "id": "map-of-the-docs"
+    },
+    {
+      "level": 2,
+      "heading": "Reading order",
+      "id": "reading-order"
+    },
+    {
+      "level": 3,
+      "heading": "Understand the system",
+      "id": "understand-the-system"
+    },
+    {
+      "level": 3,
+      "heading": "Use, extend, and audit it",
+      "id": "use-extend-and-audit-it"
+    },
+    {
+      "level": 2,
+      "heading": "Build progress at a glance",
+      "id": "build-progress-at-a-glance"
+    },
+    {
+      "level": 2,
+      "heading": "Design language",
+      "id": "design-language"
+    },
+    {
+      "level": 2,
+      "heading": "File formats, per doc",
+      "id": "file-formats-per-doc"
+    },
+    {
+      "level": 2,
+      "heading": "\"Ultra-linked\" by design",
+      "id": "ultra-linked-by-design"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    README[\"docs/README.md\\n(you are here)\"] --> ARCH[\"01 · Architecture\"]\n    README --> COMP[\"02 · Competitive Landscape\"]\n    README --> LOOP[\"03 · Loop Engineering\"]\n    README --> HARN[\"04 · Harness Engineering\"]\n    README --> ORCH[\"05 · Orchestration Engineering\"]\n    README --> MCP[\"06 · MCP Control Plane\"]\n    README --> GUI[\"07 · GUI Dashboard\"]\n    README --> ADAPT[\"08 · Agent Adapters\"]\n    README --> AGSK[\"09 · Agents & Skills Map\"]\n    README --> HOWTO[\"10 · How to Use This\"]\n    README --> WORKFLOW[\"11 · Improving Your Workflow\"]\n    README --> ADR[\"12 · ADRs\"]\n    README --> WIKI[\"13 · DeepWiki\"]\n    README --> AUDIT[\"14 · Audit Report\"]\n    README --> TUI[\"15 · Terminal GUI\"]\n    README --> DS[\"16 · Design System (HELIX)\"]\n    ARCH --> LOOP\n    ARCH --> HARN\n    ARCH --> ORCH\n    ARCH --> MCP\n    ARCH --> GUI\n    LOOP --> ADAPT\n    ORCH --> ADAPT\n    HARN --> LOOP\n    MCP --> GUI\n    MCP --> LOOP\n    MCP --> ORCH\n    AGSK --> LOOP\n    AGSK --> HARN\n    AGSK --> ORCH\n    AGSK --> SKILLS[\"skills/ (baked-in workflow skills)\"]\n    AGSK --> CLAUDEDIR[\"claude/AGENTS.md\"]\n    HOWTO --> WORKFLOW\n    WORKFLOW --> ADR\n    ADR --> WIKI\n    WIKI --> AUDIT\n    AUDIT --> TUI\n    TUI --> DS\n    DS --> GUI\n    DS --> ARCH\n    TUI --> ARCH\n    WIKI --> ARCH\n    WIKI -.\"full file-by-file index\".-> SKILLS\n    ADR -.\"decisions behind\".-> ARCH\n    ADR -.\"decisions behind\".-> GUI\n    ADR -.\"decisions behind\".-> ORCH",
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee'}}}%%\nflowchart LR\n    MD[\"name.md\\n(source of truth,\\nhuman + agent readable)\"] -->|docs/tools/build-docs.mjs| JSON[\"name.json\\n(structured, for tools/agents)\"]\n    MD -->|docs/tools/build-docs.mjs| HTML[\"name.html\\n(dark-HUD themed,\\nlive Mermaid render)\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "Competitive Landscape",
+      "href": "02-competitors.md"
+    },
+    {
+      "text": "Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Design System (HELIX)",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "`skills/`",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "`claude/AGENTS.md`",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "docs/skills/docs-authoring.skill.md",
+      "href": "skills/docs-authoring.skill.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "Competitive Landscape",
+      "href": "02-competitors.md"
+    },
+    {
+      "text": "Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Design System (HELIX)",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "`skills/`",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "`claude/AGENTS.md`",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "Mermaid",
+      "href": "https://mermaid.js.org/"
+    },
+    {
+      "text": "docs/skills/docs-authoring.skill.md",
+      "href": "skills/docs-authoring.skill.md"
+    }
+  ]
+}

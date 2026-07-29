@@ -1,0 +1,80 @@
+{
+  "title": "Skill: Adapter Authoring",
+  "description": "**Use this skill when:** adding a new agent-CLI adapter (adapter #9 and beyond) to `src/loop/adapters/`.",
+  "sourceFile": "skills/adapter-authoring.skill.md",
+  "readingMinutes": 1,
+  "wordCount": 299,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Workflow",
+      "id": "workflow"
+    },
+    {
+      "level": 2,
+      "heading": "Common pitfalls",
+      "id": "common-pitfalls"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "../09-agents-and-skills.md"
+    },
+    {
+      "text": "harness",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "../08-agent-adapters.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "../09-agents-and-skills.md"
+    },
+    {
+      "text": "harness",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../../AGENTS.md"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "title": "Skill: Orchestration",
+  "description": "**Use this skill when:** working on `src/orchestrator/`, debugging a `git worktree` issue, or extending the supervisor's recovery strategies.",
+  "sourceFile": "skills/orchestration.skill.md",
+  "readingMinutes": 1,
+  "wordCount": 218,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Workflow",
+      "id": "workflow"
+    },
+    {
+      "level": 2,
+      "heading": "Common pitfalls",
+      "id": "common-pitfalls"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "../05-orchestration-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "../05-orchestration-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "../05-orchestration-engineering.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "../05-orchestration-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "../05-orchestration-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "../05-orchestration-engineering.md"
+    }
+  ]
+}

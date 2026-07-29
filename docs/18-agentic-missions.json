@@ -1,0 +1,42 @@
+{
+  "title": "18 — Agentic Missions & Guided Onboarding (v3.0.0)",
+  "description": "v3.0.0 turns LehroSol from a set of agentic tools into an autonomous agent harness: you state a **goal**, the mission engine plans, executes, verifies, and adapts — with every step graded by the harness and persisted as evidence.",
+  "sourceFile": "18-agentic-missions.md",
+  "readingMinutes": 2,
+  "wordCount": 495,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "The mission loop",
+      "id": "the-mission-loop"
+    },
+    {
+      "level": 2,
+      "heading": "Autonomy policy",
+      "id": "autonomy-policy"
+    },
+    {
+      "level": 2,
+      "heading": "Commands",
+      "id": "commands"
+    },
+    {
+      "level": 2,
+      "heading": "Guided onboarding",
+      "id": "guided-onboarding"
+    },
+    {
+      "level": 2,
+      "heading": "TUI & MCP surfaces",
+      "id": "tui-mcp-surfaces"
+    },
+    {
+      "level": 2,
+      "heading": "Design guarantees",
+      "id": "design-guarantees"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [],
+  "allLinks": []
+}

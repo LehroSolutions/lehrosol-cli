@@ -1,0 +1,64 @@
+{
+  "title": "Skill: Harness Verification",
+  "description": "**Use this skill when:** adding a new policy rule, a new OWASP check, or a new scanner heuristic.",
+  "sourceFile": "skills/harness-verification.skill.md",
+  "readingMinutes": 1,
+  "wordCount": 252,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Workflow",
+      "id": "workflow"
+    },
+    {
+      "level": 2,
+      "heading": "Common pitfalls",
+      "id": "common-pitfalls"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "Skills index",
+      "href": "README.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "../04-harness-engineering.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "../03-loop-engineering.md"
+    }
+  ]
+}

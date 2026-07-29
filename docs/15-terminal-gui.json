@@ -1,0 +1,207 @@
+{
+  "title": "15 · Terminal GUI — The HELIX Console (Immersive In-CLI Cockpit)",
+  "description": "LehroSol ships a **GUI that lives inside the terminal** — not just the browser dashboard in `gui/`. `lehrosol tui` launches the **HELIX Console**: a live, animated, keyboard-driven agentic cockpit built on the [HELIX design system](16-design-system.md). It is a CMUX-class control surface for loop + harness + orchestration, tuned for every skill stage (basic → intermediate → advanced), and it stays **zero-dependency**: pure Node.js + ANSI/Unicode, no `blessed`, `ink`, `tui`, or native UI libraries.",
+  "sourceFile": "15-terminal-gui.md",
+  "readingMinutes": 9,
+  "wordCount": 1836,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "What “immersive” means here",
+      "id": "what-immersive-means-here"
+    },
+    {
+      "level": 2,
+      "heading": "Run it",
+      "id": "run-it"
+    },
+    {
+      "level": 2,
+      "heading": "Keybindings",
+      "id": "keybindings"
+    },
+    {
+      "level": 2,
+      "heading": "Architecture",
+      "id": "architecture"
+    },
+    {
+      "level": 2,
+      "heading": "Modes",
+      "id": "modes"
+    },
+    {
+      "level": 2,
+      "heading": "Panels",
+      "id": "panels"
+    },
+    {
+      "level": 2,
+      "heading": "How this differs from the web GUI",
+      "id": "how-this-differs-from-the-web-gui"
+    },
+    {
+      "level": 2,
+      "heading": "Implementation files",
+      "id": "implementation-files"
+    },
+    {
+      "level": 2,
+      "heading": "Graceful degradation contract",
+      "id": "graceful-degradation-contract"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    },
+    {
+      "level": 2,
+      "heading": "Full interactivity — every panel is live",
+      "id": "full-interactivity-every-panel-is-live"
+    },
+    {
+      "level": 3,
+      "heading": "What Enter does per panel",
+      "id": "what-enter-does-per-panel"
+    },
+    {
+      "level": 3,
+      "heading": "How actions run without freezing the UI",
+      "id": "how-actions-run-without-freezing-the-ui"
+    },
+    {
+      "level": 2,
+      "heading": "TUI hotkey audit upgrade",
+      "id": "tui-hotkey-audit-upgrade"
+    },
+    {
+      "level": 3,
+      "heading": "Audit findings",
+      "id": "audit-findings"
+    },
+    {
+      "level": 3,
+      "heading": "Tested contract",
+      "id": "tested-contract"
+    },
+    {
+      "level": 2,
+      "heading": "Live adapter behavior",
+      "id": "live-adapter-behavior"
+    },
+    {
+      "level": 2,
+      "heading": "HELIX cockpit upgrades (Grok + CMUX features)",
+      "id": "helix-cockpit-upgrades-grok-cmux-features"
+    },
+    {
+      "level": 2,
+      "heading": "Executable overlays and model control plane (v1.2.0)",
+      "id": "executable-overlays-and-model-control-plane-v1-2-0"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    TUI[\"lehrosol tui\"] --> CAP{\"motionEnabled()?\\nTTY + color + not CI\"}\n    CAP -->|yes| LIVE[\"runLiveDashboard()\"]\n    CAP -->|no| STATIC[\"static paint (one frame)\"]\n    LIVE --> LOOP[\"anim.runLiveLoop()\\nalt-screen · raw keys · fps\"]\n    LOOP --> KEYS[\"keyboard: 1/2/3 · arrows · d a s p · r · ? · q\"]\n    LOOP --> COMPOSE[\"composeFrame(snapshot, ctx)\"]\n    STATIC --> COMPOSE\n    COMPOSE --> HEADER[\"header(): shimmer wordmark + comet bus + clock\"]\n    COMPOSE --> PANELS[\"panels: health · adapters · sessions · policy · orchestration · actions\"]\n    COMPOSE --> FOOTER[\"footer(): HUD keybar\"]\n    SNAP[\"buildTuiSnapshot()\"] --> COMPOSE\n    SNAP --> DOCTOR[\"doctor checks\"]\n    SNAP --> ADAPTERS[\"adapter registry\"]\n    SNAP --> SESSIONS[\"session store\"]\n    SNAP --> POLICY[\"policy preview\"]\n    SNAP --> WORKERS[\"worktree registry\"]\n    HEADER --> THEME[\"HELIX design system (theme.js)\"]\n    PANELS --> THEME\n    FOOTER --> THEME\n    LOOP --> MOTION[\"motion engine (anim.js)\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "16 · Design System",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "HELIX design system",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "16 · Design System",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "frontier tool calling",
+      "href": "08-agent-adapters.md#frontier-tool-calling"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "16 · Design System",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "HELIX design system",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "16 · Design System",
+      "href": "16-design-system.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "14 · Audit Report",
+      "href": "14-audit-report.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "frontier tool calling",
+      "href": "08-agent-adapters.md#frontier-tool-calling"
+    }
+  ]
+}

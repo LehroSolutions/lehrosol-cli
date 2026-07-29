@@ -1,0 +1,159 @@
+{
+  "title": "10 · How to Use This",
+  "description": "A hands-on walkthrough from \"never installed it\" to \"running a graded, orchestrated agent loop.\" If [01 · Architecture](01-architecture.md) is the map, this is the actual drive.",
+  "sourceFile": "10-how-to-use.md",
+  "readingMinutes": 3,
+  "wordCount": 685,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Pick an install path",
+      "id": "pick-an-install-path"
+    },
+    {
+      "level": 2,
+      "heading": "Two ways to drive it: flags or interactive wizard",
+      "id": "two-ways-to-drive-it-flags-or-interactive-wizard"
+    },
+    {
+      "level": 2,
+      "heading": "Quickstart: your first 10 minutes",
+      "id": "quickstart-your-first-10-minutes"
+    },
+    {
+      "level": 2,
+      "heading": "Step by step",
+      "id": "step-by-step"
+    },
+    {
+      "level": 2,
+      "heading": "Command cheat-sheet",
+      "id": "command-cheat-sheet"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    START{\"What do you have?\"}\n    START -->|\"Node.js 20+\\nand npm\"| NPM[\"npm i -g lehrosol-cli\"]\n    START -->|\"Bun installed\"| BUN[\"bun install -g lehrosol-cli\\n(or: bunx lehrosol-cli ...)\"]\n    START -->|\"Just a shell,\\nno package manager yet\"| CURL[\"curl -fsSL <install-url> | bash\\n(detects bun/npm, else symlinks bin/lehrosol.js)\"]\n    NPM --> VERIFY[\"lehrosol doctor\"]\n    BUN --> VERIFY\n    CURL --> VERIFY\n    VERIFY -->|\"all green\"| READY[\"Ready — try interactive mode!\"]\n    READY --> INT[\"lehrosol -i\\n(guided wizard, no flags needed)\"]\n    VERIFY -->|\"missing adapter binaries\"| ADAPT[\"That's fine — see 08 · Agent Adapters.\\n'local' adapter always works for a dry run.\"]",
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nsequenceDiagram\n    participant You\n    participant CLI as lehrosol\n    You->>CLI: lehrosol doctor\n    CLI-->>You: themed health-check table (pass/warn/fail per check)\n    You->>CLI: lehrosol init\n    CLI-->>You: planned-files table + created summary + next steps\n    You->>CLI: lehrosol -i  (interactive wizard)\n    CLI-->>You: select workflow → guided prompts → run\n    You->>CLI: lehrosol loop run --prompt \"add a health-check endpoint\" --agentAdapter local\n    CLI-->>You: config table + spinner + iteration progress bars + session summary\n    You->>CLI: lehrosol sessions show --id <id>\n    CLI-->>You: detail view with checkpoint table\n    You->>CLI: lehrosol gui\n    CLI-->>You: themed startup + tool listing + next steps"
+  ],
+  "relatedDocs": [
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "8 agent adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "harness",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "8 agent adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "harness",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "11 · Improving Your Workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    }
+  ]
+}

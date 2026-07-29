@@ -1,0 +1,228 @@
+{
+  "title": "09 · Agents & Skills Map",
+  "description": "This page is the single map of **every dedicated instruction file baked into this repo**, **which coding agent auto-discovers each one**, and **every baked-in workflow skill** any agent can be pointed at for a specific task. It exists so no agent has to guess where its own rules live, and so every agent's rules stay in sync instead of drifting into separate copies.",
+  "sourceFile": "09-agents-and-skills.md",
+  "readingMinutes": 3,
+  "wordCount": 637,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Why dedicated files per agent, instead of one file",
+      "id": "why-dedicated-files-per-agent-instead-of-one-file"
+    },
+    {
+      "level": 2,
+      "heading": "Which file each LLM/agent CLI actually reads",
+      "id": "which-file-each-llm-agent-cli-actually-reads"
+    },
+    {
+      "level": 2,
+      "heading": "Baked-in workflow skills",
+      "id": "baked-in-workflow-skills"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TB\n    CANON[\"AGENTS.md\\n(canonical rules, repo root)\"]\n    CANON --> AGENTMD[\"src/loop/agentMd.js\\nreadAgentMd() feeds this\\ninto every Loop Engine iteration\"]\n    CANON -.pointer.-> CLAUDE[\"CLAUDE.md (root)\\nread by: Claude Code\"]\n    CANON -.pointer.-> GEMINI[\"GEMINI.md (root)\\nread by: Gemini CLI\"]\n    CANON -.\"already reads AGENTS.md\\nnatively\".-> CODEX[\"Codex CLI\"]\n    CANON -.\"already reads AGENTS.md\\nnatively\".-> OPENCODE[\"OpenCode\"]\n    CANON -.\"pointed at via\\n--read / config\".-> AIDER[\"Aider\"]\n    CANON -.\"pointed at via\\nagent config\".-> GOOSE[\"Goose\"]\n    CANON -.\"pointed at via\\nagent config\".-> HERMES[\"Hermes Agent\"]\n    CLAUDE --> DEEPCLAUDE[\"docs/claude/AGENTS.md\\n(deep dive)\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "`docs/skills/`",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "skills/loop-engineering.skill.md",
+      "href": "skills/loop-engineering.skill.md"
+    },
+    {
+      "text": "skills/harness-verification.skill.md",
+      "href": "skills/harness-verification.skill.md"
+    },
+    {
+      "text": "skills/orchestration.skill.md",
+      "href": "skills/orchestration.skill.md"
+    },
+    {
+      "text": "skills/adapter-authoring.skill.md",
+      "href": "skills/adapter-authoring.skill.md"
+    },
+    {
+      "text": "skills/gui-dashboard.skill.md",
+      "href": "skills/gui-dashboard.skill.md"
+    },
+    {
+      "text": "skills/docs-authoring.skill.md",
+      "href": "skills/docs-authoring.skill.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "`CLAUDE.md`",
+      "href": "../CLAUDE.md"
+    },
+    {
+      "text": "`GEMINI.md`",
+      "href": "../GEMINI.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "`docs/skills/`",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "skills/loop-engineering.skill.md",
+      "href": "skills/loop-engineering.skill.md"
+    },
+    {
+      "text": "skills/harness-verification.skill.md",
+      "href": "skills/harness-verification.skill.md"
+    },
+    {
+      "text": "skills/orchestration.skill.md",
+      "href": "skills/orchestration.skill.md"
+    },
+    {
+      "text": "skills/adapter-authoring.skill.md",
+      "href": "skills/adapter-authoring.skill.md"
+    },
+    {
+      "text": "skills/gui-dashboard.skill.md",
+      "href": "skills/gui-dashboard.skill.md"
+    },
+    {
+      "text": "skills/docs-authoring.skill.md",
+      "href": "skills/docs-authoring.skill.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "`CLAUDE.md`",
+      "href": "../CLAUDE.md"
+    },
+    {
+      "text": "`GEMINI.md`",
+      "href": "../GEMINI.md"
+    }
+  ]
+}

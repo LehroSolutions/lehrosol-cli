@@ -1,0 +1,134 @@
+{
+  "title": "06 · MCP Control Plane",
+  "description": "",
+  "sourceFile": "06-mcp-control-plane.md",
+  "readingMinutes": 1,
+  "wordCount": 297,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Why MCP",
+      "id": "why-mcp"
+    },
+    {
+      "level": 2,
+      "heading": "Tool registry",
+      "id": "tool-registry"
+    },
+    {
+      "level": 2,
+      "heading": "Request lifecycle",
+      "id": "request-lifecycle"
+    },
+    {
+      "level": 2,
+      "heading": "Transports",
+      "id": "transports"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart LR\n    subgraph Registry[\"TOOL_DEFINITIONS — src/mcp/tools.js\"]\n        T1[doctor_check]\n        T2[policy_evaluate]\n        T3[loop_run]\n        T4[adapters_list]\n        T5[sessions_list]\n        T6[sessions_show]\n        T7[orchestrate_spawn]\n        T8[orchestrate_list]\n        T9[orchestrate_remove]\n    end\n    T1 --> doctorLogic[\"src/commands/doctorLogic.js\"]\n    T2 --> policy[\"src/harness/policy.js + owasp.js\"]\n    T3 --> loop[\"src/loop/loop.js\"]\n    T4 --> adapters[\"src/loop/adapters/index.js\"]\n    T5 & T6 --> store[\"src/core/sessionStore.js\"]\n    T7 & T8 & T9 --> worktree[\"src/orchestrator/worktree.js\"]",
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nsequenceDiagram\n    participant C as Client (GUI / agent CLI)\n    participant S as src/mcp/server.js\n    participant R as Tool registry\n    participant F as Backing function\n\n    C->>S: JSON-RPC { method: \"initialize\" }\n    S-->>C: capabilities\n    C->>S: JSON-RPC { method: \"tools/list\" }\n    S->>R: listTools()\n    R-->>S: 9 tool definitions (name, description, inputSchema)\n    S-->>C: tools[]\n    C->>S: JSON-RPC { method: \"tools/call\", params: { name, arguments } }\n    S->>R: executeTool(name, arguments)\n    R->>F: call backing function\n    F-->>R: result\n    R-->>S: result\n    S-->>C: JSON-RPC result"
+  ],
+  "relatedDocs": [
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "terminal",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "Model Context Protocol",
+      "href": "https://modelcontextprotocol.io"
+    },
+    {
+      "text": "terminal",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "GUI",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "`AGENTS.md`",
+      "href": "../AGENTS.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    }
+  ]
+}

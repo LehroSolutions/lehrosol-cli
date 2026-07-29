@@ -1,0 +1,203 @@
+{
+  "title": "08 · Agent Adapters",
+  "description": "",
+  "sourceFile": "08-agent-adapters.md",
+  "readingMinutes": 7,
+  "wordCount": 1431,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "The shared contract",
+      "id": "the-shared-contract"
+    },
+    {
+      "level": 2,
+      "heading": "Every adapter, side by side",
+      "id": "every-adapter-side-by-side"
+    },
+    {
+      "level": 2,
+      "heading": "Graceful degradation",
+      "id": "graceful-degradation"
+    },
+    {
+      "level": 2,
+      "heading": "Safety",
+      "id": "safety"
+    },
+    {
+      "level": 2,
+      "heading": "Adding a new adapter",
+      "id": "adding-a-new-adapter"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    },
+    {
+      "level": 2,
+      "heading": "Adapter kinds: CLI, HTTP, and custom",
+      "id": "adapter-kinds-cli-http-and-custom"
+    },
+    {
+      "level": 3,
+      "heading": "OpenAI-compatible HTTP adapters (Ollama, NVIDIA, and any endpoint)",
+      "id": "openai-compatible-http-adapters-ollama-nvidia-and-any-endpoint"
+    },
+    {
+      "level": 3,
+      "heading": "Custom adapters — usable with ANY open-source agent",
+      "id": "custom-adapters-usable-with-any-open-source-agent"
+    },
+    {
+      "level": 2,
+      "heading": "Frontier tool calling",
+      "id": "frontier-tool-calling"
+    },
+    {
+      "level": 2,
+      "heading": "Adapter correctness audit — live means live",
+      "id": "adapter-correctness-audit-live-means-live"
+    },
+    {
+      "level": 3,
+      "heading": "Fixes from the live-adapter audit",
+      "id": "fixes-from-the-live-adapter-audit"
+    },
+    {
+      "level": 3,
+      "heading": "Current researched defaults",
+      "id": "current-researched-defaults"
+    },
+    {
+      "level": 2,
+      "heading": "First-class adapter configuration",
+      "id": "first-class-adapter-configuration"
+    },
+    {
+      "level": 3,
+      "heading": "Commands",
+      "id": "commands"
+    },
+    {
+      "level": 3,
+      "heading": "Supported local model endpoints",
+      "id": "supported-local-model-endpoints"
+    },
+    {
+      "level": 3,
+      "heading": "CLI adapters with saved binary paths",
+      "id": "cli-adapters-with-saved-binary-paths"
+    },
+    {
+      "level": 2,
+      "heading": "xAI Grok models",
+      "id": "xai-grok-models"
+    },
+    {
+      "level": 2,
+      "heading": "Model profiles and endpoint probes (v1.2.0)",
+      "id": "model-profiles-and-endpoint-probes-v1-2-0"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart LR\n    LOOP[\"Loop Engine\"] --> IDX[\"adapters/index.js\\nADAPTERS registry\"]\n    IDX --> FACT[\"makeCliAdapter.js\\n(shared factory)\"]\n    FACT --> C1[claudeCode.js]\n    FACT --> C2[codex.js]\n    FACT --> C3[opencode.js]\n    FACT --> C4[geminiCli.js]\n    FACT --> C5[aider.js]\n    FACT --> C6[goose.js]\n    FACT --> C7[hermesAgent.js]\n    LOOP --> C8[local.js\\n(always available, no exec)]\n    C1 & C2 & C3 & C4 & C5 & C6 & C7 -->|execFile, arg array\\nnever a shell string| BIN[(\"external CLI binary\\non PATH\")]\n    BIN -->|git diff| DIFF[\"shared.js: deriveChangedFiles()\"]\n    DIFF --> POLICY[\"policyInput\\n→ Harness\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "Loop Engine",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "Orchestrator's supervisor",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "skills/adapter-authoring.skill.md",
+      "href": "skills/adapter-authoring.skill.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "Loop Engine",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "Orchestrator's supervisor",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "skills/adapter-authoring.skill.md",
+      "href": "skills/adapter-authoring.skill.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "docs/claude/AGENTS.md",
+      "href": "claude/AGENTS.md"
+    },
+    {
+      "text": "tool registry",
+      "href": "#frontier-tool-calling"
+    }
+  ]
+}

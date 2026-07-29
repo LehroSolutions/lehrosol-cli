@@ -1,0 +1,129 @@
+{
+  "title": "16 · HELIX — The LehroSol Terminal Design System",
+  "description": "**HELIX** is LehroSol's terminal design system: one zero-dependency source of truth for color, typography, glyphs, spacing, motion, and component primitives shared across the CLI *and* the in-terminal GUI ([the HELIX Console](15-terminal-gui.md)). The goal is blunt — an agentic terminal experience that **out-classes every other CLI agent tool**: immersive, legible, and consistent at every stage, on every terminal.",
+  "sourceFile": "16-design-system.md",
+  "readingMinutes": 4,
+  "wordCount": 777,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Principles",
+      "id": "principles"
+    },
+    {
+      "level": 2,
+      "heading": "The “Deep HUD” palette",
+      "id": "the-deep-hud-palette"
+    },
+    {
+      "level": 3,
+      "heading": "Signature gradients",
+      "id": "signature-gradients"
+    },
+    {
+      "level": 2,
+      "heading": "Component primitives (theme.js)",
+      "id": "component-primitives-theme-js"
+    },
+    {
+      "level": 2,
+      "heading": "Motion primitives (anim.js)",
+      "id": "motion-primitives-anim-js"
+    },
+    {
+      "level": 2,
+      "heading": "Capability detection & overrides",
+      "id": "capability-detection-overrides"
+    },
+    {
+      "level": 2,
+      "heading": "Using HELIX in a new command",
+      "id": "using-helix-in-a-new-command"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart LR\n    BG[\"bg #05070a\"] --> SURF[\"surface #0f1720\"]\n    SURF --> LINE[\"line #22303f\"]\n    subgraph Accents\n      CY[\"cyan #22d3ee (brand)\"]\n      TE[\"teal #2dd4bf (accent)\"]\n      GR[\"green #34d399 (ok)\"]\n      AM[\"amber #fbbf24 (warn)\"]\n      RE[\"red #f87171 (danger)\"]\n      VI[\"violet #a78bfa (brandAlt)\"]\n      BL[\"blue #38bdf8 (info)\"]\n    end\n    LINE --> Accents",
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee'}}}%%\nflowchart TD\n    START[\"process env + stdout\"] --> C{\"NO_COLOR / FORCE_COLOR?\"}\n    C -->|NO_COLOR| L0[\"level 0 (plain)\"]\n    C -->|else| T{\"isTTY?\"}\n    T -->|no| L0\n    T -->|yes| CT{\"COLORTERM / TERM\"}\n    CT -->|truecolor| L3[\"level 3 (24-bit)\"]\n    CT -->|-256color| L2[\"level 2 (256)\"]\n    CT -->|otherwise| L3\n    L0 --> U{\"LEHRO_ASCII?\"}\n    L3 --> U\n    L2 --> U\n    U -->|set| ASCII[\"ascii glyphs + boxes\"]\n    U -->|unset| UNI[\"unicode glyphs + boxes\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "the HELIX Console",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "12 · ADRs",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "the HELIX Console",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "12 · ADRs",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "09 · Agents & Skills Map",
+      "href": "09-agents-and-skills.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    }
+  ]
+}

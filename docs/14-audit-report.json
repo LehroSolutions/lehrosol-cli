@@ -1,0 +1,148 @@
+{
+  "title": "14 · Audit Report — Parser, Persistence, Policy, and Scanner Hardening",
+  "description": "This report records the first full implementation audit of LehroSol CLI after the CLI/terminal UX upgrade. The audit was not just a read-through: every finding below was fixed, smoke-tested, and backed by regression tests.",
+  "sourceFile": "14-audit-report.md",
+  "readingMinutes": 6,
+  "wordCount": 1151,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Audit flow",
+      "id": "audit-flow"
+    },
+    {
+      "level": 2,
+      "heading": "Findings and fixes",
+      "id": "findings-and-fixes"
+    },
+    {
+      "level": 2,
+      "heading": "Regression tests added",
+      "id": "regression-tests-added"
+    },
+    {
+      "level": 2,
+      "heading": "Smoke-tested commands",
+      "id": "smoke-tested-commands"
+    },
+    {
+      "level": 2,
+      "heading": "Design principle reinforced",
+      "id": "design-principle-reinforced"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    },
+    {
+      "level": 2,
+      "heading": "Production-readiness audit — v1.0.0",
+      "id": "production-readiness-audit-v1-0-0"
+    },
+    {
+      "level": 3,
+      "heading": "Production blockers fixed",
+      "id": "production-blockers-fixed"
+    },
+    {
+      "level": 3,
+      "heading": "Production regression suite",
+      "id": "production-regression-suite"
+    },
+    {
+      "level": 2,
+      "heading": "v1.2.0 Grok + executable cockpit audit",
+      "id": "v1-2-0-grok-executable-cockpit-audit"
+    },
+    {
+      "level": 3,
+      "heading": "Findings (ordered by severity)",
+      "id": "findings-ordered-by-severity"
+    },
+    {
+      "level": 3,
+      "heading": "Verification",
+      "id": "verification"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    A[\"Audit source tree\\nrg risk markers + inspect core modules\"] --> B[\"Classify concrete findings\"]\n    B --> C[\"Patch CLI parser\\nshort flags + --key=value + booleans\"]\n    B --> D[\"Patch persistence UX\\nsuppress sqlite warning + fix sessions show\"]\n    B --> E[\"Patch orchestration schema\\nno stale main default\"]\n    B --> F[\"Patch scanner safety\\nrefuse path escape + size cap\"]\n    B --> G[\"Patch policy\\nmain + master protected by default\"]\n    C --> H[\"Regression tests\"]\n    D --> H\n    E --> H\n    F --> H\n    G --> H\n    H --> I[\"Full syntax audit + smoke tests + regenerated docs\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "01 · Architecture",
+      "href": "01-architecture.md"
+    },
+    {
+      "text": "12 · Architecture Decision Records",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "13 · DeepWiki",
+      "href": "13-deepwiki.md"
+    },
+    {
+      "text": "04 · Harness Engineering",
+      "href": "04-harness-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    }
+  ]
+}

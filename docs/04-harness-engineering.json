@@ -1,0 +1,115 @@
+{
+  "title": "04 · Harness Engineering",
+  "description": "",
+  "sourceFile": "04-harness-engineering.md",
+  "readingMinutes": 2,
+  "wordCount": 394,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "What \"harness engineering\" means here",
+      "id": "what-harness-engineering-means-here"
+    },
+    {
+      "level": 2,
+      "heading": "How a policy score is built",
+      "id": "how-a-policy-score-is-built"
+    },
+    {
+      "level": 2,
+      "heading": "OWASP rule packs",
+      "id": "owasp-rule-packs"
+    },
+    {
+      "level": 2,
+      "heading": "The built-in scanner is real, not just a checklist",
+      "id": "the-built-in-scanner-is-real-not-just-a-checklist"
+    },
+    {
+      "level": 2,
+      "heading": "Pass bars by capability tier",
+      "id": "pass-bars-by-capability-tier"
+    },
+    {
+      "level": 2,
+      "heading": "CLI reference",
+      "id": "cli-reference"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    IN[\"Input: branch, hasTests,\\nsecretScanPassed, reviewCount,\\nowaspScope, changed files\"] --> BASE{\"Base policy rules\"}\n    BASE -->|no tests| V1[\"violation: tests-required (-20)\"]\n    BASE -->|secret scan failed| V2[\"violation: secret-scan-failed (-20)\"]\n    BASE -->|reviewCount < 1| V3[\"violation: review-required (-20)\"]\n    BASE -->|branch == main| V4[\"violation: direct-main-merge-blocked (-20)\"]\n    BASE -->|owaspScope unset| W1[\"warning: owasp-scope-unset (-5)\"]\n    IN --> SCAN[\"scanOwaspBasics(files)\"]\n    SCAN -->|secret literal found| V5[\"violation: sensitive-information-disclosure\"]\n    SCAN -->|eval / new Function| V6[\"violation: insecure-design\"]\n    SCAN -->|exec with template/concat| V7[\"violation: injection\"]\n    SCAN -->|wildcard CORS| W2[\"warning: security-misconfiguration\"]\n    V1 & V2 & V3 & V4 & V5 & V6 & V7 --> SCORE[\"score = 100 - 20×errors - 5×warnings\"]\n    W1 & W2 --> SCORE\n    SCORE --> BAND{\"band\"}\n    BAND -->|score >= 90| GREEN[\"green\"]\n    BAND -->|70-89| AMBER[\"amber\"]\n    BAND -->|< 70| RED[\"red\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "loop iteration",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "orchestrated worker",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "skills/harness-verification.skill.md",
+      "href": "skills/harness-verification.skill.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "loop iteration",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "orchestrated worker",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "03 · Loop Engineering",
+      "href": "03-loop-engineering.md"
+    },
+    {
+      "text": "05 · Orchestration Engineering",
+      "href": "05-orchestration-engineering.md"
+    },
+    {
+      "text": "skills/harness-verification.skill.md",
+      "href": "skills/harness-verification.skill.md"
+    }
+  ]
+}

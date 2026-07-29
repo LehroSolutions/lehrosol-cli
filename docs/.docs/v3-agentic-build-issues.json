@@ -1,0 +1,32 @@
+{
+  "title": "v3.0.0 agentic missions — build issue log",
+  "description": "Loop-engineering log for the v3.0.0 pass (mission engine, autonomy policy, onboarding, TUI/MCP integration).",
+  "sourceFile": ".docs/v3-agentic-build-issues.md",
+  "readingMinutes": 1,
+  "wordCount": 258,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "Issue 1 — TUI quick-actions helper was not exported",
+      "id": "issue-1-tui-quick-actions-helper-was-not-exported"
+    },
+    {
+      "level": 2,
+      "heading": "Issue 2 — readonly autonomy needed a hard floor",
+      "id": "issue-2-readonly-autonomy-needed-a-hard-floor"
+    },
+    {
+      "level": 2,
+      "heading": "Issue 3 — recovery ladder must not fight adapter outages",
+      "id": "issue-3-recovery-ladder-must-not-fight-adapter-outages"
+    },
+    {
+      "level": 2,
+      "heading": "Verification",
+      "id": "verification"
+    }
+  ],
+  "mermaidDiagrams": [],
+  "relatedDocs": [],
+  "allLinks": []
+}
