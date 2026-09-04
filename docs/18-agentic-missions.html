@@ -209,20 +209,20 @@
     <a class="item active" href="18-agentic-missions.html" data-title="18 — agentic missions &amp; guided onboarding (v3.0.0)"><span class="num">18</span><span class="txt">18 — Agentic Missions &amp; Guided Onboarding (v3.0.0)</span></a>
   </div>
   <div class="nav-group"><div class="label">.docs</div>
-    <a class="item" href=".docs/phase-4-5-build-issues.html" data-title="phase 4/5 build issue log"><span class="num">◆</span><span class="txt">Phase 4/5 build issue log</span></a>
-    <a class="item" href=".docs/v3-agentic-build-issues.html" data-title="v3.0.0 agentic missions — build issue log"><span class="num">◆</span><span class="txt">v3.0.0 agentic missions — build issue log</span></a>
+    <a class="item" href=".docs\phase-4-5-build-issues.html" data-title="phase 4/5 build issue log"><span class="num">◆</span><span class="txt">Phase 4/5 build issue log</span></a>
+    <a class="item" href=".docs\v3-agentic-build-issues.html" data-title="v3.0.0 agentic missions — build issue log"><span class="num">◆</span><span class="txt">v3.0.0 agentic missions — build issue log</span></a>
   </div>
   <div class="nav-group"><div class="label">Claude</div>
-    <a class="item" href="claude/AGENTS.html" data-title="claude code — deep-dive agent guide"><span class="num">◆</span><span class="txt">Claude Code — deep-dive agent guide</span></a>
+    <a class="item" href="claude\AGENTS.html" data-title="claude code — deep-dive agent guide"><span class="num">◆</span><span class="txt">Claude Code — deep-dive agent guide</span></a>
   </div>
   <div class="nav-group"><div class="label">Skills</div>
-    <a class="item" href="skills/adapter-authoring.skill.html" data-title="skill: adapter authoring"><span class="num">◆</span><span class="txt">Skill: Adapter Authoring</span></a>
-    <a class="item" href="skills/docs-authoring.skill.html" data-title="skill: docs authoring"><span class="num">◆</span><span class="txt">Skill: Docs Authoring</span></a>
-    <a class="item" href="skills/gui-dashboard.skill.html" data-title="skill: gui dashboard"><span class="num">◆</span><span class="txt">Skill: GUI Dashboard</span></a>
-    <a class="item" href="skills/harness-verification.skill.html" data-title="skill: harness verification"><span class="num">◆</span><span class="txt">Skill: Harness Verification</span></a>
-    <a class="item" href="skills/loop-engineering.skill.html" data-title="skill: loop engineering"><span class="num">◆</span><span class="txt">Skill: Loop Engineering</span></a>
-    <a class="item" href="skills/orchestration.skill.html" data-title="skill: orchestration"><span class="num">◆</span><span class="txt">Skill: Orchestration</span></a>
-    <a class="item" href="skills/README.html" data-title="skills index"><span class="num">⌂</span><span class="txt">Skills index</span></a>
+    <a class="item" href="skills\adapter-authoring.skill.html" data-title="skill: adapter authoring"><span class="num">◆</span><span class="txt">Skill: Adapter Authoring</span></a>
+    <a class="item" href="skills\docs-authoring.skill.html" data-title="skill: docs authoring"><span class="num">◆</span><span class="txt">Skill: Docs Authoring</span></a>
+    <a class="item" href="skills\gui-dashboard.skill.html" data-title="skill: gui dashboard"><span class="num">◆</span><span class="txt">Skill: GUI Dashboard</span></a>
+    <a class="item" href="skills\harness-verification.skill.html" data-title="skill: harness verification"><span class="num">◆</span><span class="txt">Skill: Harness Verification</span></a>
+    <a class="item" href="skills\loop-engineering.skill.html" data-title="skill: loop engineering"><span class="num">◆</span><span class="txt">Skill: Loop Engineering</span></a>
+    <a class="item" href="skills\orchestration.skill.html" data-title="skill: orchestration"><span class="num">◆</span><span class="txt">Skill: Orchestration</span></a>
+    <a class="item" href="skills\README.html" data-title="skills index"><span class="num">⌂</span><span class="txt">Skills index</span></a>
   </div>
   <div id="no-results" class="no-results">No matching docs</div>
 </nav>
@@ -256,7 +256,7 @@ lehrosol mission status --id mission-abc123</code></pre></div>
 <ul><li><strong>HELIX TUI</strong> — <code>Run agentic mission</code> is the first quick action in every tier; it prompts for a goal and streams phase progress. Mission history is part of the cockpit snapshot.</li><li><strong>MCP</strong> — external agents (Claude, Cursor, etc.) get <code>mission_run</code> (dry-run by default), <code>mission_plan</code>, and <code>mission_list</code>, so LehroSol itself becomes a delegable autonomous sub-agent.</li></ul>
 <h2 id="design-guarantees"><a class="anchor" href="#design-guarantees" aria-label="Link to section">#</a>Design guarantees</h2>
 <ul><li>Dry-run by default everywhere; live execution is always an explicit opt-in.</li><li>Unknown adapters and autonomy levels fail loudly with fix-it hints — no silent fallbacks.</li><li>Missions are ≤ 5 phases, phases are sequential (<code>concurrency: 1</code>), per-phase iterations are capped, and all writes go through the same policy/path-safety layers as <code>loop</code>.</li><li>Every mission is replayable evidence: phases, verdicts, sessions, recovery actions, and event timelines are stored atomically in the run registry.</li></ul>
-    <div class="pager"><a class="prev" href="17-phase-4-5-full-potential.html"><span class="dir">← Previous</span><span class="t">17 · Phase 4, Phase 5 &amp; Full-Potential Layer</span></a><a class="next" href=".docs/phase-4-5-build-issues.html"><span class="dir">Next →</span><span class="t">Phase 4/5 build issue log</span></a></div>
+    <div class="pager"><a class="prev" href="17-phase-4-5-full-potential.html"><span class="dir">← Previous</span><span class="t">17 · Phase 4, Phase 5 &amp; Full-Potential Layer</span></a><a class="next" href=".docs\phase-4-5-build-issues.html"><span class="dir">Next →</span><span class="t">Phase 4/5 build issue log</span></a></div>
     <footer class="credit"><span>LehroSol CLI · GPL-3.0 · free &amp; open source</span><span>Generated by docs/tools/build-docs.mjs</span></footer>
   </main>
   <aside class="toc"><div class="toc-label">On this page</div>

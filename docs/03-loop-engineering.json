@@ -2,8 +2,8 @@
   "title": "03 · Loop Engineering",
   "description": "",
   "sourceFile": "03-loop-engineering.md",
-  "readingMinutes": 2,
-  "wordCount": 482,
+  "readingMinutes": 5,
+  "wordCount": 942,
   "sections": [
     {
       "level": 2,
@@ -37,8 +37,18 @@
     },
     {
       "level": 2,
+      "heading": "Local code-lane continuation",
+      "id": "local-code-lane-continuation"
+    },
+    {
+      "level": 2,
       "heading": "See also",
       "id": "see-also"
+    },
+    {
+      "level": 2,
+      "heading": "Model Lab: quality-per-token feedback",
+      "id": "model-lab-quality-per-token-feedback"
     }
   ],
   "mermaidDiagrams": [

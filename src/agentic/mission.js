@@ -12,6 +12,8 @@ import { listAdapters } from '../loop/adapters/index.js';
 import { getFavorites } from '../core/favorites.js';
 
 export const AUTONOMY_LEVELS = ['readonly', 'guarded', 'full'];
+export const DEFAULT_MISSION_ITERATIONS = 8;
+export const MAX_MISSION_ITERATIONS = 48;
 
 export function normalizeAutonomy(value) {
   const level = String(value || 'guarded').trim().toLowerCase();
@@ -55,7 +57,10 @@ export async function runMission(goal, options = {}) {
   // readonly can never mutate: force dry-run regardless of flags.
   const dryRun = autonomy === 'readonly' ? true : options.dryRun !== false;
   const adapter = dryRun ? (options.adapter || 'local') : resolveMissionAdapter(options.adapter);
-  const maxIterations = Math.max(1, Math.min(Number(options.maxIterations || 3), 12));
+  const requestedIterations = Number(options.maxIterations || DEFAULT_MISSION_ITERATIONS);
+  const maxIterations = Number.isFinite(requestedIterations)
+    ? Math.max(1, Math.min(requestedIterations, MAX_MISSION_ITERATIONS))
+    : DEFAULT_MISSION_ITERATIONS;
   const plan = planMission(goal, options);
   const graph = planTaskGraph({ id: plan.id, tasks: plan.tasks });
 

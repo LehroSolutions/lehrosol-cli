@@ -30,7 +30,8 @@ function buildSystemPrompt(ctx) {
     'You are a coding agent operating inside the LehroSol agentic-engineering harness.',
     'Use the provided tools to inspect and edit files strictly within the project root.',
     'Prefer minimal, correct, well-tested changes. Never print secrets. When finished,',
-    'reply with a concise summary of exactly what you changed and why.',
+    'reply with a concise summary of exactly what you changed, how you verified it, and why.',
+    'Do not return a final answer merely because a tool-step budget is approaching; keep using tools until the task is complete or a concrete blocker is identified.',
   ];
   if (ctx.agentMd) parts.push('\n# Project AGENTS.md\n' + String(ctx.agentMd).slice(0, 4000));
   if (ctx.fixPlan) parts.push('\n# fix_plan.md\n' + String(ctx.fixPlan).slice(0, 2000));
@@ -97,7 +98,8 @@ export function createHttpAdapter(options) {
     const model = ctx.model || eff.model || options.resolveModel?.() || meta.model;
     const apiKey = eff.apiKey || (eff.apiKeyEnv ? process.env[eff.apiKeyEnv] : null);
     const useTools = ctx.tools !== false;
-    const maxSteps = Math.max(1, Math.min(Number(ctx.toolSteps || 8), 20));
+    const defaultToolSteps = meta.local ? 32 : 16;
+    const maxSteps = Math.max(1, Math.min(Number(ctx.toolSteps || defaultToolSteps), 80));
     const url = `${String(eff.baseUrl || meta.baseUrl).replace(/\/$/, '')}/chat/completions`;
 
     const messages = [
@@ -106,9 +108,12 @@ export function createHttpAdapter(options) {
     ];
     const toolTrace = [];
     let finalText = '';
+    let completed = false;
+    let stepsUsed = 0;
 
     try {
       for (let step = 0; step < maxSteps; step += 1) {
+        stepsUsed = step + 1;
         const body = { model, messages, temperature: ctx.temperature != null ? ctx.temperature : 0.2 };
         if (useTools) { body.tools = toolSchemas(); body.tool_choice = 'auto'; }
         const res = await fetch(url, {
@@ -142,7 +147,7 @@ export function createHttpAdapter(options) {
         }
         messages.push(msg);
         const calls = msg.tool_calls || [];
-        if (!calls.length) { finalText = msg.content || ''; break; }
+        if (!calls.length) { finalText = msg.content || ''; completed = true; break; }
         for (const call of calls) {
           const fnName = call.function && call.function.name;
           let fnArgs = {};
@@ -163,10 +168,16 @@ export function createHttpAdapter(options) {
       const traceLine = toolTrace.length
         ? `\n\n[tools: ${toolTrace.map((t) => `${t.tool}${t.ok ? '' : '!'}`).join(', ')}]`
         : '';
+      const completionText = completed
+        ? String(finalText).trim()
+        : `Tool-step checkpoint reached after ${stepsUsed}/${maxSteps} steps without a final verified answer. The outer loop should continue from the current workspace state.`;
       return {
         adapter: meta.id, available: true,
         toolCalls: toolTrace,
-        summary: (`${meta.label} (${model}):\n${String(finalText).trim()}${traceLine}`).slice(0, 4000),
+        toolStepsUsed: stepsUsed,
+        toolStepBudget: maxSteps,
+        incomplete: !completed,
+        summary: (`${meta.label} (${model}):\n${completionText}${traceLine}`).slice(0, 4000),
         changedFiles,
         policyInput: {
           hasTests: hasTestChanges(changedFiles),

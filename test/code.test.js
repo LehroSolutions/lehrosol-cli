@@ -3,7 +3,19 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { extractAction, applyAction, trimHistory, buildSystemPrompt } from '../src/commands/code.js';
+import { extractAction, applyAction, trimHistory, buildSystemPrompt, resolveCodeBudget, resolveCodeGenerationSettings } from '../src/commands/code.js';
+
+test('code generation recommendations cannot exceed context safety budgets', () => {
+  const recommendation = { ready: true, recommended: { settings: { maxTokens: 1024, temperature: 0.3 } } };
+  assert.deepEqual(
+    resolveCodeGenerationSettings({ recommendation, resourceProfile: 'performance', contextMode: 'normal' }),
+    { maxTokens: 384, temperature: 0.3 },
+  );
+  assert.deepEqual(
+    resolveCodeGenerationSettings({ flags: { maxTokens: 640, temperature: 0 }, recommendation, resourceProfile: 'eco', contextMode: 'compact' }),
+    { maxTokens: 640, temperature: 0 },
+  );
+});
 
 test('extractAction digs the JSON action out of chatty replies', () => {
   assert.deepEqual(extractAction('{"action":"list","path":"."}'), { action: 'list', path: '.' });
@@ -71,6 +83,29 @@ test('trimHistory keeps recent turns intact and shrinks old ones', () => {
 test('system prompt only advertises run when it is enabled', () => {
   assert.match(buildSystemPrompt({ allowRun: false }), /disabled in this session/);
   assert.match(buildSystemPrompt({ allowRun: true }), /"action":"run"/);
+  assert.match(buildSystemPrompt({ allowRun: false }), /Do not use "done" merely because you reached a step budget/);
+});
+
+test('code lane extends a pass budget by default and supports strict mode', () => {
+  assert.deepEqual(resolveCodeBudget({}), {
+    maxSteps: 24,
+    autoContinue: true,
+    maxExtensions: 3,
+    totalStepBudget: 96,
+  });
+  assert.deepEqual(resolveCodeBudget({ maxSteps: 12, maxExtensions: 4 }), {
+    maxSteps: 12,
+    autoContinue: true,
+    maxExtensions: 4,
+    totalStepBudget: 60,
+  });
+  assert.deepEqual(resolveCodeBudget({ maxSteps: 12, noAutoContinue: true }), {
+    maxSteps: 12,
+    autoContinue: false,
+    maxExtensions: 0,
+    totalStepBudget: 12,
+  });
+  assert.equal(resolveCodeBudget({ maxSteps: 999 }).totalStepBudget, 160);
 });
 
 test('follow-up prompts restate the task so compact history cannot lose the goal', async () => {

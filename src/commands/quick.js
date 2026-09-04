@@ -44,7 +44,7 @@ export async function chatOnce(opts) {
   return second;
 }
 
-async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], maxTokens = 512, timeoutMs = 600000 }) {
+async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], maxTokens = 512, temperature, timeoutMs = 600000 }) {
   const messages = [];
   if (system) messages.push({ role: 'system', content: system });
   messages.push(...history, { role: 'user', content: prompt });
@@ -59,7 +59,13 @@ async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], 
         connection: 'close',
         ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
       },
-      body: JSON.stringify({ model: 'local', messages, max_tokens: maxTokens, stream: false }),
+      body: JSON.stringify({
+        model: 'local',
+        messages,
+        max_tokens: maxTokens,
+        ...(temperature == null ? {} : { temperature: Number(temperature) }),
+        stream: false,
+      }),
       signal: controller.signal,
     });
     const ms = Date.now() - started;
@@ -70,8 +76,10 @@ async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], 
     }
     const content = json.choices?.[0]?.message?.content ?? '';
     const tokens = json.usage?.completion_tokens ?? Math.max(1, Math.round(content.length / 4));
+    const promptTokens = Number(json.usage?.prompt_tokens || 0);
+    const totalTokens = Number(json.usage?.total_tokens || (promptTokens + tokens));
     const tokPerSec = ms > 0 ? Math.round((tokens / (ms / 1000)) * 10) / 10 : tokens;
-    return { ok: true, content, ms, tokens, tokPerSec, usage: json.usage || null };
+    return { ok: true, content, ms, tokens, completionTokens: tokens, promptTokens, totalTokens, tokPerSec, usage: json.usage || null };
   } catch (e) {
     if (e && e.name === 'AbortError') {
       return { ok: false, ms: Date.now() - started, error: `timed out after ${timeoutMs}ms` };

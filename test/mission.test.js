@@ -6,7 +6,7 @@ import { join } from 'node:path';
 
 process.env.LEHRO_HOME = mkdtempSync(join(tmpdir(), 'lehro-mission-'));
 
-const { planMission, runMission, normalizeAutonomy, listMissions, loadMission, AUTONOMY_LEVELS, resolveMissionAdapter } = await import('../src/agentic/mission.js');
+const { planMission, runMission, normalizeAutonomy, listMissions, loadMission, AUTONOMY_LEVELS, resolveMissionAdapter, DEFAULT_MISSION_ITERATIONS, MAX_MISSION_ITERATIONS } = await import('../src/agentic/mission.js');
 const { TOOL_DEFINITIONS, executeTool } = await import('../src/mcp/tools.js');
 const { buildTuiSnapshot, quickActions } = await import('../src/commands/tui.js');
 
@@ -15,6 +15,13 @@ test('normalizeAutonomy accepts levels and rejects junk', () => {
   assert.equal(normalizeAutonomy(undefined), 'guarded');
   assert.equal(normalizeAutonomy('FULL'), 'full');
   assert.throws(() => normalizeAutonomy('yolo'), /Unknown autonomy level/);
+});
+
+test('missions expose a longer local-model iteration budget', () => {
+  assert.equal(DEFAULT_MISSION_ITERATIONS, 8);
+  assert.equal(MAX_MISSION_ITERATIONS, 48);
+  assert.equal(TOOL_DEFINITIONS.mission_run.inputSchema.properties.maxIterations.default, 8);
+  assert.equal(TOOL_DEFINITIONS.mission_run.inputSchema.properties.maxIterations.maximum, 48);
 });
 
 test('planMission produces a dependency-ordered phase graph', () => {

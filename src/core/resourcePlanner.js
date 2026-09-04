@@ -26,12 +26,19 @@ export function planResources(hw, fit = {}, profile = 'balanced') {
   const budgetGB = round1(Math.min(fitBudget, freeForEngineGB));
   const requiredGB = Number(fit?.requiredGB || 0);
   const constrained = requiredGB > 0 && requiredGB > budgetGB;
-  const ctxSize = constrained ? 2048 : Math.min(policy.maxContext, budgetGB < 5 ? 2048 : budgetGB < 9 ? 4096 : policy.maxContext);
+  // When RAM-constrained, honor the requested profile's context floor
+  // rather than hard-clamping to 2048. The warning below already explains
+  // the trade-off; users who explicitly ask for a higher profile are opting
+  // into the larger KV cache. (Pre-fix this always returned 2048, which
+  // made constrained setups even slower because missions couldn't fit.)
+  const ctxSize = constrained
+    ? policy.maxContext
+    : Math.min(policy.maxContext, budgetGB < 5 ? 2048 : budgetGB < 9 ? 4096 : policy.maxContext);
   const baseThreads = Number(hw?.recommendedThreads || 1);
   const threads = id === 'eco' ? Math.max(1, Math.min(2, baseThreads)) : baseThreads;
   const gpuLayers = fit?.accelerated ? 999 : 0;
   const warning = constrained
-    ? `Estimated working set ${requiredGB} GB exceeds the currently safe ${budgetGB} GB budget. Close memory-heavy apps, choose a smaller quant, or use Eco mode.`
+    ? `Estimated working set ${requiredGB} GB exceeds the currently safe ${budgetGB} GB budget. Close memory-heavy apps, choose a smaller quant, use Eco mode, or pin a smaller context with --ctx.`
     : null;
   return {
     profile: id,

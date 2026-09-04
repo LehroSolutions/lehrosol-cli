@@ -1,7 +1,7 @@
 {
   "title": "Skill: Harness Verification",
   "description": "**Use this skill when:** adding a new policy rule, a new OWASP check, or a new scanner heuristic.",
-  "sourceFile": "skills/harness-verification.skill.md",
+  "sourceFile": "skills\\harness-verification.skill.md",
   "readingMinutes": 1,
   "wordCount": 252,
   "sections": [

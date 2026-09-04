@@ -11,13 +11,50 @@ import { chatOnce, ensureServing, displayModelName, DEFAULT_PORT, DEFAULT_KEY } 
 import { buildSkillGuidance, inferSkillIds, mergeSkillIds, parseSkillRequest } from '../core/skills.js';
 import { normalizeResourceProfile, RESOURCE_PROFILES } from '../core/resourcePlanner.js';
 import { newMissionId, recordMission, suggestTuning, backupFile, readJournal } from '../core/journal.js';
+import { loadRecommendations, recommendationForWorkflow } from '../bench/modelLab.js';
 
 const IGNORED = new Set(['node_modules', '.git', '.lehro', 'dist', 'build', '.next', '__pycache__']);
+
+export function resolveCodeGenerationSettings({ flags = {}, recommendation = null, resourceProfile = 'balanced', contextMode = 'normal' } = {}) {
+  const recommended = recommendation?.ready ? (recommendation.recommended?.settings || {}) : {};
+  const contextTokenBudget = { compact: 256, normal: 384, expanded: 512 }[contextMode] || 384;
+  return {
+    maxTokens: Number(flags.maxTokens || Math.min(recommended.maxTokens || Infinity, RESOURCE_PROFILES[resourceProfile].tokenBudget, contextTokenBudget)),
+    temperature: flags.temperature != null ? Number(flags.temperature) : (recommended.temperature == null ? undefined : Number(recommended.temperature)),
+  };
+}
 // A 2K-context local model cannot hold a full multi-kilobyte document plus the
 // tool contract. Keep each observation deliberately small; large plans are
 // read in line ranges instead of crashing the next request.
 const MAX_READ_CHARS = 1800;
 const MAX_RUN_CHARS = 4000;
+// Local models often need more than a dozen tool turns for a real change.
+// Treat maxSteps as a per-pass budget and continue through a few checkpoints
+// by default, while keeping an upper bound for unattended runs.
+export const CODE_DEFAULT_STEPS = 24;
+export const CODE_DEFAULT_EXTENSIONS = 3;
+export const CODE_HARD_STEP_LIMIT = 160;
+
+function boundedNumber(value, fallback, min, max) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? Math.max(min, Math.min(parsed, max)) : fallback;
+}
+
+export function resolveCodeBudget(flags = {}) {
+  const maxSteps = boundedNumber(flags.maxSteps, CODE_DEFAULT_STEPS, 1, CODE_HARD_STEP_LIMIT);
+  const strictBudget = flags.noAutoContinue === true || String(flags.noAutoContinue).toLowerCase() === 'true'
+    || flags.autoContinue === false || String(flags.autoContinue).toLowerCase() === 'false';
+  const autoContinue = !strictBudget;
+  const maxExtensions = autoContinue
+    ? boundedNumber(flags.maxExtensions, CODE_DEFAULT_EXTENSIONS, 0, 8)
+    : 0;
+  return {
+    maxSteps,
+    autoContinue,
+    maxExtensions,
+    totalStepBudget: Math.min(CODE_HARD_STEP_LIMIT, maxSteps * (maxExtensions + 1)),
+  };
+}
 
 function emit(result, flags, logger) {
   if (flags.json) {
@@ -116,7 +153,8 @@ export function buildSystemPrompt({ allowRun, dryRun = false, reasoning = 'stand
     '- If a file observation says it was truncated, continue with focused startLine/endLine reads; do not try to load the entire file at once.',
     '- Never invent file contents you have not read.',
     '- Keep changes minimal and complete. Do not touch unrelated files.',
-    '- If the task is finished or impossible, use "done" with an honest summary.',
+    '- Keep working until the TASK is actually complete. Do not use "done" merely because you reached a step budget or inspected one file.',
+    '- Use "done" only after verifying the requested result, or when a concrete blocker makes further progress impossible; include evidence or the blocker in the summary.',
     dryRun
       ? '- This is a DRY RUN: propose concrete mkdir/write actions. Do not claim files exist or changes were made unless you read evidence for that claim.'
       : '- This is a live-write session: create the requested files with write actions; write creates parent folders automatically.',
@@ -282,7 +320,7 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
   }
   const port = Number(flags.port || DEFAULT_PORT);
   const apiKey = flags.apiKey || flags.key || DEFAULT_KEY;
-  const maxSteps = Number(flags.maxSteps || 12);
+  const { maxSteps, autoContinue, maxExtensions, totalStepBudget } = resolveCodeBudget(flags);
   const resourceProfile = normalizeResourceProfile(flags.resourceProfile || flags.ramProfile);
   const explicitContextMode = ['compact', 'normal', 'expanded'].includes(String(flags.contextMode || '').toLowerCase()) ? String(flags.contextMode).toLowerCase() : null;
   // Adaptive self-tuning: with no explicit flag, learn the default from how
@@ -294,8 +332,9 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
   // A 1024-token completion request can itself overflow a 2048-token server
   // once the tool contract and project context are present. Agent actions are
   // short JSON, so leave headroom by default; users may still override this.
-  const contextTokenBudget = { compact: 256, normal: 384, expanded: 512 }[contextMode];
-  const maxTokens = Number(flags.maxTokens || Math.min(RESOURCE_PROFILES[resourceProfile].tokenBudget, contextTokenBudget));
+  const codeRecommendation = recommendationForWorkflow(String(flags.model || 'local'), 'code', loadRecommendations(), { fallbackGeneral: false });
+  const generation = resolveCodeGenerationSettings({ flags, recommendation: codeRecommendation, resourceProfile, contextMode });
+  const { maxTokens, temperature } = generation;
   const timeoutMs = Number(flags.timeout || 600000);
   const activeSkills = mergeSkillIds(inferSkillIds(goal), flags.skills || flags.skill, parsedRequest.requested);
   const skillSet = buildSkillGuidance({ reasoning: flags.reasoning, skills: activeSkills });
@@ -328,6 +367,7 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
     ui.keyValue('Skills', skillSet.skillIds.join(', '));
     ui.keyValue('Resource profile', resourceProfile);
     ui.keyValue('Context mode', `${contextMode} (${ctx.maxReadChars} chars per read · ${maxTokens} output tokens reserved)${contextModeSource === 'adaptive' ? ' — auto-tuned from mission history' : ''}`);
+    ui.keyValue('Step budget', `${maxSteps} per pass · ${totalStepBudget} total${autoContinue ? ` · up to ${maxExtensions} continuation(s)` : ' · strict'}`);
     ui.keyValue('Mission id', ctx.missionId);
     console.log();
   }
@@ -351,7 +391,7 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
   const planDisabled = flags.plan === false || String(flags.plan) === 'false';
   const planWanted = !planDisabled && (flags.plan === true || String(flags.plan) === 'true' || skillSet.reasoning === 'deep');
   if (planWanted) {
-    const planRes = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt: `TASK: ${goal}\n\nWrite a numbered micro-plan (at most 3 short steps) for completing this task with list/read/write actions. Plan only — no JSON, no code.`, system: 'You are a concise planning assistant. Reply with at most 3 numbered steps, one line each.', history: [], maxTokens: 96, timeoutMs });
+    const planRes = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt: `TASK: ${goal}\n\nWrite a numbered micro-plan (at most 3 short steps) for completing this task with list/read/write actions. Plan only — no JSON, no code.`, system: 'You are a concise planning assistant. Reply with at most 3 numbered steps, one line each.', history: [], maxTokens: 96, temperature, timeoutMs });
     if (planRes.ok && planRes.content) {
       planText = truncateText(String(planRes.content).trim(), 400);
       if (!flags.json) console.log(`  [plan]\n${planText.split('\n').map((l) => `    ${l}`).join('\n')}`);
@@ -365,13 +405,17 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
   let parseFails = 0;
   let retries = 0;
   let lastActionKey = null;
+  let repeatedActions = 0;
+  let prematureDoneClaims = 0;
   const actionCounts = {};
-  const missionFlags = { dryRun: ctx.dryRun, allowRun: ctx.allowRun, contextMode, resourceProfile, reasoning: skillSet.reasoning, maxSteps };
+  const missionFlags = { dryRun: ctx.dryRun, allowRun: ctx.allowRun, contextMode, resourceProfile, reasoning: skillSet.reasoning, maxSteps, autoContinue, maxExtensions, totalStepBudget };
+  let extensions = 0;
+  let terminationReason = 'budget-exhausted';
 
-  for (let step = 1; step <= maxSteps; step += 1) {
+  for (let step = 1; step <= totalStepBudget; step += 1) {
     stepsUsed = step;
     const stepStart = Date.now();
-    let res = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens, timeoutMs });
+    let res = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens, temperature, timeoutMs });
     // Self-healing: a context overflow shrinks observation budgets and retries
     // instead of killing the mission (the old behavior surfaced as HTTP 500).
     if (!res.ok && retries < 2 && /context|exceed|500/i.test(String(res.error || ''))) {
@@ -380,8 +424,8 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
       ctx.maxListChars = Math.max(400, Math.floor(Number(ctx.maxListChars) * 0.55));
       history = [];
       prompt = `TASK (unchanged): ${truncateText(goal, 300)}\n\n(The previous request overflowed the model context; observations are smaller now.) Continue with your next action.`;
-      if (!flags.json) console.log(`  [${step}/${maxSteps}] context overflow — shrinking observations and retrying (${retries}/2)`);
-      res = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens: Math.min(maxTokens, 256), timeoutMs });
+      if (!flags.json) console.log(`  [${step}/${totalStepBudget}] context overflow — shrinking observations and retrying (${retries}/2)`);
+      res = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens: Math.min(maxTokens, 256), temperature, timeoutMs });
     }
     if (!res.ok) {
       if (!flags.json) ui.error('Model call failed', res.error);
@@ -398,9 +442,10 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
     const action = extractAction(res.content);
     if (!action) {
       parseFails += 1;
-      if (!flags.json) console.log(`  [${step}/${maxSteps}] (no valid JSON action in reply — nudging the model)`);
+      if (!flags.json) console.log(`  [${step}/${totalStepBudget}] (no valid JSON action in reply — nudging the model)`);
       if (parseFails >= 3) {
         if (!flags.json) ui.error('Model kept replying without a valid JSON action', 'This model may be too small for the code lane — try a stronger one: lehrosol code "..." --model jan');
+        terminationReason = 'model-format-stall';
         break;
       }
       prompt = buildNudgePrompt(goal);
@@ -411,29 +456,56 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
     // Loop guard: a model that repeats the exact same action is stuck.
     const actionKey = JSON.stringify(action);
     if (actionKey === lastActionKey) {
-      if (!flags.json) console.log(`  [${step}/${maxSteps}] (repeated the same action — nudging a different approach)`);
+      repeatedActions += 1;
+      if (!flags.json) console.log(`  [${step}/${totalStepBudget}] (repeated the same action — nudging a different approach)`);
+      if (repeatedActions >= 4) {
+        terminationReason = 'model-action-stall';
+        break;
+      }
       prompt = `TASK (unchanged): ${truncateText(goal, 300)}\n\nYou just repeated the exact same action. Do NOT repeat it. Take a DIFFERENT next action, or finish with \"done\".`;
       continue;
     }
+    repeatedActions = 0;
     lastActionKey = actionKey;
     actionCounts[String(action.action)] = (actionCounts[String(action.action)] || 0) + 1;
 
     const out = await applyAction(action, ctx);
-    if (!flags.json) console.log(`  [${step}/${maxSteps}] ${out.label}${out.ok ? '' : '  ← refused'}  (${((Date.now() - stepStart) / 1000).toFixed(1)}s)`);
+    if (!flags.json) console.log(`  [${step}/${totalStepBudget}] ${out.label}${out.ok ? '' : '  ← refused'}  (${((Date.now() - stepStart) / 1000).toFixed(1)}s)`);
     if (out.done) {
+      const summaryText = String(out.summary || '').trim();
+      const mutationTask = /\b(add|build|change|create|delete|fix|implement|modify|refactor|remove|rename|replace|update|write)\b/i.test(goal);
+      const blockerClaim = /\b(blocked|cannot|can't|impossible|missing|not available|unable)\b/i.test(summaryText);
+      const premature = summaryText.length < 20 || (mutationTask && !ctx.dryRun && ctx.changed.length === 0 && !blockerClaim);
+      if (premature && prematureDoneClaims < 2) {
+        prematureDoneClaims += 1;
+        prompt = `TASK (unchanged): ${truncateText(goal, 300)}\n\nCompletion was not accepted: ${summaryText.length < 20 ? 'the summary lacked concrete evidence' : 'this is a change task but no file changes were recorded'}. Continue working, or return "done" with a specific blocker and evidence.`;
+        if (!flags.json) console.log(`  [${step}/${totalStepBudget}] done claim rejected — completion evidence is incomplete (${prematureDoneClaims}/2)`);
+        continue;
+      }
       summary = out.summary;
+      terminationReason = 'done';
       break;
     }
     prompt = buildFollowUpPrompt(goal, action.action, out.observation);
+
+    // A pass boundary is a checkpoint, not an automatic task failure. Give
+    // the model a fresh request with the unchanged goal and let it continue
+    // unless the caller explicitly selected strict mode.
+    if (step < totalStepBudget && step % maxSteps === 0 && extensions < maxExtensions) {
+      extensions += 1;
+      history = [];
+      prompt = `TASK (unchanged): ${truncateText(goal, 300)}\n\nBudget checkpoint reached after ${step} tool steps. Continue from the current project state; do not stop just because the previous pass ended. Take the next action, or use "done" only after verification.`;
+      if (!flags.json) console.log(`  [${step}/${totalStepBudget}] continuing mission (pass ${extensions + 1}/${maxExtensions + 1})`);
+    }
   }
 
   const durationMs = Date.now() - missionStart;
-  recordMission({ id: ctx.missionId, ok: Boolean(summary), task: goal, steps: stepsUsed, retries, durationMs, changedFiles: ctx.changed, contextMode, contextModeSource, resourceProfile, root: ctx.root, summary, actionCounts, flags: missionFlags });
+  recordMission({ id: ctx.missionId, ok: Boolean(summary), task: goal, steps: stepsUsed, retries, extensions, totalStepBudget, terminationReason, durationMs, changedFiles: ctx.changed, contextMode, contextModeSource, resourceProfile, root: ctx.root, summary, actionCounts, flags: missionFlags });
 
   if (!flags.json) {
     ui.divider();
     if (summary) ui.success(`Done in ${stepsUsed} step(s)`, summary.slice(0, 300));
-    else ui.warning(`Stopped after ${stepsUsed} step(s) without "done"`, 'Raise the budget with --maxSteps 20, or give a smaller task.');
+    else ui.warning(`Stopped after ${stepsUsed} step(s) without "done"`, `${terminationReason}${autoContinue ? ' — continuation budget exhausted' : ' — strict budget enabled'}. Resume with --continue or raise --maxSteps.`);
     if (ctx.changed.length) ui.keyValue('Files changed', ctx.changed.join(', '));
     else ui.keyValue('Files changed', ctx.dryRun ? '(none — dry run)' : '(none)');
     ui.keyValue('Mission report', `${(durationMs / 1000).toFixed(1)}s · ${Object.entries(actionCounts).map(([k, v]) => `${k}×${v}`).join(' ') || 'no actions'}${retries ? ` · ${retries} overflow retry(ies)` : ''}`);
@@ -444,5 +516,5 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
     ]);
   }
 
-  return emit({ ok: Boolean(summary), missionId: ctx.missionId, task: goal, reasoning: skillSet.reasoning, skills: skillSet.skillIds, model: serving.model, steps: stepsUsed, retries, durationMs, actionCounts, contextMode, contextModeSource, changedFiles: ctx.changed, summary }, flags, logger);
+  return emit({ ok: Boolean(summary), missionId: ctx.missionId, task: goal, reasoning: skillSet.reasoning, skills: skillSet.skillIds, model: serving.model, steps: stepsUsed, maxSteps, totalStepBudget, autoContinue, extensions, terminationReason, continuationAvailable: !summary && terminationReason === 'budget-exhausted', retries, durationMs, actionCounts, contextMode, contextModeSource, resourceProfile, changedFiles: ctx.changed, summary }, flags, logger);
 }

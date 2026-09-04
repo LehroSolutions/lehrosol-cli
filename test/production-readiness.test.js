@@ -58,7 +58,7 @@ test('MCP initialize reports production version', async () => {
 });
 
 test('MCP tools include config, thread, and expanded adapter tools', () => {
-  for (const name of ['config_list', 'config_set', 'config_unset', 'threads_list', 'threads_run', 'adapters_list', 'loop_run']) {
+  for (const name of ['config_list', 'config_set', 'config_unset', 'threads_list', 'threads_run', 'adapters_list', 'loop_run', 'model_lab_run', 'model_lab_tune', 'model_lab_history', 'model_lab_recommend']) {
     assert.ok(TOOL_DEFINITIONS[name], `missing ${name}`);
   }
   assert.doesNotThrow(() => JSON.stringify(TOOL_DEFINITIONS.loop_run.inputSchema));

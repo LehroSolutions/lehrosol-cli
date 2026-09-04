@@ -14,8 +14,8 @@ export async function runLoop(options) {
   const prompt = opts.prompt;
   if (!prompt) throw new Error('loop_run requires a "prompt".');
 
-  const requestedMax = Number(opts.maxIterations || 8);
-  const maxIterations = Number.isFinite(requestedMax) ? Math.max(1, Math.min(requestedMax, 50)) : 8;
+  const requestedMax = Number(opts.maxIterations || 12);
+  const maxIterations = Number.isFinite(requestedMax) ? Math.max(1, Math.min(requestedMax, 100)) : 12;
   const dryRun = opts.dryRun !== false;
   const requestedAdapter = opts.agentAdapter || 'local';
   if (!ADAPTERS[requestedAdapter] && opts.dryRun === false) {
@@ -50,9 +50,11 @@ export async function runLoop(options) {
       skills: opts.skills || [],
       reasoning: opts.reasoning || 'standard',
       resourceProfile: opts.resourceProfile || 'balanced',
+      toolSteps: opts.toolSteps,
     };
     const result = dryRun ? await ADAPTERS.local(context) : await adapter(context);
     const adapterFailed = !dryRun && (result.available === false || result.error === true);
+    const adapterIncomplete = !dryRun && result.incomplete === true;
     const owaspFindings = scanOwaspBasics({ cwd: cwd, files: result.changedFiles || [], owaspScope: opts.owaspScope });
     const policyInput = Object.assign({}, result.policyInput || {}, { owaspFindings: owaspFindings });
     const score = adapterFailed
@@ -65,6 +67,16 @@ export async function runLoop(options) {
           warnings: [],
           verdict: result.available === false ? 'stop-adapter-unavailable' : 'stop-adapter-error',
         }
+      : adapterIncomplete
+        ? {
+            iteration,
+            score: 0,
+            bar: 100,
+            passed: false,
+            violations: [{ name: 'adapter-incomplete', fixSuggestion: result.summary || 'Adapter reached its tool-step checkpoint without a verified final answer.' }],
+            warnings: [],
+            verdict: iteration >= maxIterations ? 'stop-budget-exhausted' : 'continue',
+          }
       : scoreIteration({ iteration: iteration, maxIterations: maxIterations, policyInput: policyInput, capabilityTier: opts.capabilityTier });
     // Snapshot the workspace diff so users can inspect exactly what the agent
     // changed (lehrosol diff, TUI 'x' view, GUI sessions_diff). Dry runs make

@@ -1,5 +1,14 @@
 /** One-shot Q&A against the configured local engine. */
 import { chatOnce, ensureServing, DEFAULT_PORT, DEFAULT_KEY } from './quick.js';
+import { loadRecommendations, recommendationForWorkflow } from '../bench/modelLab.js';
+
+export function resolveAskGenerationSettings(flags = {}, recommendation = null) {
+  const recommended = recommendation?.ready ? (recommendation.recommended?.settings || {}) : {};
+  return {
+    maxTokens: Number(flags.maxTokens || recommended.maxTokens || 1024),
+    temperature: flags.temperature != null ? Number(flags.temperature) : (recommended.temperature == null ? undefined : Number(recommended.temperature)),
+  };
+}
 
 export async function runAskCommand(question, flags = {}, logger = console) {
   const prompt = String(question || '').trim();
@@ -11,6 +20,8 @@ export async function runAskCommand(question, flags = {}, logger = console) {
 
   const port = Number(flags.port || DEFAULT_PORT);
   const apiKey = flags.apiKey || DEFAULT_KEY;
+  const recommendation = recommendationForWorkflow(String(flags.model || 'local'), 'ask', loadRecommendations(), { fallbackGeneral: true });
+  const generation = resolveAskGenerationSettings(flags, recommendation);
   const host = await ensureServing({
     model: flags.model,
     port,
@@ -30,7 +41,8 @@ export async function runAskCommand(question, flags = {}, logger = console) {
     apiKey,
     prompt,
     system: 'You are a helpful engineering assistant. Be concise and accurate.',
-    maxTokens: Number(flags.maxTokens || 1024),
+    maxTokens: generation.maxTokens,
+    temperature: generation.temperature,
   });
 
   if (!result.ok) {

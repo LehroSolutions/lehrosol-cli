@@ -23,7 +23,7 @@ test('chatOnce measures latency and tok/s against an OpenAI-compatible server', 
       assert.equal(parsed.messages.at(-1).content, 'ping');
       assert.equal(req.headers.authorization, 'Bearer k');
       res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: 'pong' } }], usage: { completion_tokens: 42 } }));
+      res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: 'pong' } }], usage: { prompt_tokens: 8, completion_tokens: 42, total_tokens: 50 } }));
     });
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -33,8 +33,29 @@ test('chatOnce measures latency and tok/s against an OpenAI-compatible server', 
   assert.equal(res.ok, true);
   assert.equal(res.content, 'pong');
   assert.equal(res.tokens, 42);
+  assert.equal(res.promptTokens, 8);
+  assert.equal(res.totalTokens, 50);
   assert.ok(res.tokPerSec > 0);
   assert.match(formatStats(res), /tok\/s/);
+});
+
+test('chatOnce forwards temperature when tuning generation settings', async () => {
+  const server = createServer((req, res) => {
+    let body = '';
+    req.on('data', (c) => { body += c; });
+    req.on('end', () => {
+      const parsed = JSON.parse(body);
+      assert.equal(parsed.max_tokens, 128);
+      assert.equal(parsed.temperature, 0.5);
+      res.setHeader('content-type', 'application/json');
+      res.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: 'ok' } }], usage: { completion_tokens: 2 } }));
+    });
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const port = server.address().port;
+  const res = await chatOnce({ baseUrl: `http://127.0.0.1:${port}/v1`, prompt: 'ping', maxTokens: 128, temperature: 0.5 });
+  server.close();
+  assert.equal(res.ok, true);
 });
 
 test('chatOnce reports HTTP failures instead of throwing', async () => {

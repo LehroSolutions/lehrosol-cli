@@ -45,6 +45,8 @@ import { runSkillsCommand } from '../src/core/skills.js';
 import { runOptimizeCommand } from '../src/commands/optimize.js';
 import { runMissionsCommand } from '../src/commands/missions.js';
 import { runSupportCommand } from '../src/commands/support.js';
+import { runBenchCommand } from '../src/commands/bench.js';
+import { runModelLabCommand } from '../src/commands/modelLab.js';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -177,6 +179,8 @@ ${ui.box('LehroSol CLI — Unified Agentic Engineering', { title: 'LehroSol CLI 
     ${ui.filePath('ide install --editor ...')}       VS Code, Zed, JetBrains integration
     ${ui.filePath('completions <shell>')}             Bash/Zsh/Fish/PowerShell completion
     ${ui.filePath('learn report')}                   Session-derived improvement intelligence
+    ${ui.filePath('bench run|report|history|weights|forget|note')}  Internal scorecard for loop + agentic + graph engineering, with persistent user-tuned weights and corrections
+    ${ui.filePath('model-lab run|tune|history|recommend')}              Measure and tune local-model quality per token
     ${ui.filePath('support create')}                 Redacted diagnostic support bundle
     ${ui.filePath('sessions list|show')}             Inspect persisted Loop Engine sessions/checkpoints
     ${ui.filePath('orchestrate spawn|list|remove')}  Manage git-worktree agent workers
@@ -206,6 +210,8 @@ ${ui.box('LehroSol CLI — Unified Agentic Engineering', { title: 'LehroSol CLI 
     $ lehrosol serve status                            # probe the local /v1 endpoint
     $ lehrosol vault                                   # every GGUF on your drive, rated for this machine
     $ lehrosol vault serve --model qwopus --port 7000  # host straight from the hard drive + wire the loop
+    $ lehrosol vault serve --model <name> --port 7000 --ctx 4096            # override the auto-picked context window
+    $ lehrosol vault serve --model <name> --port 7000 --resourceProfile balanced  # pick eco|balanced|performance (sets ctx/threads/token budget)
     $ lehrosol modes plan                              # flip the loop into read-only Recon mode
     $ lehrosol switch                                  # sweep mode → adapter → model interactively
     $ lehrosol recommend                               # rate your local models against your RAM/GPU
@@ -231,6 +237,27 @@ ${ui.box('LehroSol CLI — Unified Agentic Engineering', { title: 'LehroSol CLI 
     --no-color           Disable ANSI color output
     --ascii              Force ASCII-only glyphs/borders (legacy consoles)
     --no-anim            Disable animations (static frames only)
+
+  ${ui.highlight('Local-engine flags (vault serve / serve start):')}
+    --model <name>       GGUF filename, folder, or vault id to host (required for llamacpp)
+    --port <n>           Port to serve on (default 7000 for vault, 8080 for serve start)
+    --apiKey <key>       API key the engine will require (default auto-generated; pass lehro-local for local-only)
+    --ctx <n>            Context window size — overrides the auto-pick (e.g. --ctx 4096 for longer agent missions)
+    --ctxSize <n>        Alias for --ctx
+    --resourceProfile <p>  Memory/thread policy: eco (2048 ctx, 2 threads), balanced (4096 ctx), performance (8192 ctx)
+    --ramProfile <p>     Alias for --resourceProfile
+    --gpuLayers <n>      GPU layers to offload (llamacpp -ngl; default 0 on CPU-only)
+    --ngl <n>            Alias for --gpuLayers
+    --threads <n>        CPU threads (-t; default auto-tuned to physical cores)
+    --mmproj <path>      Vision projector GGUF for multimodal models
+    --use                Also wire this engine as the preferred adapter (default true for vault serve)
+    --foreground         Run the engine in the foreground instead of detaching
+
+  ${ui.highlight('Local code-lane flags:')}
+    --maxSteps <n>       Tool steps per pass (default 24; max 160)
+    --maxExtensions <n>  Automatic continuation passes after a budget checkpoint (default 3)
+    --noAutoContinue     Stop after one pass instead of continuing automatically
+    --continue           Resume the most recent code-lane task after a budget stop
 
   ${ui.highlight('Documentation:')} https://github.com/lehrosolutions/lehrosol-cli
 `;
@@ -311,6 +338,7 @@ async function main() {
         case 'ide': runIdeCommand(options.subcommand || 'install', options, logger); break;
         case 'learn': runLearnCommand('report', options, logger); break;
         case 'support': runSupportCommand('create', options, logger); break;
+        case 'bench': await runBenchCommand(options.subcommand || 'run', options, logger); break;
         case 'sessions':
           runSessionsCommand(options.id ? 'show' : 'list', options, logger);
           break;
@@ -418,6 +446,8 @@ async function main() {
     case 'optimize': runOptimizeCommand(flags, logger); break;
     case 'missions': await runMissionsCommand(subcommand || 'list', flags, logger); break;
     case 'scan': await runScanCommand(flags, logger); break;
+    case 'bench': await runBenchCommand(subcommand || 'run', flags, logger); break;
+    case 'model-lab': await runModelLabCommand(subcommand || 'run', flags, logger); break;
     case 'sessions':
       runSessionsCommand(subcommand, flags, logger);
       break;

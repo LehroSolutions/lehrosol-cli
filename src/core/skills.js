@@ -99,6 +99,42 @@ export const BUILTIN_SKILLS = Object.freeze([
       'When capacity is constrained, state the trade-off and choose a smaller, verifiable step.',
     ],
   },
+  {
+    id: 'cache-friendly-prompting',
+    name: 'Cache-Friendly Prompting',
+    description: 'Structure prompts so llama.cpp KV-cache hits on the shared prefix across retries and follow-ups; learn the user\'s phrasing style from prior sessions.',
+    guidance: [
+      'Lead every task with the same stable role line: "You are a senior engineer working on the project below." Do not paraphrase it between turns — even one extra word invalidates the prefix cache.',
+      'Pin the project context block (files in scope, conventions, resource profile) BEFORE the user goal. Same wording, same order, every turn. Anything the model has to re-read costs full re-eval.',
+      'Keep the user goal on a single line starting with "GOAL:" followed by a verb. The goal is the ONLY part of the prompt that should change between turns.',
+      'Put constraints, examples, and output format requests AFTER the goal, not before. Prefix-cache gains are paid only on tokens before the first changed token.',
+      'When retrying with feedback, append a "REVISION:" block after the goal — never edit the goal line itself. The model reuses the cached goal and only re-evaluates from the revision onward.',
+      'Honor any ALWAYS / NEVER rules recorded in ~/.lehro/prompt-feedback.json. They are appended to the prefix as a stable block so they survive every retry.',
+      'For multi-turn follow-ups ("now also do X", "fix the bug above"), keep all prior turns in the message history verbatim. Rephrasing a follow-up loses the cache.',
+      'Observed style (auto-learned from past sessions in ~/.lehro/sessions.sqlite) wins over default phrasing — if the user typically opens with an imperative ("Add…", "Fix…", "Write…"), mirror that pattern in the goal line.',
+    ],
+  },
+  {
+    id: 'token-efficient-output',
+    name: 'Token-Efficient Output',
+    description: 'Optimize local-model prompts and responses for useful work per output token.',
+    guidance: [
+      'Set an explicit output shape and maximum length before asking for prose; prefer compact JSON, short bullets, or focused patches when that is enough.',
+      'Do not spend output tokens narrating unchanged context. Report only the decision, evidence, changed files, and next action.',
+      'For iterative tool work, make one verifiable action per turn and keep observations bounded so the model can reserve tokens for the next action.',
+      'Treat quality per token as a measured objective: preserve correctness and required evidence while removing repetition, filler, and redundant restatement.',
+    ],
+  },
+  {
+    id: 'model-lab-feedback',
+    name: 'Model Lab Feedback',
+    description: 'Use persisted model-lab experiments to choose settings that meet the quality floor with fewer tokens.',
+    guidance: [
+      'Before a local run, check the model-lab recommendation for the selected model when one exists.',
+      'After meaningful model, prompt, or context changes, run the deterministic lab and compare quality, latency, tokens, and regressions.',
+      'Never optimize tokens by accepting a failed quality floor; prefer the lowest-token passing configuration and record why it was selected.',
+    ],
+  },
 ]);
 
 const BY_ID = new Map(BUILTIN_SKILLS.map((skill) => [skill.id, skill]));
@@ -122,6 +158,9 @@ export function inferSkillIds(task, { surface = 'code' } = {}) {
   if (/\b(loop|iterate|iteration|autonom|workflow|agentic)\b/.test(text) || surface === 'loop') inferred.push('loop-discipline');
   if (/\b(plan|architect|build|implement|create|review|audit|security|debug|fix|document|readme)\b/.test(text)) inferred.push('mode-alignment');
   if (/\b(ram|memory|gpu|cpu|performance|optim|latency|resource|efficient)\b/.test(text)) inferred.push('resource-aware');
+  if (/\b(cache|kvcache|kv-cache|prompt.*cache|prefix.*cache|rephrase|retry|same.*prompt)\b/.test(text)) inferred.push('cache-friendly-prompting');
+  if (/\b(token|tokens|output|concise|verbosity|efficient|quality.?per.?token|budget)\b/.test(text)) inferred.push('token-efficient-output');
+  if (/\b(model.?lab|benchmark|bench|quality|regression|tune|tuning|self.?improv)\b/.test(text)) inferred.push('model-lab-feedback');
   return [...new Set(inferred)];
 }
 

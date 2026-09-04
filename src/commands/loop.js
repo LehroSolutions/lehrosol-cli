@@ -43,11 +43,9 @@ export async function runLoopCommand(subcommand, flags, logger) {
   const effectivePrompt = (mode ? mode.preamble + '\n\n# USER GOAL\n' + flags.prompt : flags.prompt)
     + '\n\n' + skillSet.text + notesBlock;
 
-  const requestedIterations = flags.maxIterations ? Number(flags.maxIterations) : 8;
-  // Eco mode avoids long unattended runs competing with a locally hosted
-  // engine on machines with limited RAM. Explicit performance/balanced runs
-  // retain their normal loop budget.
-  const maxIterations = resourceProfile === 'eco' ? Math.min(requestedIterations, 5) : requestedIterations;
+  // Resource profiles tune memory and token use; they must not silently cut
+  // the amount of work the user asked the loop to perform.
+  const maxIterations = flags.maxIterations ? Number(flags.maxIterations) : 12;
 
   const project = projectIdentity(process.cwd());
 
@@ -89,6 +87,7 @@ export async function runLoopCommand(subcommand, flags, logger) {
       skills: skillSet.skillIds,
       reasoning: skillSet.reasoning,
       resourceProfile,
+      toolSteps: flags.toolSteps ? Number(flags.toolSteps) : undefined,
       cwd: process.cwd()
     });
     spinner.stop();
