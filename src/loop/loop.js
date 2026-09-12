@@ -33,6 +33,10 @@ export async function runLoop(options) {
   const iterations = [];
   let iteration = 0;
   let verdict = 'continue';
+  // Continuation memory: each pass starts a fresh chat, so the previous pass's
+  // summary is injected into the next prompt — otherwise a model that ran out
+  // of tool steps redoes recon from scratch on every iteration.
+  let lastSummary = null;
 
   while (verdict === 'continue' && iteration < maxIterations) {
     iteration += 1;
@@ -41,6 +45,7 @@ export async function runLoop(options) {
       agentMd: agentMd,
       fixPlan: fixPlan,
       iteration: iteration,
+      lastSummary: lastSummary,
       owaspScope: opts.owaspScope,
       cwd: cwd,
       branch: opts.branch,
@@ -85,6 +90,7 @@ export async function runLoop(options) {
     const record = { iteration: iteration, adapter: adapterName, requestedAdapter: requestedAdapter, result: result, owaspFindings: owaspFindings, score: score, diff: workspaceDiff };
     iterations.push(record);
     recordCheckpoint(sessionId, iteration, record);
+    if (result && result.summary) lastSummary = String(result.summary);
     verdict = score.verdict;
     if (verdict === 'stop-budget-exhausted') {
       appendFixPlanItem('Loop exhausted budget for prompt: ' + prompt, cwd);

@@ -4,7 +4,7 @@ This file is the living instruction set for any coding agent (human-directed or 
 
 ## What this project is
 
-LehroSol CLI (short alias `lehr-sol`) is a free, GPL-3.0-or-later, zero-runtime-dependency Node.js CLI that unifies three previously-separate disciplines into one tool:
+LehroSol CLI (short alias `lehr-sol`) is a free, open-source (Apache-2.0), zero-runtime-dependency Node.js CLI that unifies three previously-separate disciplines into one tool:
 
 1. **Loop engineering** (Ralph-style self-improving loops) — `src/loop/`, driving 7 real agent-CLI adapters plus a `local` dry-run adapter, all sessions/checkpoints persisted via `src/core/sessionStore.js`. Deep dive: `docs/03-loop-engineering.md`.
 2. **Harness engineering** (verification gates, policy, OWASP compliance) — `src/harness/`, with OWASP LLM Top-10 (2025) / Web Top-10 / ASVS rule packs and a built-in heuristic scanner (`scanOwaspBasics`). Deep dive: `docs/04-harness-engineering.md`.
@@ -42,6 +42,14 @@ This repo ships one canonical instruction file (this one) plus thin, agent-speci
 | Aider / Goose / Hermes Agent | No fixed auto-discovered filename — point them at this file explicitly via their own config/flags | This file |
 
 Full explanation and diagram: `docs/09-agents-and-skills.md`. That page also catalogs every **baked-in workflow skill** under `docs/skills/` (task-scoped `.md` guides for loop engineering, harness verification, orchestration, adapter authoring, GUI work, and docs authoring) — read the relevant skill file before starting focused work in that area.
+
+## Live local-model testing notes (2026-09-07, i5-8265U / UHD-620 / 16 GB, CPU-only)
+
+- Recent llama.cpp builds (WinGet `ggml.llamacpp`, 0.4.0-dev) auto-enable the Vulkan backend on ANY GPU, including integrated ones whose "VRAM" is shared RAM — pinning `-ngl 0` was worth 2–5x tok/s. `serve start` does this automatically on integrated-only machines.
+- llama-server defaults to the model's native context; Qwen3-family GGUFs ship 262k, which tries to allocate a multi-GB KV cache and can OOM-exit before binding the port. `serve start` clamps to 4096 unless `--ctxSize` is given.
+- Node's global fetch (undici) has a fixed 300 s headersTimeout — a ~5-minute CPU prompt eval dies with an opaque "fetch failed" that `AbortSignal.timeout` cannot prevent. That is why `makeHttpAdapter.js` uses a raw `node:http` request, not fetch.
+- `IQ1_S`/`IQ2_XXS`-class quants are ~2.4x slower per token than `Q4_K_M` on AVX2-only CPUs (no AVX512): Qwen3-8B IQ1_S ≈ 1.8 tok/s vs qwen2.5-3B Q4_K_M ≈ 4.3 tok/s (same box, `-t 4`). Prefer Q4_K_M for CPU-only hosts; `vault` fit ratings already prefer it.
+- Background load is the benchmark killer: a disguised miner (see fix_plan.md, 2026-09-07) at 100% CPU made a 9B model look 6x slower. Before benchmarking, check `Get-CimInstance Win32_Processor -Prop LoadPercentage` and scan for runaway processes. **Now automatic:** `arena` and `bench` sample CPU load across the run (`cpuLoadSample`) and flag skewed readings; the GUI Test Bench shows the same guard.
 
 ## Common commands
 

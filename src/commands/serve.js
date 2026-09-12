@@ -17,8 +17,8 @@
 // is one more entry in ENGINES — no other file changes.
 import { execFileSync, spawn } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync, statSync, readdirSync, openSync, closeSync } from 'node:fs';
-import { join } from 'node:path';
-import { detectHardware } from '../core/hardware.js';
+import { join, dirname } from 'node:path';
+import { detectHardware, rateModelFit, estimateRequiredGB } from '../core/hardware.js';
 import { homedir } from 'node:os';
 import { resolveCommand, launchSpec } from '../loop/adapters/shared.js';
 import { saveAdapterConfig } from '../core/config.js';
@@ -42,6 +42,24 @@ export function resolveGgufModel(input) {
     }
   } catch { /* not a local path; pass through untouched */ }
   return raw;
+}
+
+// Best-effort on-disk size of a resolved GGUF. Multi-part GGUFs are loaded
+// shard by shard — the -00001-of-N file alone understates by N× — so sum all.
+function modelDiskBytes(modelPath) {
+  try {
+    const st = statSync(modelPath);
+    if (!st.isFile()) return null;
+    const m = String(modelPath).match(/-00001-of-(\d+)\.gguf$/i);
+    if (!m) return st.size;
+    const total = Number(m[1]);
+    const dir = dirname(modelPath);
+    let sum = 0;
+    for (const f of readdirSync(dir)) {
+      if (new RegExp(`-\\d{5}-of-${total}\\.gguf$`, 'i').test(f)) sum += statSync(join(dir, f)).size;
+    }
+    return sum || st.size;
+  } catch { return null; }
 }
 
 export const ENGINES = Object.freeze({
@@ -116,7 +134,7 @@ function stateFile() {
   return join(lehroHome(), 'serve.json');
 }
 
-function readState() {
+export function readState() {
   try { return JSON.parse(readFileSync(stateFile(), 'utf8')); } catch { return null; }
 }
 
@@ -138,12 +156,20 @@ function engineBin(engine) {
   return process.env[engine.binEnv] || engine.bin;
 }
 
-async function probeEndpoint(baseUrl, timeoutMs = 1500) {
+async function probeEndpoint(baseUrl, timeoutMs = 1500, apiKey = null) {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
-    const res = await fetch(String(baseUrl).replace(/\/$/, '') + '/models', { signal: controller.signal });
+    const res = await fetch(String(baseUrl).replace(/\/$/, '') + '/models', {
+      signal: controller.signal,
+      ...(apiKey ? { headers: { authorization: `Bearer ${apiKey}` } } : {}),
+    });
     clearTimeout(timer);
+    // A key-protected engine answers 401/403 instead of refusing the
+    // connection: that is a LIVE engine holding the wrong key, which must
+    // count as occupied. A keyless pre-flight used to read those statuses as
+    // "something answered" or even "port free", then 401-flooded for minutes.
+    if (res.status === 401 || res.status === 403) return { ok: false, status: res.status, models: [], unauthorized: true };
     if (!res.ok) return { ok: false, status: res.status, models: [] };
     const json = await res.json().catch(() => null);
     const models = Array.isArray(json?.data) ? json.data.map((m) => m && m.id).filter(Boolean) : [];
@@ -153,12 +179,16 @@ async function probeEndpoint(baseUrl, timeoutMs = 1500) {
   }
 }
 
-async function waitForReady(baseUrl, totalMs) {
+async function waitForReady(baseUrl, totalMs, apiKey = null) {
   const deadline = Date.now() + totalMs;
   let last = { ok: false, models: [] };
   while (Date.now() < deadline) {
-    last = await probeEndpoint(baseUrl);
+    last = await probeEndpoint(baseUrl, 1500, apiKey);
     if (last.ok) return last;
+    // Polling a key-protected engine keylessly 401-spams llama-server's log
+    // once per second for the whole ready window. Send the key we launched
+    // with; a mismatch surfaces once, here, instead of flooding the log.
+    if (last.unauthorized) return last;
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
   return last;
@@ -275,12 +305,15 @@ export async function runServeCommand(subcommand, flags = {}, logger = console) 
 
     // Pre-flight: if something already answers on this port, a fresh launch
     // will silently lose the bind race and requests will hit the OLD server
-    // (whose API key will not match this launch). Fail loudly instead.
-    const existing = await probeEndpoint(baseUrl);
-    if (existing.ok) {
+    // (whose API key will not match this launch). A 401/403 also means a live
+    // engine is listening — fail loudly instead of 401-spamming it later.
+    const existing = await probeEndpoint(baseUrl, 1500, apiKey);
+    if (existing.ok || existing.unauthorized) {
       ui.error(
         `Port ${port} is already serving at ${baseUrl}`,
-        'An older engine instance (or the Jan desktop app\u2019s local API server) is still running \u2014 its API key will not match this launch. '
+        (existing.unauthorized
+          ? 'A live engine is listening there but rejects the API key for this launch — its key will not match. '
+          : 'An older engine instance (or the Jan desktop app\u2019s local API server) is still running \u2014 its API key will not match this launch. ')
         + 'Stop it first: `lehrosol serve stop`, or kill the listener directly \u2014 '
         + `Windows PowerShell: Get-NetTCPConnection -LocalPort ${port} -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force } \u2014 `
         + `macOS/Linux: kill $(lsof -ti :${port}). Or start on a free port with --port.`,
@@ -290,10 +323,55 @@ export async function runServeCommand(subcommand, flags = {}, logger = console) 
     }
 
     const features = engine.id === 'llamacpp' ? llamaFeatures(bin) : null;
+
+    // Offload + memory pre-flight (llamacpp). Recent llama.cpp builds ship
+    // Vulkan/compute backends that auto-enable on ANY GPU — including Intel
+    // UHD-class iGPUs whose "VRAM" is shared system RAM. Live benchmarking on
+    // an i5-8265U/UHD-620 laptop measured llama-server silently routing
+    // through the iGPU at 0.3–2.2 tok/s where the same model pinned to the
+    // CPU runs 2×–5× faster. Unless the user pins --gpuLayers, force -ngl 0
+    // on integrated-only machines, and warn up front when the model cannot
+    // fit the RAM budget (page-thrashing measured ≈1 tok/s or worse).
+    let resourceWarning = null;
+    let gpuLayers = flags.gpuLayers ?? flags.ngl;
+    if (engine.id === 'llamacpp') {
+      const hw = detectHardware();
+      const dedicated = Boolean(hw.gpu && !hw.gpu.integrated && Number.isFinite(hw.gpu.vramGB) && hw.gpu.vramGB > 0);
+      if ((gpuLayers == null || gpuLayers === '') && !dedicated) gpuLayers = 0;
+      const sizeBytes = modelDiskBytes(model);
+      if (sizeBytes) {
+        const fit = rateModelFit(sizeBytes, hw);
+        // rateModelFit budgets against total RAM (a server-restart plan);
+        // a launch pre-flight must also check what is free RIGHT NOW —
+        // measured live: a 5.8 GB model in 3.7 GB free RAM pages to ~1 tok/s.
+        const freeNow = Math.min(Number(hw.freeMemGB || 0), Number(fit.budgetGB || Infinity));
+        const requiredGB = Number(fit.requiredGB || estimateRequiredGB(sizeBytes));
+        // 0.85 margin: os.freemem() counts standby cache as available, which
+        // evaporates the moment the engine actually touches those pages.
+        if (fit.fit === 'no-fit' || requiredGB > freeNow * 0.85) {
+          resourceWarning = `Model needs ~${requiredGB} GB but only ~${freeNow} GB is currently free (of ${hw.totalMemGB} GB) — expect heavy paging (≈1 tok/s or worse). Close memory-heavy apps, lower --ctxSize, or pick a smaller quant: \`lehrosol vault list\` rates every GGUF on your drive for this machine.`;
+        }
+      }
+    }
+    // KV-cache OOM guard: llama-server defaults to the model's native context
+    // (some Qwen3 models ship 262k). Measured live: a 9B model without
+    // --ctxSize tried to allocate an 8 GB KV cache and exited before binding
+    // its port. Agentic loop prompts are small — clamp to the balanced profile
+    // unless the user asks for more.
+    const ctxRequested = flags.ctxSize || flags.ctx;
+    const ctxSize = engine.id === 'llamacpp' ? Number(ctxRequested || 4096) : ctxRequested;
+    if (engine.id === 'llamacpp' && !ctxRequested) {
+      ui.keyValue('Context', '4096 (auto-clamped — models with huge native contexts can OOM the KV cache; override with --ctxSize)');
+    }
+    if (resourceWarning) ui.warning('Memory pressure risk', resourceWarning);
+    if (engine.id === 'llamacpp' && (gpuLayers === 0 || gpuLayers === '0')) {
+      ui.keyValue('GPU offload', 'pinned to CPU (integrated-only machine — use --gpuLayers to override)');
+    }
+
     const spec = launchSpec(bin, engine.serveArgs({
       model, port, apiKey,
       detach: engine.detach === 'native' && !foreground,
-      ctxSize: flags.ctxSize || flags.ctx, gpuLayers: flags.gpuLayers ?? flags.ngl,
+      ctxSize, gpuLayers,
       mmproj: flags.mmproj,
       // llama.cpp defaults to all logical cores; physical cores are faster on
       // SMT laptops (Intel iGPU class), so auto-tune unless the user pins -t.
@@ -356,12 +434,15 @@ export async function runServeCommand(subcommand, flags = {}, logger = console) 
     // 60 seconds. The GUI itself waits ten minutes, so the CLI must not fail
     // first and create a false "serve failed" result.
     const readySeconds = Number(flags.readyTimeout || (engine.id === 'llamacpp' ? 300 : 60));
-    const ready = await waitForReady(baseUrl, readySeconds * 1000);
+    const ready = await waitForReady(baseUrl, readySeconds * 1000, apiKey);
     const serverModel = ready.models.length === 1 ? ready.models[0] : null;
     const resolvedModel = engine.preferServerModelId ? (serverModel || model) : (model || serverModel);
     const state = {
       engine: engine.id, bin, pid, port, baseUrl,
       model: resolvedModel, requestedModel: rawModel,
+      // Persist the key so `serve status|models` and IDE integrations can
+      // authenticate against the engine they did not launch themselves.
+      apiKey: apiKey || undefined,
       startedAt: new Date().toISOString(), logPath,
     };
     writeState(state);
@@ -372,7 +453,7 @@ export async function runServeCommand(subcommand, flags = {}, logger = console) 
     const diagnostic = ready.ok ? null : (logPath
       ? (tailText(logPath) || `llama-server did not become ready within ${readySeconds}s; log: ${logPath}`)
       : `Engine did not become ready within ${readySeconds}s`);
-    const result = { ok: ready.ok, ...state, models: ready.models, wiredAsPreferred: wire && ready.ok, diagnostic };
+    const result = { ok: ready.ok, ...state, models: ready.models, wiredAsPreferred: wire && ready.ok, diagnostic, ...(engine.id === 'llamacpp' ? { ctxSize } : {}), ...(resourceWarning ? { resourceWarning } : {}) };
     if (!flags.json) {
       ui.sectionHeader(`Serving via ${engine.label}`);
       ui.keyValue('Endpoint', baseUrl);
@@ -394,8 +475,8 @@ export async function runServeCommand(subcommand, flags = {}, logger = console) 
   if (cmd === 'status') {
     const state = readState();
     const baseUrl = state?.baseUrl || `http://localhost:${engine.defaultPort}/v1`;
-    const probe = await probeEndpoint(baseUrl);
-    const result = { running: probe.ok, baseUrl, models: probe.models, state };
+    const probe = await probeEndpoint(baseUrl, 1500, state?.apiKey);
+    const result = { running: probe.ok, unauthorized: probe.unauthorized === true, baseUrl, models: probe.models, state };
     if (!flags.json) {
       ui.sectionHeader('Local Model Server');
       ui.keyValue('Endpoint', baseUrl);
@@ -446,10 +527,11 @@ export async function runServeCommand(subcommand, flags = {}, logger = console) 
     if (!engine.modelsArgs) {
       const state = readState();
       const baseUrl = state?.baseUrl || `http://localhost:${engine.defaultPort}/v1`;
-      const probe = await probeEndpoint(baseUrl);
-      const result = { ok: probe.ok, engine: engine.id, models: probe.models };
+      const probe = await probeEndpoint(baseUrl, 1500, state?.apiKey);
+      const result = { ok: probe.ok, unauthorized: probe.unauthorized === true, engine: engine.id, models: probe.models };
       if (!flags.json) {
         ui.sectionHeader(`${engine.label} — served models`);
+        if (probe.unauthorized) ui.warning('Key-protected engine on this port', 'Its API key rejects this probe — see `lehrosol serve status` for the tracked key.');
         if (probe.models.length) probe.models.forEach((m) => console.log('  ' + m));
         else console.log('  (no server running — llama.cpp serves one GGUF at a time; see `lehrosol serve start --engine llamacpp`)');
       }

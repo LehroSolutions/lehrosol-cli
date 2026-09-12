@@ -44,7 +44,9 @@ test('run_command is denied unless explicitly opted in', () => {
   const prev = process.env.LEHRO_TOOLS_ALLOW_EXEC;
   delete process.env.LEHRO_TOOLS_ALLOW_EXEC;
   const res = executeTool('run_command', { command: 'echo hi' }, { cwd: process.cwd() });
-  assert.equal(res.ok, true); // executor itself does not throw
+  // ok:false, not a success-looking string: a denied execution must read as a
+  // failed tool call so completion-evidence gates can spot unverified claims.
+  assert.equal(res.ok, false);
   assert.match(res.output, /disabled|LEHRO_TOOLS_ALLOW_EXEC/);
   if (prev != null) process.env.LEHRO_TOOLS_ALLOW_EXEC = prev;
 });

@@ -68,17 +68,36 @@ export function runCompactCommand(flags, logger) {
 }
 
 export function runEngramsCommand(flags, logger) {
-  ui.sectionHeader('Engram Memory');
+  const emit = (payload) => {
+    if (logger && logger.json) logger.json(payload);
+    else console.log(JSON.stringify(payload, null, 2));
+  };
+  const row = (e) => ({
+    id: e.id,
+    project: e.project,
+    adapter: e.adapter,
+    finalVerdict: e.finalVerdict,
+    diffSummary: e.diffSummary,
+    lesson: e.lesson,
+    distilledAt: e.distilledAt,
+  });
   const book = loadEngrams();
+  const limit = Math.max(1, Number(flags.limit || 15));
+  const recent = [...book]
+    .sort((a, b) => String(b.distilledAt || '').localeCompare(String(a.distilledAt || '')))
+    .slice(0, limit);
+
+  // Machine-readable form (the GUI dashboard's memory panel consumes this).
+  if (flags.json) {
+    return emit({ ok: true, engrams: recent.map(row), total: book.length });
+  }
+
+  ui.sectionHeader('Engram Memory');
   if (!book.length) {
     console.log('  No engrams yet. Distill finished sessions into lessons with: lehrosol compact --apply');
     ui.nextSteps(['Preview what would be distilled: lehrosol compact']);
     return;
   }
-  const limit = Math.max(1, Number(flags.limit || 15));
-  const recent = [...book]
-    .sort((a, b) => String(b.distilledAt || '').localeCompare(String(a.distilledAt || '')))
-    .slice(0, limit);
 
   ui.table(
     ['Project', 'Adapter', 'Verdict', 'Changed', 'Lesson'],

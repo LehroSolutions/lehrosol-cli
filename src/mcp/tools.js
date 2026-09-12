@@ -52,7 +52,7 @@ export const TOOL_DEFINITIONS = {
         agentAdapter: { type: 'string', default: 'local', description: 'Adapter id: local, claude-code, codex, opencode, gemini-cli, aider, goose, hermes-agent, cursor, qwen, qoder, zencoder, amp, ollama, lmstudio, vllm, localai, nvidia, grok, or a custom adapter id.' },
         owaspScope: { type: 'array', items: { type: 'string' } },
         capabilityTier: { type: 'string', enum: ['frontier', 'standard', 'small', 'local'], default: 'standard' },
-        toolSteps: { type: 'number', default: 32, minimum: 1, maximum: 80, description: 'Tool calls per adapter pass; local HTTP adapters default higher for longer coding tasks.' },
+        toolSteps: { type: 'number', default: 64, minimum: 1, maximum: 200, description: 'Tool calls per adapter pass. Local HTTP adapters default 64, remote 24; LEHRO_TOOL_STEPS sets a machine-wide default. The harness challenges premature completions and continues from checkpoints.' },
       },
       required: ['prompt'],
     },

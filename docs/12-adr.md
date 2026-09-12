@@ -12,7 +12,7 @@ flowchart TD
     A1["ADR-0001\nZero-dependency core"] --> A4["ADR-0004\nexecFile-only adapters"]
     A1 --> A6["ADR-0006\nnode:sqlite + JSON fallback"]
     A1 --> A10["ADR-0010\nCLI UX from gidevo\n(ANSI, no deps)"]
-    A2["ADR-0002\nGPL-3.0-or-later"]
+    A2["ADR-0002\nApache-2.0 (via ADR-0012)"]
     A3["ADR-0003\nWeb-only GUI\n(no Tauri/Electron)"] --> A7["ADR-0007\nMCP as shared control plane"]
     A5["ADR-0005\nGit worktrees for orchestration"] --> A8["ADR-0008\nAuto-detect base branch"]
     A7 --> A3
@@ -32,12 +32,12 @@ flowchart TD
 - **Decision**: `src/core`, `src/mcp`, `src/harness`, `src/loop`, and `src/orchestrator` may only use Node.js builtins (`node:fs`, `node:http`, `node:child_process`, `node:crypto`, `node:util`, `node:sqlite`). Only `gui/` may declare npm dependencies.
 - **Consequences**: No `node_modules` needed for the primary CLI/loop/harness/orchestrator path; the GUI requires a separate `npm install` with internet access. See [01 · Architecture](01-architecture.md).
 
-## ADR-0002 — License: GPL-3.0-or-later
+## ADR-0002 — License: GPL-3.0-or-later (superseded by ADR-0012)
 
-- **Status**: Accepted
+- **Status**: Superseded by [ADR-0012](#adr-0012--relicense-to-apache-20) as of v3.2.0
 - **Context**: The project intentionally competes with proprietary incumbents (Claude Code, Codex CLI) and wanted to stay fully free/copyleft rather than adopt a dual-license or permissive model.
 - **Decision**: GPL-3.0-or-later for the whole repository.
-- **Consequences**: Downstream forks/derivatives must stay GPL-compatible; this differentiates LehroSol from AGPL (`mux`) and MIT/Apache competitors — see [02 · Competitive Landscape](02-competitors.md).
+- **Consequences**: ~~Downstream forks/derivatives must stay GPL-compatible~~ (see ADR-0012). Releases ≤ 3.1.0 remain GPL-3.0-or-later; from 3.2.0 the project is Apache-2.0.
 
 ## ADR-0003 — Web-only GUI instead of Tauri or Electron
 
@@ -101,6 +101,13 @@ flowchart TD
 - **Context**: The audit found several places where the product contract and implementation had drifted: `-i` was advertised but short flags were not parsed, `--dryRun=false` was documented but boolean/equal-sign parsing did not support it, `sessions show` printed `-/-` for SQLite checkpoints because it read the wrong data shape, MCP schema still claimed `baseBranch` defaulted to `main`, and the OWASP scanner could be handed paths outside the project root.
 - **Decision**: Treat documentation/CLI contract drift as a blocking product bug. Add parser support for short flags, `--key=value`, and boolean coercion; fix session checkpoint display; suppress only the noisy SQLite experimental warning by default; remove stale `main` defaults; refuse scanner path escapes; protect both `main` and `master` by default; and back the fixes with Node regression tests.
 - **Consequences**: The examples in the docs now execute exactly as written. `npm test` validates the audit fixes. The CLI is safer in hostile inputs (`--files ../../...`) and clearer in normal use. See [14 · Audit Report](14-audit-report.md).
+
+## ADR-0012 — Relicense to Apache-2.0
+
+- **Status**: Accepted
+- **Context**: The original GPL-3.0-or-later choice (ADR-0002) fit the free-software stance, but as the project moves into open beta the copyleft terms became real friction: most agent CLIs LehroSol integrates with are MIT/Apache, downstream embedders (VS Code extensions, MCP clients, CI images) want redistribution-with-attribution rather than license-compatibility review, and the committed `LICENSE` had drifted into a placeholder rather than verbatim license text.
+- **Decision**: Relicense the entire repository under **Apache License 2.0** starting at v3.2.0. The verbatim license text ships in `LICENSE` with a filled-in copyright appendix, a `NOTICE` file is added, and every SPDX identifier (`package.json`, Homebrew formula, VS Code extension manifest, docs) is updated in one sweep. A regression test pins `pkg.license === 'Apache-2.0'` so it cannot silently regress.
+- **Consequences**: Permissive redistribution with attribution plus the Apache explicit patent grant; contributions land under Apache-2.0 by default (see `CONTRIBUTING.md`). Anyone who depends on the copyleft terms can stay on releases ≤ 3.1.0, which remain GPL-3.0-or-later. `docs/02-competitors.md`'s license table now describes competitors, not this project.
 
 ## See also
 

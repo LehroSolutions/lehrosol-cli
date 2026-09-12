@@ -89,7 +89,7 @@ Also see: [`skills/`](skills/README.md) for task-scoped workflow skills any agen
 
 | Phase | What was built | Status |
 | --- | --- | --- |
-| 0 | Core, CLI, MCP server, harness policy, loop engine, git-worktree orchestrator, `doctor`/`init`, GPL-3.0 | Done |
+| 0 | Core, CLI, MCP server, harness policy, loop engine, git-worktree orchestrator, `doctor`/`init`, Apache-2.0 | Done |
 | 1 | Real agent adapters: Claude Code, Codex CLI, OpenCode, Gemini CLI, Aider, Goose, Hermes Agent | Done |
 | 2 | OWASP rule packs (`llm`/`web`/`asvs`) + heuristic scanner, SQLite session store | Done |
 | 3 | Web GUI dashboard scaffold wired to MCP HTTP endpoint | Done |

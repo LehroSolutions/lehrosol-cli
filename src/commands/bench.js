@@ -12,6 +12,7 @@
 // bin/lehrosol.js, the MCP tool registry, and the TUI quick-actions.
 
 import { ui } from '../core/ui.js';
+import { cpuLoadSample } from './quick.js';
 import { runBench, benchSummary, topMovers, resolveLayers } from '../bench/benchCore.js';
 import {
   LAYER_IDS,
@@ -51,10 +52,19 @@ async function runBenchRun(flags, logger) {
   const prefs = loadPrefs();
   ui.keyValue('Weights', Object.entries(prefs.weights).map(([k, v]) => `${k}=${v}`).join('  '));
 
+  // Benchmark validity guard (live-testing lesson 2026-09-07): a single
+  // runaway background process made a 9B model look 6x slower. Sample load
+  // across the run so skewed scores announce themselves.
+  const loadPromise = cpuLoadSample(1000);
   const spinner = ui.createSpinner(`Running ${layers.length} scorecard(s)...`);
   spinner.start();
   const result = await runBench({ layers: layers.join(','), prompt: flags.prompt, triggeredBy: 'cli' });
   spinner.stop();
+  const cpuLoad = await loadPromise;
+  result.cpuLoad = cpuLoad;
+  if (!flags.json && cpuLoad >= 60) {
+    ui.warning(`Background CPU load ${cpuLoad}%`, 'These scores may be skewed by another process. Close heavy apps and re-run.');
+  }
 
   if (flags.json) {
     logger.json ? logger.json(result) : console.log(JSON.stringify(result, null, 2));

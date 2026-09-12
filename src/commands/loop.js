@@ -49,6 +49,36 @@ export async function runLoopCommand(subcommand, flags, logger) {
 
   const project = projectIdentity(process.cwd());
 
+  // JSON consumers parse stdout; banner/table/spinner must stay off there.
+  if (flags.json) {
+    const result = await runLoop({
+      prompt: effectivePrompt,
+      maxIterations: maxIterations,
+      dryRun: flags.dryRun !== false,
+      agentAdapter: flags.agentAdapter || 'local',
+      owaspScope: flags.owaspScope ? String(flags.owaspScope).split(',') : [],
+      capabilityTier: flags.capabilityTier || 'standard',
+      timeoutMs: flags.timeoutMs ? Number(flags.timeoutMs) : undefined,
+      temperature: mode && mode.temperature != null ? mode.temperature : undefined,
+      skills: skillSet.skillIds,
+      reasoning: skillSet.reasoning,
+      resourceProfile,
+      toolSteps: flags.toolSteps ? Number(flags.toolSteps) : undefined,
+      cwd: process.cwd()
+    }).catch((e) => {
+      process.exitCode = 1;
+      return { error: String((e && e.message) || e) };
+    });
+    touchProject(process.cwd(), {
+      mode: mode ? mode.id : null,
+      adapter: flags.agentAdapter || 'local',
+      verdict: result.finalVerdict || null,
+      sessionId: result.sessionId || null,
+    });
+    logger.json(result);
+    return result;
+  }
+
   ui.sectionHeader('Loop Engine');
 
   // Show the run configuration
@@ -64,6 +94,7 @@ export async function runLoopCommand(subcommand, flags, logger) {
       ['Dry Run', flags.dryRun !== false ? 'yes (no real agent calls)' : 'no (real agent calls)'],
       ['OWASP Scope', (flags.owaspScope || '(none)')],
       ['Capability Tier', ui.highlight(flags.capabilityTier || 'standard')],
+      ['Tool Steps / pass', flags.toolSteps ? String(Number(flags.toolSteps)) : 'adapter default (64 local / 24 remote — LEHRO_TOOL_STEPS overrides)'],
       ['Reasoning', skillSet.reasoning],
       ['Skills', skillSet.skillIds.join(', ')],
       ['Resource Profile', resourceProfile],

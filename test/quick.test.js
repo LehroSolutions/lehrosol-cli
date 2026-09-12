@@ -163,6 +163,21 @@ test('a silent reasoner cannot win the arena over a model that answered', async 
   assert.equal(arenaWinner(allEmpty).model, 'b', 'falls back to speed when nobody answered');
 });
 
+test('verifyChatAuth flags a key-protected engine that rejects our key', async () => {
+  const { verifyChatAuth } = await import('../src/commands/quick.js');
+  const server = createServer((req, res) => {
+    assert.equal(req.headers.authorization, 'Bearer wrong-key');
+    res.statusCode = 401;
+    res.end('unauthorized: Invalid API Key');
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const port = server.address().port;
+  const res = await verifyChatAuth(`http://127.0.0.1:${port}/v1`, 'wrong-key');
+  server.close();
+  assert.equal(res.ok, false);
+  assert.equal(res.unauthorized, true, 'ensureServing relies on this flag to replace a key-rejecting hot engine');
+});
+
 test('a slow warm-up is not treated as a launch failure', async () => {
   const { isLaunchFailure } = await import('../src/commands/quick.js');
   assert.equal(isLaunchFailure({ ok: false, reason: 'port-in-use' }), true);

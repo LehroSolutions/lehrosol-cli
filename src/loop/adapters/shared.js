@@ -8,6 +8,20 @@ export function commandExists(bin) {
   return resolveCommand(bin).ok;
 }
 
+// Successful PATH resolutions are memoized per binary for a short TTL. Each
+// miss spawns a `where`/`which` child process, and the loop engine/MCP server
+// re-probe the same adapter binaries many times per run — on Windows that
+// wasted whole minutes (see fix_plan.md). Failed lookups are deliberately NOT
+// cached: a binary that appears on PATH later (or mid-test) must be found, and
+// failed probes are the cheap path anyway. Call clearResolveCache() in tests
+// that manipulate PATH.
+const RESOLVE_TTL_MS = 60_000;
+const resolveCache = new Map();
+
+export function clearResolveCache() {
+  resolveCache.clear();
+}
+
 export function resolveCommand(bin) {
   if (!bin) return { ok: true, command: null, launcher: null };
   const raw = String(bin);
@@ -26,6 +40,9 @@ export function resolveCommand(bin) {
     return { ok: false, command: raw, launcher: null };
   }
   const lookup = process.platform === 'win32' ? 'where' : 'which';
+  const cached = resolveCache.get(raw);
+  if (cached && Date.now() - cached.at < RESOLVE_TTL_MS) return cached.value;
+  let value;
   try {
     const out = execFileSync(lookup, [bin], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
     const candidates = out.split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
@@ -35,9 +52,12 @@ export function resolveCommand(bin) {
     // report ENOENT even after `where opencode` succeeds; launch the resolved
     // shim through cmd.exe so readiness matches actual runtime behavior.
     if (process.platform === 'win32' && (/\.(cmd|bat)$/.test(lower) || !/\.exe$/.test(lower))) {
-      return { ok: true, command, launcher: 'cmd' };
+      value = { ok: true, command, launcher: 'cmd' };
+    } else {
+      value = { ok: true, command, launcher: null };
     }
-    return { ok: true, command, launcher: null };
+    resolveCache.set(raw, { at: Date.now(), value });
+    return value;
   } catch {
     return { ok: false, command: bin, launcher: null };
   }

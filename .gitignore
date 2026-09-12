@@ -7,3 +7,6 @@ gui/dist/
 .env
 .DS_Store
 *.gguf
+
+# Local agent-tool skill state (auto-generated)
+.agents/

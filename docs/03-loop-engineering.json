@@ -2,8 +2,8 @@
   "title": "03 · Loop Engineering",
   "description": "",
   "sourceFile": "03-loop-engineering.md",
-  "readingMinutes": 5,
-  "wordCount": 942,
+  "readingMinutes": 6,
+  "wordCount": 1151,
   "sections": [
     {
       "level": 2,
@@ -34,6 +34,11 @@
       "level": 2,
       "heading": "CLI reference",
       "id": "cli-reference"
+    },
+    {
+      "level": 2,
+      "heading": "Long-task persistence (pushing weak models past premature \"done\")",
+      "id": "long-task-persistence-pushing-weak-models-past-premature-done"
     },
     {
       "level": 2,

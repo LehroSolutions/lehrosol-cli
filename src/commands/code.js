@@ -143,6 +143,7 @@ export function buildSystemPrompt({ allowRun, dryRun = false, reasoning = 'stand
     '{"action":"read","path":"<file>","startLine":1,"endLine":80} read a file or a focused line range',
     '{"action":"mkdir","path":"<folder>"}                       create a project folder when needed',
     '{"action":"write","path":"<file>","content":"<FULL new file content>"}   create or completely overwrite a file',
+    '{"action":"edit","path":"<file>","find":"<exact text>","replace":"<new text>"}  replace the ONE exact occurrence of find in an existing file — the surgical way to change big files with small diffs',
     allowRun
       ? '{"action":"run","command":"<shell command>"}              run a command in the project root'
       : '(command execution is disabled in this session — never use "run")',
@@ -150,6 +151,7 @@ export function buildSystemPrompt({ allowRun, dryRun = false, reasoning = 'stand
     '',
     'Rules:',
     '- ALWAYS read a file before rewriting it; "write" replaces the whole file.',
+    '- Prefer "edit" over "write" for changing existing files: the "find" text must be copied EXACTLY from a fresh read (including whitespace) and match exactly one occurrence.',
     '- If a file observation says it was truncated, continue with focused startLine/endLine reads; do not try to load the entire file at once.',
     '- Never invent file contents you have not read.',
     '- Keep changes minimal and complete. Do not touch unrelated files.',
@@ -269,6 +271,39 @@ export async function applyAction(action, ctx) {
       };
     }
 
+    if (kind === 'edit') {
+      const file = assertInsideRoot(normalizeProjectPath(action.path || ''), ctx.root, { allowOutside: ctx.allowOutside });
+      const rel = relative(ctx.root, file);
+      const find = String(action.find ?? '');
+      const replace = String(action.replace ?? '');
+      if (!find) {
+        return { ok: false, label: `edit ${rel} (no find)`, observation: 'The edit action needs an exact "find" string. Read the file and copy the text to replace verbatim.' };
+      }
+      if (!existsSync(file)) {
+        return { ok: false, label: `edit ${rel} (missing)`, observation: `No such file: ${rel}. Use "write" to create a new file.` };
+      }
+      const content = readFileSync(file, 'utf8');
+      const occurrences = content.split(find).length - 1;
+      if (occurrences === 0) {
+        return { ok: false, label: `edit ${rel} (no match)`, observation: `The "find" text was not found in ${rel}. Copy it EXACTLY from a fresh read — including whitespace — or use "write" to replace the whole file.` };
+      }
+      if (occurrences > 1) {
+        return { ok: false, label: `edit ${rel} (ambiguous)`, observation: `The "find" text occurs ${occurrences} times in ${rel}. Extend the find string with surrounding lines until it matches exactly one occurrence, then retry.` };
+      }
+      const idx = content.indexOf(find);
+      if (ctx.dryRun) {
+        return { ok: true, label: `edit ${rel} (dry run — held back)`, observation: `DRY RUN: ${rel} was NOT edited (${find.length} → ${replace.length} chars staged). Continue as if it were.` };
+      }
+      if (ctx.missionId) { try { backupFile(ctx.missionId, ctx.root, rel); } catch { /* backups are best-effort */ } }
+      writeFileSync(file, content.slice(0, idx) + replace + content.slice(idx + find.length));
+      if (!ctx.changed.includes(rel)) ctx.changed.push(rel);
+      return {
+        ok: true,
+        label: `edit ${rel} (${find.length} → ${replace.length} chars)`,
+        observation: `Edited ${rel}: replaced ${find.length} chars with ${replace.length} chars.`,
+      };
+    }
+
     if (kind === 'mkdir') {
       const folder = assertInsideRoot(normalizeProjectPath(action.path || ''), ctx.root, { allowOutside: ctx.allowOutside });
       const rel = relative(ctx.root, folder);
@@ -295,7 +330,7 @@ export async function applyAction(action, ctx) {
       return { ok: true, done: true, label: 'done', summary: String(action.summary || '(no summary given)') };
     }
 
-    return { ok: false, label: `${kind}?`, observation: `Unknown action "${kind}". Valid actions: list, read, mkdir, write, run, done.` };
+    return { ok: false, label: `${kind}?`, observation: `Unknown action "${kind}". Valid actions: list, read, edit, mkdir, write, run, done.` };
   } catch (e) {
     if (e instanceof PathSafetyError) {
       return { ok: false, label: `${kind} ${action.path} (blocked)`, observation: e.message };
@@ -410,6 +445,7 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
   const actionCounts = {};
   const missionFlags = { dryRun: ctx.dryRun, allowRun: ctx.allowRun, contextMode, resourceProfile, reasoning: skillSet.reasoning, maxSteps, autoContinue, maxExtensions, totalStepBudget };
   let extensions = 0;
+  let stepsWithoutActing = 0;
   let terminationReason = 'budget-exhausted';
 
   for (let step = 1; step <= totalStepBudget; step += 1) {
@@ -468,6 +504,20 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
     repeatedActions = 0;
     lastActionKey = actionKey;
     actionCounts[String(action.action)] = (actionCounts[String(action.action)] || 0) + 1;
+
+    // Verification-treadmill guard (2026-09-11, Qwen3.8-9B live run): the
+    // model cycled list/read/run for 15+ steps re-verifying without ever
+    // acting — the identical-action stall guard cannot see it because every
+    // read varies slightly. After this many non-acting steps in a row,
+    // demand the actual change (or an honest done-with-blocker).
+    const actingKind = ['write', 'edit', 'mkdir'].includes(String(action.action).toLowerCase());
+    if (actingKind) stepsWithoutActing = 0;
+    else stepsWithoutActing += 1;
+    if (stepsWithoutActing === 6) {
+      prompt = `TASK (unchanged): ${truncateText(goal, 300)}\n\nYou have taken ${stepsWithoutActing} inspection steps in a row without changing any file. Take the actual edit or write action NOW — copy the exact text from your last read. If acting is genuinely impossible, use "done" with the specific blocker.`;
+      if (!flags.json) console.log(`  [${step}/${totalStepBudget}] action-lag guard: ${stepsWithoutActing} non-acting steps — demanding the change`);
+      continue;
+    }
 
     const out = await applyAction(action, ctx);
     if (!flags.json) console.log(`  [${step}/${totalStepBudget}] ${out.label}${out.ok ? '' : '  ← refused'}  (${((Date.now() - stepStart) / 1000).toFixed(1)}s)`);

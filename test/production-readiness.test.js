@@ -30,7 +30,8 @@ async function postJson(url, body, headers = {}) {
 
 test('package is production version with executable bin', async () => {
   const pkg = JSON.parse(await readFile(join(ROOT, 'package.json'), 'utf8'));
-  assert.equal(pkg.version, '3.1.0');
+  assert.match(pkg.version, /^\d+\.\d+\.\d+(-[\w.]+)?$/, 'version must be valid semver');
+  assert.equal(pkg.license, 'Apache-2.0');
   assert.equal(pkg.bin.lehrosol, './bin/lehrosol.js');
   assert.ok(pkg.files.includes('bin'));
   assert.ok(pkg.files.includes('src'));
@@ -51,10 +52,11 @@ test('help exposes production config and CMUX thread commands', async () => {
   assert.match(stdout, /tui \[--mode basic\|intermediate\|advanced\]/);
 });
 
-test('MCP initialize reports production version', async () => {
+test('MCP initialize reports the package version (no drift)', async () => {
+  const pkg = JSON.parse(await readFile(join(ROOT, 'package.json'), 'utf8'));
   const res = await handleRpc({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {} });
   assert.equal(res.result.serverInfo.name, 'lehrosol-cli');
-  assert.equal(res.result.serverInfo.version, '3.0.0');
+  assert.equal(res.result.serverInfo.version, pkg.version, 'MCP serverInfo.version must match package.json');
 });
 
 test('MCP tools include config, thread, and expanded adapter tools', () => {

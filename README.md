@@ -2,7 +2,7 @@
 
 **Short alias: `lehr-sol`**
 
-A free, GPL-3.0-or-later, zero-dependency-core Node.js CLI that unifies **loop engineering** (Ralph-style self-improving loops), **harness engineering** (policy/OWASP verification gates with a built-in scanner), and **orchestration engineering** (git-worktree multi-agent supervision) behind one MCP control plane, so any existing coding agent (Claude Code, Codex CLI, Gemini CLI, OpenCode, Aider, Goose, Hermes Agent) can be driven, scored, and orchestrated from either the terminal or a GUI, with seamless handoff between the two.
+An open-source (**Apache-2.0**), zero-dependency-core Node.js CLI that unifies **loop engineering** (Ralph-style self-improving loops), **harness engineering** (policy/OWASP verification gates with a built-in scanner), and **orchestration engineering** (git-worktree multi-agent supervision) behind one MCP control plane, so any existing coding agent (Claude Code, Codex CLI, Gemini CLI, OpenCode, Aider, Goose, Hermes Agent) can be driven, scored, and orchestrated from either the terminal or a GUI, with seamless handoff between the two.
 
 ## Install
 
@@ -10,8 +10,14 @@ A free, GPL-3.0-or-later, zero-dependency-core Node.js CLI that unifies **loop e
 npm install -g lehrosol-cli
 # or
 bun install -g lehrosol-cli
-# or
+# or (macOS / Linux)
 curl -fsSL https://get.lehro.dev/install | bash
+```
+
+**Windows:** no curl needed — `npm install -g lehrosol-cli` works out of the box, or from a cloned repo:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
 Both `lehrosol` and `lehr-sol` point at the same binary.
@@ -62,4 +68,6 @@ See `AGENTS.md` for the project's own operating instructions, and `docs/01-archi
 
 ## License
 
-GPL-3.0-or-later. See `LICENSE`.
+Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+> **Note:** releases ≤ 3.1.0 were distributed under GPL-3.0-or-later; from 3.2.0 onward the project is Apache-2.0 (see ADR-0012 in `docs/12-adr.md`).

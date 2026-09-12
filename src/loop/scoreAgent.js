@@ -13,6 +13,6 @@ export function scoreIteration(iterationInput) {
     passed: passed,
     violations: policyResult.violations,
     warnings: policyResult.warnings,
-    verdict: passed ? 'stop-success' : (input.iteration >= (input.maxIterations || 8) ? 'stop-budget-exhausted' : 'continue')
+    verdict: passed ? 'stop-success' : (input.iteration >= (input.maxIterations || 12) ? 'stop-budget-exhausted' : 'continue')
   };
 }

@@ -1,10 +1,10 @@
 class Lehrosol < Formula
   desc "Unified agentic engineering console"
   homepage "https://github.com/lehrosolutions/lehrosol-cli"
-  url "https://example.com/lehrosol-cli-2.0.0.tgz"
-  version "2.0.0"
+  url "https://example.com/lehrosol-cli-3.2.0.tgz"
+  version "3.2.0"
   sha256 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-  license "GPL-3.0-or-later"
+  license "Apache-2.0"
   depends_on "node@20"
   def install
     libexec.install Dir["*"]

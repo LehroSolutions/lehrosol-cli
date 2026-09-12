@@ -74,7 +74,20 @@ lehrosol loop run --prompt "harden the auth endpoint" \
 | `--maxIterations` | `12` | Iteration budget (bounded at 100; resource profiles no longer reduce it) |
 | `--owaspScope` | (none) | Comma-separated: `llm`, `web`, `asvs` |
 | `--capabilityTier` | `standard` | `frontier` \| `standard` \| `small` \| `local` — controls the pass bar |
-| `--toolSteps` | `32` for local HTTP adapters | Tool calls allowed inside one adapter pass (bounded at 80); incomplete passes remain `continue` evidence instead of being treated as success |
+| `--toolSteps` | `64` for local HTTP adapters (`24` remote) | Tool calls allowed inside one adapter pass (bounded at 200; `LEHRO_TOOL_STEPS` sets a machine-wide default); incomplete passes remain `continue` evidence instead of being treated as success |
+
+## Long-task persistence (pushing weak models past premature "done")
+
+Small local models routinely announce "Done!" after a few steps without doing the work. The loop harness now defends against this at three layers:
+
+1. **Completion-evidence gate** — if a model returns a final answer with *zero* tool activity on an action-style task ("fix", "implement", "refactor", …), the adapter pushes back with a bounded challenge (max 2) demanding real tool work. Pure questions are answered directly. An explicit `BLOCKED: <reason>` reply is always accepted as a terminal, honest state. The run result reports `challenges`, `blocked`, and `evidence` (`{ toolCalls, changedFiles }`) so a "done" is distinguishable from a "claimed done".
+2. **Outer-loop continuation memory** — every pass starts a fresh chat, so `loop.js` injects the previous pass's summary into the next prompt (`OUTER-LOOP CONTINUATION — pass N … prior pass summary …`). A model that exhausted its step budget resumes from the workspace state instead of redoing recon from scratch.
+3. **Raised step budgets** — 64 tool steps per pass for local HTTP adapters (24 remote), bounded at 200, overridable via `LEHRO_TOOL_STEPS` or `--toolSteps`. Combined with the `--maxIterations 12` default that is up to 768 tool calls of unattended work per loop run.
+
+```bash
+lehrosol loop run --prompt "implement input validation with tests" --agentAdapter ollama --dryRun=false
+LEHRO_TOOL_STEPS=96 lehrosol loop run --prompt "..." --agentAdapter llamacpp --dryRun=false --maxIterations 16
+```
 
 ## Local code-lane continuation
 

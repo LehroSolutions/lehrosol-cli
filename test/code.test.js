@@ -61,6 +61,36 @@ test('applyAction keeps command execution behind --allowRun', async () => {
   assert.match(allowed.observation, /hi/);
 });
 
+test('applyAction edit makes surgical, unique-match replacements', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'lehro-code-'));
+  writeFileSync(join(root, 'plan.md'), 'line one\n- [ ] old item\nline three\n');
+  const ctx = { root, dryRun: false, allowRun: false, changed: [] };
+  const ok = await applyAction({ action: 'edit', path: 'plan.md', find: '- [ ] old item', replace: '- [x] old item' }, ctx);
+  assert.equal(ok.ok, true);
+  assert.equal(readFileSync(join(root, 'plan.md'), 'utf8'), 'line one\n- [x] old item\nline three\n');
+  assert.deepEqual(ctx.changed, [join('plan.md')]);
+  const missing = await applyAction({ action: 'edit', path: 'plan.md', find: 'NOT PRESENT', replace: 'x' }, ctx);
+  assert.equal(missing.ok, false, 'a no-match find must refuse with a self-correction hint');
+  assert.match(missing.observation, /not found/);
+  const ambiguous = await applyAction({ action: 'edit', path: 'plan.md', find: 'line', replace: 'LINE' }, ctx);
+  assert.equal(ambiguous.ok, false, 'an ambiguous find must refuse instead of guessing');
+  assert.match(ambiguous.observation, /2 times/);
+  const dry = await applyAction({ action: 'edit', path: 'plan.md', find: '- [x] old item', replace: 'y' }, { root, dryRun: true, changed: [] });
+  assert.equal(dry.ok, true);
+  assert.match(dry.observation, /DRY RUN/);
+  assert.equal(readFileSync(join(root, 'plan.md'), 'utf8'), 'line one\n- [x] old item\nline three\n', 'dry-run edit must hold back');
+  const esc = await applyAction({ action: 'edit', path: '../escape.txt', find: 'a', replace: 'b' }, { root, changed: [] });
+  assert.equal(esc.ok, false, 'edits outside the project root must be refused');
+});
+
+test('buildSystemPrompt advertises the surgical edit action', () => {
+  const prompt = buildSystemPrompt({ allowRun: true });
+  assert.match(prompt, /"action":"edit"/);
+  assert.match(prompt, /Prefer "edit" over "write"/);
+  const strict = buildSystemPrompt({ allowRun: false });
+  assert.match(strict, /"action":"edit"/);
+});
+
 test('list hides dependency noise like node_modules', async () => {
   const root = mkdtempSync(join(tmpdir(), 'lehro-code-'));
   mkdirSync(join(root, 'node_modules'));

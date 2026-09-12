@@ -3,7 +3,17 @@
 // patterns, re-themed to match LehroSol's dark glass-HUD design language.
 
 import { createInterface } from 'node:readline';
+import { readFileSync } from 'node:fs';
 import { refreshCapabilities, setUnicode } from './theme.js';
+
+// Single source of truth for the displayed license: package.json. Keeps the
+// banner from drifting after a relicense (the GPL-3.0-or-later string used to
+// be hardcoded here and outlived the Apache-2.0 switch in 3.2.0-beta.1).
+let CORE_LICENSE = 'Apache-2.0';
+try {
+  const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+  if (pkg && typeof pkg.license === 'string') CORE_LICENSE = pkg.license;
+} catch { /* keep fallback */ }
 
 const ESC = String.fromCharCode(27);
 const C = {
@@ -49,7 +59,7 @@ export function showBanner(version) {
   console.log('');
   console.log(paint(C.cyan, paint(C.bold, '  LehroSol CLI')));
   console.log(paint(C.dim, '  Unified agentic engineering: loop + harness + orchestration'));
-  if (version) console.log(paint(C.dim, `  v${version}  ·  GPL-3.0-or-later  ·  alias: lehr-sol`));
+  if (version) console.log(paint(C.dim, `  v${version}  ·  ${CORE_LICENSE}  ·  alias: lehr-sol`));
   console.log('');
 }
 
@@ -74,7 +84,7 @@ export function showLogoBanner(version) {
     '',
     'L E H R O S O L',
     'local models on your drive · agentic engineering',
-    version ? `v${version} · GPL-3.0-or-later · alias: lehr-sol` : '',
+    version ? `v${version} · ${CORE_LICENSE} · alias: lehr-sol` : '',
     '',
   ];
   console.log('');

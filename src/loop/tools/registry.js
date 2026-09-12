@@ -119,7 +119,7 @@ export function toolNames() {
 // ---------------------------------------------------------------------------
 function handleRead(args, cwd) {
   const target = assertInsideRoot(String(args.path || ''), cwd);
-  if (!existsSync(target)) return `File not found: ${args.path}`;
+  if (!existsSync(target)) throw new Error(`File not found: ${args.path} — call list_dir to discover the actual layout`);
   const raw = readFileSync(target, 'utf8');
   if (raw.length > MAX_READ) return raw.slice(0, MAX_READ) + `\n… [truncated ${raw.length - MAX_READ} bytes]`;
   return raw;
@@ -136,11 +136,11 @@ function handleWrite(args, cwd) {
 
 function handleEdit(args, cwd) {
   const target = assertInsideRoot(String(args.path || ''), cwd);
-  if (!existsSync(target)) return `File not found: ${args.path}`;
+  if (!existsSync(target)) throw new Error(`File not found: ${args.path} — call list_dir to discover the actual layout`);
   const before = readFileSync(target, 'utf8');
   const find = String(args.find == null ? '' : args.find);
   if (!find) throw new Error('edit_file requires a non-empty "find"');
-  if (!before.includes(find)) return `No occurrence of the given "find" text in ${args.path}`;
+  if (!before.includes(find)) throw new Error(`No occurrence of the given "find" text in ${args.path} — read_file first and copy the exact text`);
   const replace = String(args.replace == null ? '' : args.replace);
   const after = args.all ? before.split(find).join(replace) : before.replace(find, replace);
   if (after.length > MAX_WRITE) throw new Error(`result exceeds ${MAX_WRITE} byte cap`);
@@ -151,7 +151,7 @@ function handleEdit(args, cwd) {
 
 function handleList(args, cwd) {
   const target = assertInsideRoot(String(args.path || '.'), cwd);
-  if (!existsSync(target)) return `Directory not found: ${args.path || '.'}`;
+  if (!existsSync(target)) throw new Error(`Directory not found: ${args.path || '.'} — call list_dir with "." for the project root`);
   const entries = readdirSync(target).slice(0, MAX_LIST).map((name) => {
     let kind = 'file';
     try { kind = statSync(join(target, name)).isDirectory() ? 'dir' : 'file'; } catch { /* ignore */ }
@@ -220,7 +220,11 @@ function handleRunTests(_args, cwd) {
 
 function handleRunCommand(args, cwd) {
   if (process.env.LEHRO_TOOLS_ALLOW_EXEC !== '1') {
-    return 'run_command is disabled. Set LEHRO_TOOLS_ALLOW_EXEC=1 to allow arbitrary shell execution.';
+    // Throw (not return a string): executeTool maps throws to { ok:false } so
+    // the completion-evidence gate can tell "verification attempted" from
+    // "verification silently refused". Returning the notice as a successful
+    // result let models cite it as if verification had happened.
+    throw new Error('run_command is disabled on this machine. Verification by execution is unavailable — inspect the code instead and state plainly in your final answer that you could NOT run anything. Set LEHRO_TOOLS_ALLOW_EXEC=1 to enable shell execution.');
   }
   const command = String(args.command || '');
   if (!command) throw new Error('run_command requires a "command"');

@@ -7,12 +7,36 @@
 //   lehrosol try --prompt "2+2?"       # one-shot, scriptable
 //   lehrosol arena --prompt "..."      # same prompt across your best models — scoreboard
 //   lehrosol scan --path "D:\\AI Models"
+import { cpus } from 'node:os';
 import { createInterface } from 'node:readline/promises';
+
+// CPU busy-percentage sample (0-100) over a short window. Benchmark validity
+// guard: live testing (2026-09-07) showed a single runaway background process
+// made a 9B model read 6x slower — every tok/s number this CLI reports for
+// arena/bench carries this sample so skewed readings announce themselves.
+export function cpuLoadSample(sampleMs = 400) {
+  const snap = () => cpus().reduce((a, c) => {
+    const t = c.times;
+    return { idle: a.idle + t.idle, total: a.total + t.idle + t.user + t.nice + t.sys + t.irq };
+  }, { idle: 0, total: 0 });
+  const before = snap();
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const after = snap();
+      const dt = after.total - before.total;
+      const idle = after.idle - before.idle;
+      resolve(dt > 0 ? Math.max(0, Math.min(100, Math.round((1 - idle / dt) * 100))) : 0);
+    }, Math.max(50, Number(sampleMs) || 400));
+  });
+}
+
 import { scanVault, vaultRoots, resolveVaultModel } from '../core/modelVault.js';
 import { detectHardware } from '../core/hardware.js';
 import { ratedVault, runVaultCommand } from './vault.js';
-import { runServeCommand } from './serve.js';
+import { runServeCommand, readState } from './serve.js';
 import { execFileSync } from 'node:child_process';
+import { request as httpRequest } from 'node:http';
+import { request as httpsRequest } from 'node:https';
 import { ui } from '../core/ui.js';
 
 export const DEFAULT_PORT = 7000;
@@ -28,6 +52,62 @@ function emit(result, flags, logger) {
 
 function silentLogger() {
   return { json: () => {}, info: () => {}, error: () => {}, warn: () => {} };
+}
+
+function safeJsonParse(text) {
+  try { return JSON.parse(text); } catch { return null; }
+}
+
+// --- Raw node:http helpers (not global fetch) --------------------------------
+// Same rationale as makeHttpAdapter.postJson: undici's fixed 300 s
+// headersTimeout aborts long local-model requests (≈5-minute CPU prompt evals
+// are normal) with an opaque "fetch failed (ECONNRESET)". A raw request has no
+// headers deadline, honors the explicit timeoutMs, and sends
+// `connection: close` so no keep-alive socket is ever reused (some engines
+// drop reused sockets mid-generation).
+function rawRequest(method, url, headers, body, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    let u;
+    try { u = new URL(url); } catch { reject(new Error(`invalid endpoint URL: ${url}`)); return; }
+    const req = (u.protocol === 'https:' ? httpsRequest : httpRequest)(u, {
+      method,
+      headers: body == null
+        ? headers
+        : Object.assign({ 'content-length': Buffer.byteLength(body) }, headers),
+    }, (res) => {
+      const chunks = [];
+      res.on('data', (c) => chunks.push(c));
+      res.on('end', () => resolve({ status: res.statusCode, text: Buffer.concat(chunks).toString('utf8') }));
+    });
+    req.setTimeout(timeoutMs, () => req.destroy(new Error(`request timed out after ${Math.round(timeoutMs / 1000)}s (set LEHRO_HTTP_TIMEOUT_MS or --timeoutMs to raise it)`)));
+    req.on('error', reject);
+    if (body != null) req.write(body);
+    req.end();
+  });
+}
+
+// The /models catalog can answer without validating the API key on some
+// llama.cpp revisions (or an older server may only protect chat). Before
+// reusing an "already hot" engine, verify the key where it actually matters —
+// /chat/completions — with a 1-token request, so an auth mismatch surfaces as
+// one actionable error instead of a 401 flood mid-mission.
+export async function verifyChatAuth(baseUrl, apiKey, timeoutMs = 8000) {
+  try {
+    const { status } = await rawRequest('POST', String(baseUrl).replace(/\/$/, '') + '/chat/completions', {
+      'content-type': 'application/json',
+      connection: 'close',
+      ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
+    }, JSON.stringify({ model: 'local', messages: [{ role: 'user', content: 'ping' }], max_tokens: 1, stream: false }), timeoutMs);
+    if (status === 401 || status === 403) {
+      // The `unauthorized` flag is load-bearing: ensureServing's reuse guard
+      // checks it to decide whether a "hot" engine can be kept. Without it a
+      // key-rejecting engine was silently reused and 401-flooded the mission.
+      return { ok: false, unauthorized: true, error: `HTTP ${status} — the engine rejected our API key` };
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: String((e && e.message) || e) };
+  }
 }
 
 // --- OpenAI-compatible one-shot chat with timing ---------------------------
@@ -48,31 +128,24 @@ async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], 
   const messages = [];
   if (system) messages.push({ role: 'system', content: system });
   messages.push(...history, { role: 'user', content: prompt });
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
   const started = Date.now();
   try {
-    const res = await fetch(String(baseUrl).replace(/\/$/, '') + '/chat/completions', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        connection: 'close',
-        ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
-      },
-      body: JSON.stringify({
-        model: 'local',
-        messages,
-        max_tokens: maxTokens,
-        ...(temperature == null ? {} : { temperature: Number(temperature) }),
-        stream: false,
-      }),
-      signal: controller.signal,
-    });
+    const { status, text } = await rawRequest('POST', String(baseUrl).replace(/\/$/, '') + '/chat/completions', {
+      'content-type': 'application/json',
+      connection: 'close',
+      ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
+    }, JSON.stringify({
+      model: 'local',
+      messages,
+      max_tokens: maxTokens,
+      ...(temperature == null ? {} : { temperature: Number(temperature) }),
+      stream: false,
+    }), timeoutMs);
     const ms = Date.now() - started;
-    const json = await res.json().catch(() => null);
-    if (!res.ok || !json) {
-      const detail = json && json.error ? ` — ${json.error.message || JSON.stringify(json.error)}` : '';
-      return { ok: false, ms, error: `HTTP ${res.status}${detail}` };
+    const json = safeJsonParse(text);
+    if (status >= 400 || !json) {
+      const detail = json && json.error ? ` — ${json.error.message || JSON.stringify(json.error)}` : (json ? '' : ` — ${String(text || '').slice(0, 200)}`);
+      return { ok: false, ms, status, error: `HTTP ${status}${detail}` };
     }
     const content = json.choices?.[0]?.message?.content ?? '';
     const tokens = json.usage?.completion_tokens ?? Math.max(1, Math.round(content.length / 4));
@@ -81,14 +154,12 @@ async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], 
     const tokPerSec = ms > 0 ? Math.round((tokens / (ms / 1000)) * 10) / 10 : tokens;
     return { ok: true, content, ms, tokens, completionTokens: tokens, promptTokens, totalTokens, tokPerSec, usage: json.usage || null };
   } catch (e) {
-    if (e && e.name === 'AbortError') {
-      return { ok: false, ms: Date.now() - started, error: `timed out after ${timeoutMs}ms` };
+    if (/timed out/.test(String((e && e.message) || ''))) {
+      return { ok: false, ms: Date.now() - started, error: String(e.message) };
     }
     const cause = e && e.cause && (e.cause.code || e.cause.message);
     const reason = `${String((e && e.message) || e)}${cause ? ` (${cause})` : ''}`;
     return { ok: false, network: true, ms: Date.now() - started, error: reason };
-  } finally {
-    clearTimeout(timer);
   }
 }
 
@@ -99,15 +170,13 @@ export function formatStats({ ms, tokens, tokPerSec }) {
 
 async function probe(baseUrl, apiKey, timeoutMs = 1500) {
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    const res = await fetch(String(baseUrl).replace(/\/$/, '') + '/models', {
-      headers: apiKey ? { authorization: `Bearer ${apiKey}` } : {},
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-    if (!res.ok) return { up: false, listening: true, models: [] };
-    const json = await res.json().catch(() => null);
+    const { status, text } = await rawRequest('GET', String(baseUrl).replace(/\/$/, '') + '/models', {
+      connection: 'close',
+      ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
+    }, null, timeoutMs);
+    if (status === 401 || status === 403) return { up: false, listening: true, models: [], unauthorized: true };
+    if (status !== 200) return { up: false, listening: true, models: [] };
+    const json = safeJsonParse(text);
     return { up: true, listening: true, models: Array.isArray(json?.data) ? json.data.map((m) => m && m.id).filter(Boolean) : [] };
   } catch {
     return { up: false, listening: false, models: [] };
@@ -126,6 +195,9 @@ export async function waitForEngine(baseUrl, apiKey, timeoutMs = 360000, { quiet
   for (;;) {
     const state = await probe(baseUrl, apiKey, 2500);
     if (state.up) return state;
+    // A key-protected engine rejects every poll — retrying just 401-spams the
+    // server log. Surface the mismatch immediately with the actionable reason.
+    if (state.unauthorized) return state;
     const elapsed = Date.now() - started;
     if (elapsed >= timeoutMs) return state;
     if (!quiet && elapsed - lastNote >= 15000) {
@@ -233,6 +305,28 @@ export function isLaunchFailure(res) {
 // engine, otherwise stop the stale one and host the requested (or best-fit)
 // vault model. Returns { ok, baseUrl, model, reused }.
 export async function ensureServing({ model, port, apiKey, restart, showWarmup }, flags, logger) {
+  // Prefer the engine serve.json actually tracks, even when it lives on a
+  // different port: `vault serve` legitimately lands on a fallback port when
+  // the default is busy at preflight. 2026-09-11 live incident (Qwen3.8-9B):
+  // the 9B was hot on :8080 while `code` assumed :7000 — it launched a
+  // duplicate IQ1_S engine, 401-flooded on a key mismatch, and squeezed free
+  // RAM to 1.2 GB with two models resident. The tracked hot engine IS the
+  // user's model choice; reuse it before assuming any port.
+  if (!restart) {
+    const tracked = readState();
+    if (tracked && tracked.baseUrl && Number(tracked.port) !== Number(port) && tracked.pid != null) {
+      const tProbe = await probe(tracked.baseUrl, apiKey);
+      const entry = model ? resolveVaultModel(String(model), ratedModels()) : null;
+      const matches = runningMatches(tProbe.models, entry);
+      if (tProbe.up && !tProbe.unauthorized && (!model || matches)) {
+        const auth = await verifyChatAuth(tracked.baseUrl, apiKey);
+        if (auth.ok || !auth.unauthorized) {
+          if (!flags.json) ui.info(`Reusing the tracked engine on :${tracked.port}`, `${displayModelName(tProbe.models[0] || 'local')} (already hot)`);
+          return { ok: true, baseUrl: tracked.baseUrl, model: tProbe.models[0] || (entry && entry.id) || 'local', reused: true, trackedPort: tracked.port };
+        }
+      }
+    }
+  }
   const baseUrl = `http://localhost:${port}/v1`;
   const models = ratedModels();
   const entry = model ? resolveVaultModel(String(model), models) : null;
@@ -241,10 +335,25 @@ export async function ensureServing({ model, port, apiKey, restart, showWarmup }
     return { ok: false, reason: 'model-not-found' };
   }
   const state = await probe(baseUrl, apiKey);
-  if (state.up && !restart && runningMatches(state.models, entry)) {
-    return { ok: true, baseUrl, model: state.models[0] || (entry && entry.id) || 'local', reused: true };
+  // A key-protected engine that rejects OUR key can never be reused — treat it
+  // exactly like a stale engine and replace it (serve stop → force-kill →
+  // relaunch with this key). 2026-09-10 live incident: an orphaned
+  // llama-server on :7000 launched with a different key was reused as
+  // "already hot" and 401-flooded every mission request.
+  const authRejected = state.unauthorized === true;
+  if (!authRejected && state.up && !restart && runningMatches(state.models, entry)) {
+    // Some engines answer /models without validating the key but protect
+    // /chat/completions — the only place auth actually matters. Verify with a
+    // 1-token request before reusing; replace the engine on a key rejection.
+    const auth = await verifyChatAuth(baseUrl, apiKey);
+    if (auth.ok || !auth.unauthorized) {
+      return { ok: true, baseUrl, model: state.models[0] || (entry && entry.id) || 'local', reused: true };
+    }
   }
-  if (state.up || state.listening) {
+  if (authRejected || state.up || state.listening) {
+    if (!flags.json && authRejected) {
+      ui.info(`Engine on :${port} rejected our API key`, 'replacing it with a fresh launch using this key');
+    }
     const prevExitCode = process.exitCode;
     await runServeCommand('stop', { json: true }, silentLogger());
     process.exitCode = prevExitCode; // best-effort stop must not taint our exit code
@@ -258,6 +367,22 @@ export async function ensureServing({ model, port, apiKey, restart, showWarmup }
     if (!freed) {
       if (!flags.json) ui.error(`Port ${port} did not free up`, 'Another app may own it (Jan desktop?). Close it or pass --port.');
       return { ok: false, reason: 'port-still-busy' };
+    }
+  }
+  // Duplicate-engine guard: if a live engine is tracked elsewhere, launching
+  // here would host TWO models at once (2026-09-11 live incident: a stale
+  // :7000 record led to a duplicate IQ1_S launch alongside the real 9B on
+  // :8080 — free RAM dropped to 1.2 GB). Point the caller at the tracked
+  // engine instead of silently doubling RAM.
+  if (!restart) {
+    const other = readState();
+    if (other && other.pid != null && Number(other.port) !== Number(port)) {
+      let alive = true;
+      try { process.kill(other.pid, 0); } catch { alive = false; }
+      if (alive) {
+        if (!flags.json) ui.error(`A live engine (pid ${other.pid}) is already tracked on :${other.port}`, `Pass --port ${other.port} to use it, or lehrosol serve stop to end it.`);
+        return { ok: false, reason: 'engine-elsewhere', trackedPort: other.port, trackedPid: other.pid };
+      }
     }
   }
   // Keep serve's own ready-wait short; the quick lane owns the patient wait
@@ -409,6 +534,7 @@ export async function runArenaCommand(flags = {}, logger = console) {
     ui.keyValue('prompt', prompt.length > 80 ? prompt.slice(0, 77) + '…' : prompt);
     ui.keyValue('contenders', candidates.map((c) => c.id).join('  vs  '));
   }
+  const loadPromise = cpuLoadSample(1000);
   const rows = [];
   let lastServed = null;
   for (const entry of candidates) {
@@ -432,10 +558,12 @@ export async function runArenaCommand(flags = {}, logger = console) {
       error: res.error,
     });
   }
+  const cpuLoad = await loadPromise;
   const winner = arenaWinner(rows);
   if (!flags.json) {
     ui.table(['model', 'time', 'tokens', 'tok/s', 'first 60 chars / error'], formatArenaRows(rows));
     if (winner) ui.success(`Fastest: ${winner.model} at ${winner.tokPerSec} tok/s`);
+    if (cpuLoad >= 60) ui.warning(`Background CPU load ${cpuLoad}%`, 'tok/s readings may be skewed by another process — close heavy apps and re-run.');
     ui.nextSteps([
       `Keep the winner hot: lehrosol try ${winner ? winner.model : '<model>'}`,
       lastServed
@@ -443,5 +571,5 @@ export async function runArenaCommand(flags = {}, logger = console) {
         : `Check what's on :${port}: lehrosol serve status`,
     ]);
   }
-  return emit({ ok: rows.some((r) => r.ok), prompt, rows, winner: winner ? winner.model : null }, flags, logger);
+  return emit({ ok: rows.some((r) => r.ok), prompt, rows, winner: winner ? winner.model : null, cpuLoad }, flags, logger);
 }
