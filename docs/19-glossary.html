@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="A dictionary-style reference for the whole LehroSol surface — **how to install** the CLI and the Lehrosol Code desktop app, and **what every command, file, and concept means and how to use it**. Each entry gives the definition, the command(s) that exercise it, and a copy-paste example. If you know *what* you want but not *what it's called*, start at the letter."/>
+<title>19 · Install &amp; Usage Glossary · LehroSol CLI Docs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%E2%97%88%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg:#04060a; --bg2:#070b12; --panel:rgba(13,20,30,0.72); --panel-solid:#0b1119;
+    --line:rgba(56,189,248,0.16); --line-strong:rgba(56,189,248,0.34);
+    --cyan:#22d3ee; --teal:#2dd4bf; --green:#34d399; --amber:#fbbf24; --violet:#a78bfa; --blue:#38bdf8; --red:#f87171;
+    --text:#e7f6fc; --dim:#9fb8c6; --muted:#657a8b; --faint:#3a4a5a;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --radius:14px; --sidebar-w:300px; --toc-w:220px;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:32px; }
+  body { margin:0; font-family:var(--sans); color:var(--text); line-height:1.65; font-size:15.5px;
+    background:
+      radial-gradient(1100px 520px at 12% -8%, rgba(34,211,238,0.10), transparent 55%),
+      radial-gradient(1000px 620px at 100% 0%, rgba(167,139,250,0.09), transparent 50%),
+      radial-gradient(900px 700px at 50% 120%, rgba(52,211,153,0.07), transparent 55%),
+      var(--bg);
+    background-attachment:fixed; min-height:100vh;
+  }
+  a { color:var(--cyan); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+
+  /* reading progress */
+  #progress { position:fixed; top:0; left:0; height:2px; width:0%; z-index:60;
+    background:linear-gradient(90deg,var(--cyan),var(--teal),var(--green)); box-shadow:0 0 10px rgba(34,211,238,0.6); transition:width .1s linear; }
+
+  .layout { display:grid; grid-template-columns:var(--sidebar-w) minmax(0,1fr); align-items:start; }
+
+  /* sidebar */
+  nav.sidebar { position:sticky; top:0; height:100vh; overflow-y:auto; padding:22px 14px 40px;
+    border-right:1px solid var(--line); background:linear-gradient(180deg, rgba(9,14,21,0.85), rgba(6,9,15,0.7)); backdrop-filter:blur(8px); }
+  nav.sidebar::-webkit-scrollbar { width:8px; } nav.sidebar::-webkit-scrollbar-thumb { background:var(--line-strong); border-radius:8px; }
+  .brand { display:flex; align-items:center; gap:10px; padding:6px 10px 14px; }
+  .brand .logo { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; font-size:16px;
+    background:linear-gradient(135deg, rgba(34,211,238,0.22), rgba(45,212,191,0.14)); border:1px solid var(--line-strong); box-shadow:0 0 18px rgba(34,211,238,0.25); }
+  .brand .name { font-weight:800; letter-spacing:.14em; text-transform:uppercase; font-size:12.5px;
+    background:linear-gradient(90deg,var(--cyan),var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .brand .ver { font-family:var(--mono); font-size:10px; color:var(--muted); }
+  .search { position:relative; margin:4px 6px 16px; }
+  .search input { width:100%; padding:9px 12px 9px 30px; font-size:12.5px; color:var(--text); font-family:var(--sans);
+    background:rgba(6,10,16,0.8); border:1px solid var(--line); border-radius:9px; outline:none; }
+  .search input:focus { border-color:var(--line-strong); box-shadow:0 0 0 3px rgba(34,211,238,0.12); }
+  .search svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); width:13px; height:13px; opacity:.55; }
+  .nav-group { margin:0 0 16px; }
+  .nav-group .label { font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); padding:0 12px 6px; }
+  nav.sidebar a.item { display:flex; align-items:center; gap:9px; padding:6px 10px; margin:1px 4px; border-radius:8px;
+    color:var(--dim); font-size:13px; border:1px solid transparent; }
+  nav.sidebar a.item:hover { background:rgba(34,211,238,0.08); color:var(--text); text-decoration:none; }
+  nav.sidebar a.item.active { background:linear-gradient(90deg, rgba(34,211,238,0.16), rgba(34,211,238,0.03)); color:var(--cyan); border-color:var(--line); }
+  nav.sidebar a.item .num { font-family:var(--mono); font-size:10.5px; min-width:20px; height:20px; display:grid; place-items:center;
+    border-radius:6px; background:rgba(255,255,255,0.04); color:var(--muted); border:1px solid var(--line); }
+  nav.sidebar a.item.active .num { background:rgba(34,211,238,0.18); color:var(--cyan); border-color:var(--line-strong); }
+  .no-results { display:none; padding:10px 14px; color:var(--muted); font-size:12px; font-style:italic; }
+
+  /* content shell */
+  .content { padding:34px clamp(20px,4vw,64px) 80px; display:grid; grid-template-columns:minmax(0,1fr) var(--toc-w); gap:40px; align-items:start; max-width:1180px; }
+  main.article { min-width:0; }
+
+  /* hero */
+  .hero { position:relative; margin-bottom:26px; padding:26px 30px; border-radius:var(--radius); overflow:hidden;
+    background:linear-gradient(135deg, rgba(15,23,32,0.9), rgba(9,14,21,0.6)); border:1px solid var(--line); }
+  .hero::before { content:""; position:absolute; inset:0; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 4px); }
+  .hero::after { content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, rgba(34,211,238,0.18), transparent 65%); pointer-events:none; }
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--teal); margin-bottom:10px; }
+  .hero h1 { margin:0 0 10px; font-size:2.05rem; line-height:1.18; letter-spacing:-0.01em;
+    background:linear-gradient(92deg,#e7f6fc,var(--cyan) 60%,var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent; border:none; padding:0; }
+  .hero .lede { color:var(--dim); font-size:15px; max-width:70ch; margin:0; }
+  .meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .chip { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-family:var(--mono);
+    padding:4px 10px; border-radius:999px; background:rgba(34,211,238,0.08); border:1px solid var(--line); color:var(--dim); }
+  .chip b { color:var(--cyan); font-weight:600; }
+
+  /* typography */
+  main.article h1 { display:none; } /* title lives in hero */
+  main.article h2 { font-size:1.5rem; margin:2.4em 0 .7em; padding-top:.5em; color:var(--text);
+    border-top:1px solid var(--line); padding-top:1.2em; }
+  main.article h2::before { content:""; display:inline-block; width:8px; height:8px; margin-right:10px; border-radius:2px;
+    background:linear-gradient(135deg,var(--cyan),var(--teal)); box-shadow:0 0 10px rgba(34,211,238,0.6); vertical-align:middle; }
+  main.article h3 { font-size:1.15rem; margin:1.8em 0 .5em; color:var(--green); }
+  main.article h4 { font-size:1rem; color:var(--teal); margin:1.4em 0 .4em; }
+  .anchor { opacity:0; margin-left:-1.1em; padding-right:.35em; color:var(--muted); font-weight:400; text-decoration:none; }
+  h2:hover .anchor, h3:hover .anchor { opacity:1; }
+  p, li, td, th { color:#dbeef6; }
+  strong { color:#fff; }
+  ul, ol { padding-left:1.35em; }
+  li { margin:.28em 0; }
+  li::marker { color:var(--cyan); }
+  li.todo { list-style:none; margin-left:-1.1em; }
+
+  /* breadcrumb + callouts */
+  blockquote.breadcrumb { margin:0 0 22px; padding:9px 15px; font-size:12.5px; font-family:var(--mono);
+    color:var(--dim); background:rgba(34,211,238,0.05); border:1px solid var(--line); border-radius:9px; }
+  blockquote.callout { margin:1.4em 0; padding:14px 18px; border-radius:10px; color:var(--dim);
+    background:linear-gradient(90deg, rgba(251,191,36,0.08), rgba(251,191,36,0.02)); border:1px solid rgba(251,191,36,0.28); border-left:3px solid var(--amber); }
+
+  /* code */
+  .code-wrap { position:relative; margin:1.3em 0; }
+  .code-wrap::after { content:attr(data-lang); position:absolute; top:8px; right:12px; font-family:var(--mono); font-size:10px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--muted); pointer-events:none; }
+  pre { margin:0; background:#060a10; border:1px solid var(--line); border-radius:11px; padding:18px 18px 16px; overflow-x:auto;
+    font-family:var(--mono); font-size:13px; line-height:1.6; }
+  pre code { background:none; border:none; padding:0; color:#cfeaf3; font-family:var(--mono); }
+  code { background:rgba(34,211,238,0.1); border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:.88em;
+    color:var(--teal); font-family:var(--mono); }
+  .copy-btn { position:absolute; top:7px; right:8px; font-family:var(--mono); font-size:10.5px; letter-spacing:.06em;
+    padding:4px 9px; border-radius:7px; cursor:pointer; color:var(--dim); background:rgba(13,20,30,0.9);
+    border:1px solid var(--line); opacity:0; transition:opacity .15s, color .15s; }
+  .code-wrap:hover .copy-btn { opacity:1; }
+  .copy-btn:hover { color:var(--cyan); border-color:var(--line-strong); }
+  .copy-btn.copied { color:var(--green); border-color:rgba(52,211,153,0.5); }
+  .diagram-wrap { margin:1.6em 0; padding:18px; border-radius:12px; text-align:center;
+    background:radial-gradient(circle at 50% 0%, rgba(34,211,238,0.06), transparent 70%), rgba(8,12,19,0.6); border:1px solid var(--line); }
+  pre.mermaid { background:none; border:none; padding:0; }
+
+  /* tables */
+  .table-wrap { overflow-x:auto; margin:1.4em 0; border:1px solid var(--line); border-radius:11px; }
+  table { border-collapse:collapse; width:100%; font-size:.92em; }
+  th, td { border-bottom:1px solid var(--line); padding:9px 14px; text-align:left; vertical-align:top; }
+  thead th { background:rgba(34,211,238,0.09); color:var(--cyan); font-weight:600; letter-spacing:.02em;
+    position:sticky; top:0; border-bottom:1px solid var(--line-strong); }
+  tbody tr:hover { background:rgba(34,211,238,0.04); }
+  tbody tr:last-child td { border-bottom:none; }
+
+  hr { border:none; border-top:1px solid var(--line); margin:2.5em 0; }
+
+  /* on-page TOC */
+  aside.toc { position:sticky; top:24px; align-self:start; font-size:12.5px; max-height:calc(100vh - 48px); overflow-y:auto; }
+  aside.toc .toc-label { font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; padding-left:12px; }
+  aside.toc a { display:block; padding:4px 12px; color:var(--muted); border-left:2px solid var(--line); margin:1px 0; line-height:1.4; }
+  aside.toc a.sub { padding-left:24px; font-size:11.8px; }
+  aside.toc a:hover { color:var(--dim); text-decoration:none; }
+  aside.toc a.active { color:var(--cyan); border-left-color:var(--cyan); background:rgba(34,211,238,0.06); }
+
+  /* prev/next */
+  .pager { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:48px; }
+  .pager a { display:flex; flex-direction:column; gap:4px; padding:16px 18px; border-radius:12px; text-decoration:none;
+    background:var(--panel); border:1px solid var(--line); transition:border-color .15s, transform .15s; }
+  .pager a:hover { border-color:var(--line-strong); transform:translateY(-2px); }
+  .pager a.next { text-align:right; }
+  .pager .dir { font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .pager .t { color:var(--text); font-weight:600; font-size:14px; }
+
+  footer.credit { margin-top:40px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+
+  /* mobile */
+  .menu-toggle { display:none; }
+  @media (max-width:1080px) { .content { grid-template-columns:minmax(0,1fr); } aside.toc { display:none; } }
+  @media (max-width:820px) {
+    .layout { grid-template-columns:1fr; }
+    nav.sidebar { position:fixed; z-index:50; width:86%; max-width:320px; transform:translateX(-102%); transition:transform .25s ease; box-shadow:0 0 60px rgba(0,0,0,0.6); }
+    body.nav-open nav.sidebar { transform:translateX(0); }
+    .menu-toggle { display:grid; place-items:center; position:fixed; z-index:55; top:12px; left:12px; width:42px; height:42px; border-radius:11px;
+      background:var(--panel-solid); border:1px solid var(--line-strong); color:var(--cyan); font-size:18px; cursor:pointer; }
+    .content { padding-top:64px; }
+    .scrim { display:none; position:fixed; inset:0; z-index:45; background:rgba(0,0,0,0.5); }
+    body.nav-open .scrim { display:block; }
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+<div id="scrim" class="scrim"></div>
+<div class="layout">
+<nav class="sidebar">
+  <div class="brand">
+    <div class="logo">◈</div>
+    <div><div class="name">LehroSol</div><div class="ver">agentic engineering docs</div></div>
+  </div>
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+    <input id="nav-search" type="text" placeholder="Filter docs…" autocomplete="off"/>
+  </div>
+  <div class="nav-group"><div class="label">Guide</div>
+    <a class="item" href="README.html" data-title="lehrosol cli — docs"><span class="num">⌂</span><span class="txt">LehroSol CLI — Docs</span></a>
+    <a class="item" href="01-architecture.html" data-title="01 · architecture"><span class="num">01</span><span class="txt">01 · Architecture</span></a>
+    <a class="item" href="02-competitors.html" data-title="02 · competitive landscape"><span class="num">02</span><span class="txt">02 · Competitive Landscape</span></a>
+    <a class="item" href="03-loop-engineering.html" data-title="03 · loop engineering"><span class="num">03</span><span class="txt">03 · Loop Engineering</span></a>
+    <a class="item" href="04-harness-engineering.html" data-title="04 · harness engineering"><span class="num">04</span><span class="txt">04 · Harness Engineering</span></a>
+    <a class="item" href="05-orchestration-engineering.html" data-title="05 · orchestration engineering"><span class="num">05</span><span class="txt">05 · Orchestration Engineering</span></a>
+    <a class="item" href="06-mcp-control-plane.html" data-title="06 · mcp control plane"><span class="num">06</span><span class="txt">06 · MCP Control Plane</span></a>
+    <a class="item" href="07-gui-dashboard.html" data-title="07 · gui dashboard"><span class="num">07</span><span class="txt">07 · GUI Dashboard</span></a>
+    <a class="item" href="08-agent-adapters.html" data-title="08 · agent adapters"><span class="num">08</span><span class="txt">08 · Agent Adapters</span></a>
+    <a class="item" href="09-agents-and-skills.html" data-title="09 · agents &amp; skills map"><span class="num">09</span><span class="txt">09 · Agents &amp; Skills Map</span></a>
+    <a class="item" href="10-how-to-use.html" data-title="10 · how to use this"><span class="num">10</span><span class="txt">10 · How to Use This</span></a>
+    <a class="item" href="10-missions-and-journal.html" data-title="missions, the journal, and self-tuning"><span class="num">10</span><span class="txt">Missions, the Journal, and Self-Tuning</span></a>
+    <a class="item" href="11-improving-your-workflow.html" data-title="11 · improving your workflow using this tool"><span class="num">11</span><span class="txt">11 · Improving Your Workflow Using This Tool</span></a>
+    <a class="item" href="12-adr.html" data-title="12 · architecture decision records"><span class="num">12</span><span class="txt">12 · Architecture Decision Records</span></a>
+    <a class="item" href="13-deepwiki.html" data-title="13 · deepwiki — full repository reference"><span class="num">13</span><span class="txt">13 · DeepWiki — Full Repository Reference</span></a>
+    <a class="item" href="14-audit-report.html" data-title="14 · audit report — parser, persistence, policy, and scanner hardening"><span class="num">14</span><span class="txt">14 · Audit Report — Parser, Persistence, Policy, and Scanner Hardening</span></a>
+    <a class="item" href="15-terminal-gui.html" data-title="15 · terminal gui — the helix console (immersive in-cli cockpit)"><span class="num">15</span><span class="txt">15 · Terminal GUI — The HELIX Console (Immersive In-CLI Cockpit)</span></a>
+    <a class="item" href="16-design-system.html" data-title="16 · helix — the lehrosol terminal design system"><span class="num">16</span><span class="txt">16 · HELIX — The LehroSol Terminal Design System</span></a>
+    <a class="item" href="17-phase-4-5-full-potential.html" data-title="17 · phase 4, phase 5 &amp; full-potential layer"><span class="num">17</span><span class="txt">17 · Phase 4, Phase 5 &amp; Full-Potential Layer</span></a>
+    <a class="item" href="18-agentic-missions.html" data-title="18 — agentic missions &amp; guided onboarding (v3.0.0)"><span class="num">18</span><span class="txt">18 — Agentic Missions &amp; Guided Onboarding (v3.0.0)</span></a>
+    <a class="item active" href="19-glossary.html" data-title="19 · install &amp; usage glossary"><span class="num">19</span><span class="txt">19 · Install &amp; Usage Glossary</span></a>
+  </div>
+  <div class="nav-group"><div class="label">.docs</div>
+    <a class="item" href=".docs\phase-4-5-build-issues.html" data-title="phase 4/5 build issue log"><span class="num">◆</span><span class="txt">Phase 4/5 build issue log</span></a>
+    <a class="item" href=".docs\v3-agentic-build-issues.html" data-title="v3.0.0 agentic missions — build issue log"><span class="num">◆</span><span class="txt">v3.0.0 agentic missions — build issue log</span></a>
+  </div>
+  <div class="nav-group"><div class="label">Claude</div>
+    <a class="item" href="claude\AGENTS.html" data-title="claude code — deep-dive agent guide"><span class="num">◆</span><span class="txt">Claude Code — deep-dive agent guide</span></a>
+  </div>
+  <div class="nav-group"><div class="label">Skills</div>
+    <a class="item" href="skills\adapter-authoring.skill.html" data-title="skill: adapter authoring"><span class="num">◆</span><span class="txt">Skill: Adapter Authoring</span></a>
+    <a class="item" href="skills\docs-authoring.skill.html" data-title="skill: docs authoring"><span class="num">◆</span><span class="txt">Skill: Docs Authoring</span></a>
+    <a class="item" href="skills\gui-dashboard.skill.html" data-title="skill: gui dashboard"><span class="num">◆</span><span class="txt">Skill: GUI Dashboard</span></a>
+    <a class="item" href="skills\harness-verification.skill.html" data-title="skill: harness verification"><span class="num">◆</span><span class="txt">Skill: Harness Verification</span></a>
+    <a class="item" href="skills\loop-engineering.skill.html" data-title="skill: loop engineering"><span class="num">◆</span><span class="txt">Skill: Loop Engineering</span></a>
+    <a class="item" href="skills\orchestration.skill.html" data-title="skill: orchestration"><span class="num">◆</span><span class="txt">Skill: Orchestration</span></a>
+    <a class="item" href="skills\README.html" data-title="skills index"><span class="num">⌂</span><span class="txt">Skills index</span></a>
+  </div>
+  <div id="no-results" class="no-results">No matching docs</div>
+</nav>
+<div class="content">
+  <main class="article">
+    <header class="hero">
+      <div class="eyebrow">Chapter 19</div>
+      <h1>19 · Install &amp; Usage Glossary</h1>
+      <p class="lede">A dictionary-style reference for the whole LehroSol surface — <strong>how to install</strong> the CLI and the Lehrosol Code desktop app, and <strong>what every command, file, and concept means and how to use it</strong>. Each entry gives the definition, the command(s) that exercise it, and a copy-paste example. If you know <em>what</em> you want but not <em>what it's called</em>, start at the letter.</p>
+      <div class="meta"><span class="chip"><b>11</b> min read</span><span class="chip"><b>29</b> sections</span><span class="chip"><b>1</b> diagrams</span><span class="chip"><b>11</b> links</span></div>
+    </header>
+    <h1 id="19-install-usage-glossary">19 · Install &amp; Usage Glossary</h1>
+<blockquote class="breadcrumb">← <a href="18-agentic-missions.html">18 · Agentic Missions &amp; Guided Onboarding</a> · <a href="README.html">Docs home</a> · Next: <a href="skills/README.html">Skills index</a></blockquote>
+<p>A dictionary-style reference for the whole LehroSol surface — <strong>how to install</strong> the CLI and the Lehrosol Code desktop app, and <strong>what every command, file, and concept means and how to use it</strong>. Each entry gives the definition, the command(s) that exercise it, and a copy-paste example. If you know <em>what</em> you want but not <em>what it's called</em>, start at the letter.</p>
+<h2 id="the-journey-at-a-glance"><a class="anchor" href="#the-journey-at-a-glance" aria-label="Link to section">#</a>The journey at a glance</h2>
+<div class="diagram-wrap"><pre class="mermaid">
+%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%
+flowchart TD
+    INSTALL["1 · INSTALL&lt;br/&gt;npm i -g lehrosol-cli&lt;br/&gt;(or bun / curl / install.ps1)"] --&gt; VERIFY
+    APP["Lehrosol Code (Electron)&lt;br/&gt;pnpm install → pnpm start"] --&gt;|"shells out to lehrosol … --json"| CLI_CORE["LehroSol CLI core&lt;br/&gt;(zero-dependency, Node 20+)"]
+    CLI_CORE --&gt; VERIFY["2 · VERIFY&lt;br/&gt;lehrosol doctor"]
+    VERIFY --&gt;|"all green"| PAIR["3 · PAIR&lt;br/&gt;vault + serve + models"]
+    PAIR --&gt; USE["4 · USE&lt;br/&gt;quick lane · loop · mission · tui · gui"]
+    USE --&gt; LEARN["5 · LEARN&lt;br/&gt;engrams · compact · report"]
+</pre></div>
+<h2 id="part-1-installing-the-lehrosol-cli"><a class="anchor" href="#part-1-installing-the-lehrosol-cli" aria-label="Link to section">#</a>Part 1 — Installing the LehroSol CLI</h2>
+<h3 id="install-paths"><a class="anchor" href="#install-paths" aria-label="Link to section">#</a>Install paths</h3>
+<div class="table-wrap"><table><thead><tr><th>Path</th><th>Command</th><th>When to use</th></tr></thead><tbody><tr><td><strong>npm (global)</strong></td><td><code>npm i -g lehrosol-cli</code></td><td>You have Node.js 20+ and npm — the standard path</td></tr><tr><td><strong>Bun</strong></td><td><code>bun install -g lehrosol-cli</code> (or run without installing: <code>bunx lehrosol-cli doctor</code>)</td><td>You prefer Bun's speed</td></tr><tr><td><strong>curl (macOS/Linux)</strong></td><td>`curl -fsSL https://get.lehro.dev/install \</td><td>bash`</td><td>Fresh shell, no package manager configured yet — the script detects bun/npm, else symlinks <code>bin/lehrosol.js</code></td></tr><tr><td><strong>Windows installer</strong></td><td><code>powershell -ExecutionPolicy Bypass -File install.ps1</code> (<code>-Global</code> for npm, otherwise a per-user launcher shim for a local clone)</td><td>Windows-first machines</td></tr><tr><td><strong>From source</strong></td><td><code>git clone https://github.com/LehroSolutions/lehrosol-cli.git</code> then <code>node bin/lehrosol.js --help</code></td><td>Contributors and agents embedding the CLI</td></tr></tbody></table></div>
+<p>There is <strong>no install step for the core</strong>: <code>src/core</code>, <code>src/mcp</code>, <code>src/harness</code>, <code>src/loop</code>, and <code>src/orchestrator</code> use only Node builtins, so <code>npm i -g</code>, <code>bunx</code>, and <code>curl \| bash</code> all work instantly. Only the web GUI (<code>gui/</code>) has npm dependencies and needs its own <code>npm install</code>.</p>
+<h3 id="verify-and-first-run"><a class="anchor" href="#verify-and-first-run" aria-label="Link to section">#</a>Verify and first-run</h3>
+<div class="code-wrap" data-lang="bash"><pre><code class="language-bash">lehrosol doctor            # read-only health check: node version, git, AGENTS.md, config, sqlite, adapters
+lehrosol onboard           # guided first-run: doctor → adapters → model recommendation → first rehearsal mission
+lehrosol init              # scaffold AGENTS.md / fix_plan.md / .lehrorc.json in a project
+lehrosol -i                # interactive wizard — every command guided, no flags to memorize</code></pre></div>
+<p>Missing agent binaries (claude, codex, …) are <strong>fine</strong> at first: the <code>local</code> dry-run adapter always works, and <code>lehrosol adapters</code> prints per-binary setup hints.</p>
+<h2 id="part-2-installing-lehrosol-code-the-electron-app"><a class="anchor" href="#part-2-installing-lehrosol-code-the-electron-app" aria-label="Link to section">#</a>Part 2 — Installing Lehrosol Code (the Electron app)</h2>
+<p>Lehrosol Code is the agentic IDE over the CLI: model vault, HELIX missions, test bench, ENGRAM memory, and an editor with AI suggestions, all against GGUFs on your own drive. It drives the CLI (<code>lehrosol … --json</code>) and shares its state home (<code>~/.lehro</code>).</p>
+<div class="code-wrap" data-lang="powershell"><pre><code class="language-powershell"># Prerequisites: Node.js 22+ (LTS), pnpm 11 (pinned via packageManager)
+corepack enable pnpm                 # one-time — honors the pinned pnpm@11.15.1
+# (or: npm i -g pnpm@latest-11)
+git clone https://github.com/LehroSolutions/Lehrosol-Code.git
+cd Lehrosol-Code
+pnpm install                         # one-time Electron download, needs internet
+pnpm start                           # launch the desktop app
+pnpm test                            # node --test suite for the bridge/cockpit
+pnpm dist                            # build the Windows NSIS installer (electron-builder)</code></pre></div>
+<ul><li><code>.npmrc</code> sets <code>node-linker=hoisted</code> so electron-builder can package the flat <code>node_modules</code>; <code>pnpm-workspace.yaml</code> pre-approves Electron's postinstall (<code>onlyBuiltDependencies</code>) — no <code>pnpm approve-builds</code> prompt.</li><li><strong>No native modules</strong> — Microsoft Build Tools are not required.</li><li>CLI not on PATH? Settings → <strong>Locate…</strong> → pick <code>…\lehrosol-cli\bin\lehrosol.js</code>, or set <code>$env:LEHROSOL_BIN</code>.</li><li>On first launch the app scans your drives for GGUFs (Jan, LM Studio, HuggingFace cache, <code>D:\AI Models</code>-style folders), rates each against your real RAM (GREAT / TIGHT / NO FIT), and registers the folders into the CLI vault so both tools share one library.</li></ul>
+<h2 id="part-3-glossary-a-z"><a class="anchor" href="#part-3-glossary-a-z" aria-label="Link to section">#</a>Part 3 — Glossary, A → Z</h2>
+<h3 id="a"><a class="anchor" href="#a" aria-label="Link to section">#</a>A</h3>
+<p><strong>Adapter</strong> — the bridge that lets the Loop Engine drive a specific agent CLI (Claude Code, Codex, OpenCode, Gemini, Aider, Goose, Hermes, Grok, Qwen, NVIDIA, <code>llamacpp</code>, plus the always-available <code>local</code> dry-run). Every adapter degrades gracefully when its binary is missing. <em>Use:</em> <code>lehrosol adapters</code> — live readiness, setup hints, endpoints. <em>Select:</em> <code>--agentAdapter &lt;id&gt;</code> on <code>loop run</code> / <code>mission run</code>.</p>
+<p><strong>AGENT.md / AGENTS.md</strong> — the instruction seed the Loop Engine reads every iteration (task, guardrails, progress). <code>lehrosol init</code> writes a starter; you keep editing it as the project's constitution.</p>
+<p><strong>arena</strong> — quick-lane model race: runs the same prompt across your best local models and prints a tokens/sec scoreboard, with a background-CPU-load validity guard. <em>Use:</em> <code>lehrosol arena --count 2 --prompt "explain your reasoning in one line"</code>.</p>
+<p><strong>ask</strong> — quick-lane direct Q&amp;A against the hot engine: one question, one answer, no file loop. <em>Use:</em> <code>lehrosol ask "why is my KV cache OOMing at 262k ctx?"</code>.</p>
+<p><strong>Autonomy levels</strong> — mission execution policy: <code>readonly</code> (dry-run forced, hard floor), <code>guarded</code> (default; live only with <code>--dryRun=false</code>, fail-fast), <code>full</code> (retry → replan → escalate recovery ladder). <em>Use:</em> <code>lehrosol mission run --goal "…" --autonomy full --dryRun=false</code>.</p>
+<h3 id="b"><a class="anchor" href="#b" aria-label="Link to section">#</a>B</h3>
+<p><strong>BLOCKED:</strong> — the model's escape hatch to quit with a genuine, stated blocker. Abusing it with zero tool activity on an action task is challenged like any premature quit.</p>
+<p><strong>Bench / Test Bench</strong> — serve → prompt → measure latency, tokens, tok/s per model, with a leaderboard for head-to-head runs. Live in the Lehrosol Code Test Bench (⚖) and scriptable via <code>model-lab</code>. <em>Use:</em> <code>lehrosol model-lab run</code> / <code>lehrosol model-lab tune --maxExperiments 8</code>.</p>
+<h3 id="c"><a class="anchor" href="#c" aria-label="Link to section">#</a>C</h3>
+<p><strong>Challenge</strong> — the harness's pushback when a model claims "done" with zero tool activity on an action-style task. Max 2 challenges per pass; the model must either produce evidence or state a real blocker. This is what keeps small local models from "quitting after ~10 steps".</p>
+<p><strong>Checkpoint</strong> — every loop iteration is persisted (SQLite session store) with prompt, result, score, and diff. <em>Use:</em> <code>lehrosol sessions list</code> / <code>lehrosol sessions show --id &lt;id&gt;</code>.</p>
+<p><strong><code>code</code></strong> — quick-lane agentic coding on the <em>current</em> folder: the local model reads and writes your real files through the same tool registry and policy gates as <code>loop</code>. <em>Use:</em> <code>lehrosol code "rename getUserData to fetchUserProfile everywhere"</code>.</p>
+<p><strong>compact</strong> — Engram Distillery: compresses old sessions into tiny, reusable lessons. <em>Use:</em> <code>lehrosol compact --session &lt;id&gt;</code> (then browse with <code>engrams</code>).</p>
+<p><strong>config</strong> — persistent adapter/model configuration stored at <code>~/.lehro/config.json</code> (API keys, endpoints, CLI paths). <em>Use:</em> <code>lehrosol config list</code> / <code>config set --adapter grok --apiKey …</code> / <code>config wizard</code>.</p>
+<h3 id="d"><a class="anchor" href="#d" aria-label="Link to section">#</a>D</h3>
+<p><strong>doctor</strong> — read-only project health check (never modifies files): Node version, git, AGENTS.md presence, config integrity, session store, adapter inventory. <em>Use:</em> <code>lehrosol doctor</code>.</p>
+<p><strong>dry run</strong> — the default safety mode for every live-writing command: the model plans and calls tools, but nothing is written. Opt into reality explicitly with <code>--dryRun=false</code>.</p>
+<p><strong>Diff</strong> — the exact patch the agent changed, captured per loop iteration. <em>Use:</em> <code>lehrosol diff --session &lt;id&gt;</code>.</p>
+<h3 id="e"><a class="anchor" href="#e" aria-label="Link to section">#</a>E</h3>
+<p><strong>ENGRAM</strong> — distilled memory: compact, project-scoped lessons the loop reuses as field notes ("in this repo, tests live in <code>test/</code>, run <code>npm test</code>"). <em>Use:</em> <code>lehrosol engrams --json</code> (machine-readable <code>{ ok, engrams, total }</code>), <code>lehrosol compact</code> to create more.</p>
+<h3 id="f"><a class="anchor" href="#f" aria-label="Link to section">#</a>F</h3>
+<p><strong>fix_plan.md</strong> — the running backlog the loop reads alongside <code>AGENT.md</code>; bugs you notice but don't fix <em>now</em> get recorded here instead of being lost. Both files live in the repo root.</p>
+<h3 id="g"><a class="anchor" href="#g" aria-label="Link to section">#</a>G</h3>
+<p><strong>GUI</strong> — the React/Vite/Tailwind dark-HUD web dashboard over the same MCP control plane as the terminal. <em>Use:</em> <code>lehrosol gui</code> (then press <code>t</code> inside it to hop into the TUI cockpit).</p>
+<h3 id="h"><a class="anchor" href="#h" aria-label="Link to section">#</a>H</h3>
+<p><strong>Harness</strong> — the verification half of LehroSol: policy rules with severities and autofix hints, OWASP LLM/Web/ASVS rule packs, the heuristic scanner, capability tiers, and pass bars. The harness is what turns "the model said done" into "the evidence says done". <em>Use:</em> <code>lehrosol policy evaluate --branch fix-auth --hasTests --reviewCount 1 --owasp-scope llm,web</code>.</p>
+<h3 id="i"><a class="anchor" href="#i" aria-label="Link to section">#</a>I</h3>
+<p><strong><code>init</code></strong> — scaffold a project for the loop: starter <code>AGENTS.md</code>, <code>fix_plan.md</code>, <code>.lehrorc.json</code>. <em>Use:</em> <code>cd my-repo &amp;&amp; lehrosol init</code>.</p>
+<p><strong>Install paths</strong> — see <a href="#part-1--installing-the-lehrosol-cli">Part 1</a>: npm, Bun, curl, Windows <code>install.ps1</code>, or straight from source. Zero-dependency core means all of them work with no build step.</p>
+<h3 id="j"><a class="anchor" href="#j" aria-label="Link to section">#</a>J</h3>
+<p><strong>Jan engine</strong> — a desktop LLM runtime the <code>serve</code> command can drive directly (<code>--engine jan</code>), alongside llama.cpp (<code>llamacpp</code>). Both are wrapped in the same readiness/auth probing, so the loop doesn't care which one hosts the model.</p>
+<h3 id="l"><a class="anchor" href="#l" aria-label="Link to section">#</a>L</h3>
+<p><strong><code>llamacpp</code> adapter</strong> — HTTP adapter for a llama.cpp <code>llama-server</code> endpoint. Auto-discovers a running <code>lehrosol serve</code>/<code>up</code> engine from <code>~/.lehro/serve.json</code>, so <code>vault serve</code> + <code>loop run --agentAdapter llamacpp</code> needs zero env setup.</p>
+<p><strong>Loop Engine</strong> — the Ralph-style outer loop: read <code>AGENT.md</code> → run the adapter on the task → grade with the Score Agent → checkpoint → update plan → repeat. Flagship: <code>lehrosol loop run --prompt "harden the auth endpoint" --agentAdapter claude-code</code>.</p>
+<p><strong><code>LEHRO_TOOL_STEPS</code></strong> — machine-wide override for per-pass tool-step budgets (default 64 local / 24 remote, hard cap 200). <strong><code>LEHRO_HTTP_TIMEOUT_MS</code></strong> — overrides the HTTP adapter's per-request timeout. <strong><code>LEHROSOL_BIN</code></strong> — points Lehrosol Code at your CLI when it's not on PATH.</p>
+<h3 id="m"><a class="anchor" href="#m" aria-label="Link to section">#</a>M</h3>
+<p><strong>MCP</strong> — the JSON-RPC control plane (<code>lehrosol mcp start</code>; add <code>--http --port &lt;n&gt;</code> for the GUI/remote transport). Every surface — CLI, TUI, GUI, and <em>external</em> agents like Claude Code or Cursor — talks to the same tool registry (<code>loop_run</code>, <code>mission_run</code>, <code>policy_evaluate</code>, <code>vault_*</code>, …), which is what makes Lehro drivable from anywhere.</p>
+<p><strong>Mission</strong> — autonomous goal → plan → execute → verify → adapt. Phases (<code>recon → implement → verify</code>, optional <code>harden</code>/<code>document</code>) each run through the full loop harness; every phase must pass the Score Agent gate, and recovery climbs the ladder you authorize. <em>Use:</em> <code>lehrosol mission plan --goal "add rate limiting"</code> (preview), <code>mission run --goal "…" --dryRun=false --autonomy full</code>, <code>mission status --id &lt;id&gt;</code>.</p>
+<p><strong>models</strong> — model profiles with live probes: prefer, switch, and test hosted (Grok), local, or custom endpoints. <em>Use:</em> <code>lehrosol models use --profile grok-4.5 --apiKey &lt;XAI_API_KEY&gt;</code> / <code>models test --adapter grok</code>.</p>
+<p><strong>modes</strong> — the HELIX Mode Ring: recon/forge/sentinel/medic/scribe ↔ plan/code/review/fix/docs. Flipping the mode swaps skills and reasoning level injected into the loop. <em>Use:</em> <code>lehrosol modes list</code> / <code>lehrosol modes code</code>.</p>
+<h3 id="o"><a class="anchor" href="#o" aria-label="Link to section">#</a>O</h3>
+<p><strong>onboard</strong> — guided first-run: doctor → adapter inventory → best next model recommendation (live adapter, else Grok, else free local) → your first mission as a safe readonly rehearsal. Zero configuration required. <em>Use:</em> <code>lehrosol onboard</code>.</p>
+<p><strong>orchestrate</strong> — multi-agent scale-out on git worktrees: spawn N workers, each on its own branch, supervised and merged back. <em>Use:</em> <code>lehrosol orchestrate spawn --count 3</code> / <code>orchestrate list</code> / <code>orchestrate remove --name &lt;n&gt;</code>.</p>
+<p><strong>OWASP scope</strong> — which rule packs the harness gates on: <code>llm</code> (LLM Top-10 2025), <code>web</code>, <code>asvs</code>. <em>Use:</em> <code>--owasp-scope llm,web</code> on <code>policy evaluate</code> / <code>mission run</code>.</p>
+<h3 id="p"><a class="anchor" href="#p" aria-label="Link to section">#</a>P</h3>
+<p><strong>panes</strong> — tmux-style pane orchestration for watching parallel loops. <em>Use:</em> <code>lehrosol panes plan</code> / <code>panes launch</code>.</p>
+<p><strong>policy</strong> — the gate: scores a branch/diff against tests, review depth, OWASP scope; violations block, warnings inform. <em>Use:</em> <code>lehrosol policy evaluate --branch &lt;b&gt; --hasTests --reviewCount 1 --owasp-scope llm</code>.</p>
+<p><strong>projects</strong> — Project Constellation: every repo you run in earns a codename, sigil, and run history. <em>Use:</em> <code>lehrosol projects</code>.</p>
+<h3 id="q"><a class="anchor" href="#q" aria-label="Link to section">#</a>Q</h3>
+<p><strong>Quick lane</strong> — the one-word commands that get 90% of value with zero setup: <code>up</code> (scan → best-fit model → serve on :7000), <code>arena</code>, <code>ask</code>, <code>code</code>, <code>scan</code>, <code>skills</code>, <code>optimize</code>, <code>missions</code>. <em>Use:</em> <code>lehrosol up</code> — genuinely one word from nothing to a served local model.</p>
+<h3 id="r"><a class="anchor" href="#r" aria-label="Link to section">#</a>R</h3>
+<p><strong>Ralph-style loop</strong> — the self-improving loop pattern this project is named for: the agent re-reads its own instruction file (<code>AGENT.md</code>) plus a living backlog (<code>fix_plan.md</code>) every iteration, so progress compounds across passes instead of resetting.</p>
+<p><strong>recommend</strong> — hardware-aware model report: which of your local models fit this machine's RAM/GPU and the best role for each. <em>Use:</em> <code>lehrosol recommend</code>.</p>
+<p><strong>report</strong> — export any session as a shareable Markdown mission report (objective, log, diff). <em>Use:</em> <code>lehrosol report --session &lt;id&gt;</code>.</p>
+<h3 id="s"><a class="anchor" href="#s" aria-label="Link to section">#</a>S</h3>
+<p><strong>scan</strong> — zero-setup GGUF discovery across your drives (time- and entry-budgeted so it never thrashes the disk), each model rated against your real free RAM. <em>Use:</em> <code>lehrosol scan</code> / <code>lehrosol scan --path "D:\AI Models"</code>.</p>
+<p><strong>Score Agent</strong> — the grader inside every loop pass: verifies the model's claim against evidence (changed files, tool activity, verification commands) and decides continue vs. accept vs. challenge.</p>
+<p><strong>serve</strong> — host local models via an engine binary (Jan or llama.cpp) with readiness probes, key-aware auth, context clamping, and RAM-fit warnings; state persists in <code>~/.lehro/serve.json</code>. <em>Use:</em> <code>lehrosol serve start --model jan-code-4b --use</code> / <code>serve status</code> / <code>serve stop</code>.</p>
+<p><strong>sessions</strong> — the persisted record of every loop/mission run: sessions, checkpoints, diffs. <em>Use:</em> <code>lehrosol sessions list</code> / <code>sessions show --id &lt;id&gt;</code>.</p>
+<p><strong>skills</strong> — reusable engineering playbooks (plus reasoning-level guidance) injected into runs; also a quick-lane browser. <em>Use:</em> <code>lehrosol skills</code> (browse) — the baked-in set lives in <code>docs/skills/</code>.</p>
+<p><strong>stall warning</strong> — <code>[HARNESS STALL WARNING]</code> injected when a model repeats the identical tool call 3×, demanding a strategy change; runs report <code>stallWarnings</code>.</p>
+<p><strong>supervise</strong> — dependency-aware task-graph supervisor: plan waves, run with concurrency and fail-fast, track attempts. <em>Use:</em> <code>lehrosol supervise plan</code> / <code>supervise run</code> / <code>supervise status --id &lt;id&gt;</code>.</p>
+<p><strong>switch</strong> — interactive switchboard sweeping mode → adapter → model with live probes. <em>Use:</em> <code>lehrosol switch</code>.</p>
+<h3 id="t"><a class="anchor" href="#t" aria-label="Link to section">#</a>T</h3>
+<p><strong>Test Bench</strong> — see <a href="#b">Bench</a>. In Lehrosol Code it's the ⚖ panel; on the CLI it's <code>model-lab</code>.</p>
+<p><strong>threads</strong> — CMUX-style parallel loop threads over sessions/worktrees. <em>Use:</em> <code>lehrosol threads list</code> / <code>threads run</code>.</p>
+<p><strong>TUI</strong> — the immersive in-terminal cockpit (<code>lehrosol tui</code>): panels, overlays, keybindings, three density modes (<code>basic|intermediate|advanced</code>), <code>--json</code> snapshots for automation, <code>--static</code> for pipes/CI. Press <code>t</code> from the web GUI to hop in.</p>
+<p><strong>try</strong> — chat REPL with tok/s stats against the hot engine. <em>Use:</em> <code>lehrosol try qwopus</code> (or one-shot: <code>try --prompt "…"</code>).</p>
+<h3 id="u"><a class="anchor" href="#u" aria-label="Link to section">#</a>U</h3>
+<p><strong><code>up</code></strong> — the quick lane's crown jewel: scan drives → pick the best-fit model for this machine → serve it on :7000, in one word. With <code>Auto-start engine</code> on, Lehrosol Code resumes your last served model at launch. <em>Use:</em> <code>lehrosol up</code>.</p>
+<h3 id="v"><a class="anchor" href="#v" aria-label="Link to section">#</a>V</h3>
+<p><strong>vault</strong> — the Model Vault: scan, rate (GREAT/TIGHT/NO FIT against real <code>os.freemem()</code>), add roots, and host GGUFs directly — no engine app needed. <em>Use:</em> <code>lehrosol vault list</code> / <code>vault add-root "D:\AI Models"</code> / <code>vault serve --model &lt;id&gt; --port 7000</code>.</p>
+<h3 id="w"><a class="anchor" href="#w" aria-label="Link to section">#</a>W</h3>
+<p><strong>Worktrees</strong> — how <code>orchestrate</code> gives each parallel agent its own sandbox: a git worktree per worker on its own branch, so agents never clobber each other's files.</p>
+<h3 id="z"><a class="anchor" href="#z" aria-label="Link to section">#</a>Z</h3>
+<p><strong>Zero-dependency core</strong> — the architectural rule that makes every install path work: <code>src/core</code>, <code>src/mcp</code>, <code>src/harness</code>, <code>src/loop</code>, <code>src/orchestrator</code> use only Node builtins. Only <code>gui/</code> may declare npm dependencies. See <a href="12-adr.html">ADR-0001</a>.</p>
+<h2 id="see-also"><a class="anchor" href="#see-also" aria-label="Link to section">#</a>See also</h2>
+<p><a href="10-how-to-use.html">10 · How to Use This</a> · <a href="18-agentic-missions.html">18 · Agentic Missions</a> · <a href="08-agent-adapters.html">08 · Agent Adapters</a> · <a href="06-mcp-control-plane.html">06 · MCP Control Plane</a> · <a href="07-gui-dashboard.html">07 · GUI Dashboard</a> · <a href="15-terminal-gui.html">15 · Terminal GUI</a> · <a href="skills/README.html">Skills index</a></p>
+    <div class="pager"><a class="prev" href="18-agentic-missions.html"><span class="dir">← Previous</span><span class="t">18 — Agentic Missions &amp; Guided Onboarding (v3.0.0)</span></a><a class="next" href=".docs\phase-4-5-build-issues.html"><span class="dir">Next →</span><span class="t">Phase 4/5 build issue log</span></a></div>
+    <footer class="credit"><span>LehroSol CLI · GPL-3.0 · free &amp; open source</span><span>Generated by docs/tools/build-docs.mjs</span></footer>
+  </main>
+  <aside class="toc"><div class="toc-label">On this page</div>
+    <a class="" href="#the-journey-at-a-glance">The journey at a glance</a>
+    <a class="" href="#part-1-installing-the-lehrosol-cli">Part 1 — Installing the LehroSol CLI</a>
+    <a class="sub" href="#install-paths">Install paths</a>
+    <a class="sub" href="#verify-and-first-run">Verify and first-run</a>
+    <a class="" href="#part-2-installing-lehrosol-code-the-electron-app">Part 2 — Installing Lehrosol Code (the Electron app)</a>
+    <a class="" href="#part-3-glossary-a-z">Part 3 — Glossary, A → Z</a>
+    <a class="sub" href="#a">A</a>
+    <a class="sub" href="#b">B</a>
+    <a class="sub" href="#c">C</a>
+    <a class="sub" href="#d">D</a>
+    <a class="sub" href="#e">E</a>
+    <a class="sub" href="#f">F</a>
+    <a class="sub" href="#g">G</a>
+    <a class="sub" href="#h">H</a>
+    <a class="sub" href="#i">I</a>
+    <a class="sub" href="#j">J</a>
+    <a class="sub" href="#l">L</a>
+    <a class="sub" href="#m">M</a>
+    <a class="sub" href="#o">O</a>
+    <a class="sub" href="#p">P</a>
+    <a class="sub" href="#q">Q</a>
+    <a class="sub" href="#r">R</a>
+    <a class="sub" href="#s">S</a>
+    <a class="sub" href="#t">T</a>
+    <a class="sub" href="#u">U</a>
+    <a class="sub" href="#v">V</a>
+    <a class="sub" href="#w">W</a>
+    <a class="sub" href="#z">Z</a>
+    <a class="" href="#see-also">See also</a>
+  </aside>
+</div>
+</div>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', themeVariables: { primaryColor: '#0f1720', primaryTextColor: '#e6faff', primaryBorderColor: '#22d3ee', lineColor: '#22d3ee', secondaryColor: '#111827', tertiaryColor: '#05070a', fontFamily: 'JetBrains Mono, monospace' } });
+</script>
+<script>
+(function(){
+  var bar=document.getElementById('progress');
+  function onScroll(){var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;var p=max>0?(h.scrollTop/max)*100:0;if(bar)bar.style.width=p+'%';}
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  // copy buttons
+  document.querySelectorAll('.code-wrap').forEach(function(w){var pre=w.querySelector('pre');if(!pre)return;var b=document.createElement('button');b.className='copy-btn';b.textContent='copy';b.addEventListener('click',function(){var t=pre.innerText;navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent='copied';b.classList.add('copied');setTimeout(function(){b.textContent='copy';b.classList.remove('copied');},1400);});w.appendChild(b);});
+  // sidebar filter
+  var box=document.getElementById('nav-search');var empty=document.getElementById('no-results');
+  if(box){box.addEventListener('input',function(){var q=box.value.trim().toLowerCase();var any=false;document.querySelectorAll('nav.sidebar a.item').forEach(function(a){var hit=!q||a.getAttribute('data-title').indexOf(q)>-1;a.style.display=hit?'':'none';if(hit)any=true;});document.querySelectorAll('.nav-group').forEach(function(g){var vis=g.querySelectorAll('a.item:not([style*="none"])').length;g.style.display=(!q||vis>0)?'':'none';});if(empty)empty.style.display=any?'none':'block';});}
+  // scroll spy for TOC
+  var tocLinks=Array.prototype.slice.call(document.querySelectorAll('aside.toc a'));
+  if(tocLinks.length){var map={};tocLinks.forEach(function(l){var id=l.getAttribute('href').slice(1);var el=document.getElementById(id);if(el)map[id]=l;});
+    var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){tocLinks.forEach(function(l){l.classList.remove('active');});var l=map[e.target.id];if(l)l.classList.add('active');}});},{rootMargin:'-10% 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){var el=document.getElementById(id);if(el)obs.observe(el);});}
+  // mobile menu
+  var mt=document.getElementById('menu-toggle');var scrim=document.getElementById('scrim');
+  function close(){document.body.classList.remove('nav-open');}
+  if(mt)mt.addEventListener('click',function(){document.body.classList.toggle('nav-open');});
+  if(scrim)scrim.addEventListener('click',close);
+  document.querySelectorAll('nav.sidebar a.item').forEach(function(a){a.addEventListener('click',close);});
+})();
+</script>
+</body>
+</html>

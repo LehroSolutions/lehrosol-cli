@@ -3,7 +3,7 @@
   "description": "",
   "sourceFile": "README.md",
   "readingMinutes": 4,
-  "wordCount": 795,
+  "wordCount": 863,
   "sections": [
     {
       "level": 2,
@@ -47,7 +47,7 @@
     }
   ],
   "mermaidDiagrams": [
-    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    README[\"docs/README.md\\n(you are here)\"] --> ARCH[\"01 · Architecture\"]\n    README --> COMP[\"02 · Competitive Landscape\"]\n    README --> LOOP[\"03 · Loop Engineering\"]\n    README --> HARN[\"04 · Harness Engineering\"]\n    README --> ORCH[\"05 · Orchestration Engineering\"]\n    README --> MCP[\"06 · MCP Control Plane\"]\n    README --> GUI[\"07 · GUI Dashboard\"]\n    README --> ADAPT[\"08 · Agent Adapters\"]\n    README --> AGSK[\"09 · Agents & Skills Map\"]\n    README --> HOWTO[\"10 · How to Use This\"]\n    README --> WORKFLOW[\"11 · Improving Your Workflow\"]\n    README --> ADR[\"12 · ADRs\"]\n    README --> WIKI[\"13 · DeepWiki\"]\n    README --> AUDIT[\"14 · Audit Report\"]\n    README --> TUI[\"15 · Terminal GUI\"]\n    README --> DS[\"16 · Design System (HELIX)\"]\n    ARCH --> LOOP\n    ARCH --> HARN\n    ARCH --> ORCH\n    ARCH --> MCP\n    ARCH --> GUI\n    LOOP --> ADAPT\n    ORCH --> ADAPT\n    HARN --> LOOP\n    MCP --> GUI\n    MCP --> LOOP\n    MCP --> ORCH\n    AGSK --> LOOP\n    AGSK --> HARN\n    AGSK --> ORCH\n    AGSK --> SKILLS[\"skills/ (baked-in workflow skills)\"]\n    AGSK --> CLAUDEDIR[\"claude/AGENTS.md\"]\n    HOWTO --> WORKFLOW\n    WORKFLOW --> ADR\n    ADR --> WIKI\n    WIKI --> AUDIT\n    AUDIT --> TUI\n    TUI --> DS\n    DS --> GUI\n    DS --> ARCH\n    TUI --> ARCH\n    WIKI --> ARCH\n    WIKI -.\"full file-by-file index\".-> SKILLS\n    ADR -.\"decisions behind\".-> ARCH\n    ADR -.\"decisions behind\".-> GUI\n    ADR -.\"decisions behind\".-> ORCH",
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    README[\"docs/README.md\\n(you are here)\"] --> ARCH[\"01 · Architecture\"]\n    README --> COMP[\"02 · Competitive Landscape\"]\n    README --> LOOP[\"03 · Loop Engineering\"]\n    README --> HARN[\"04 · Harness Engineering\"]\n    README --> ORCH[\"05 · Orchestration Engineering\"]\n    README --> MCP[\"06 · MCP Control Plane\"]\n    README --> GUI[\"07 · GUI Dashboard\"]\n    README --> ADAPT[\"08 · Agent Adapters\"]\n    README --> AGSK[\"09 · Agents & Skills Map\"]\n    README --> HOWTO[\"10 · How to Use This\"]\n    README --> WORKFLOW[\"11 · Improving Your Workflow\"]\n    README --> ADR[\"12 · ADRs\"]\n    README --> WIKI[\"13 · DeepWiki\"]\n    README --> AUDIT[\"14 · Audit Report\"]\n    README --> TUI[\"15 · Terminal GUI\"]\n    README --> DS[\"16 · Design System (HELIX)\"]\n    README --> P45[\"17 · Phase 4-5 Full Potential\"]\n    README --> MISSIONS[\"18 · Agentic Missions\"]\n    README --> GLOSS[\"19 · Install & Usage Glossary\"]\n    HOWTO --> GLOSS\n    MISSIONS --> GLOSS\n    ARCH --> LOOP\n    ARCH --> HARN\n    ARCH --> ORCH\n    ARCH --> MCP\n    ARCH --> GUI\n    LOOP --> ADAPT\n    ORCH --> ADAPT\n    HARN --> LOOP\n    MCP --> GUI\n    MCP --> LOOP\n    MCP --> ORCH\n    AGSK --> LOOP\n    AGSK --> HARN\n    AGSK --> ORCH\n    AGSK --> SKILLS[\"skills/ (baked-in workflow skills)\"]\n    AGSK --> CLAUDEDIR[\"claude/AGENTS.md\"]\n    HOWTO --> WORKFLOW\n    WORKFLOW --> ADR\n    ADR --> WIKI\n    WIKI --> AUDIT\n    AUDIT --> TUI\n    TUI --> DS\n    DS --> GUI\n    DS --> ARCH\n    TUI --> ARCH\n    WIKI --> ARCH\n    WIKI -.\"full file-by-file index\".-> SKILLS\n    ADR -.\"decisions behind\".-> ARCH\n    ADR -.\"decisions behind\".-> GUI\n    ADR -.\"decisions behind\".-> ORCH",
     "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee'}}}%%\nflowchart LR\n    MD[\"name.md\\n(source of truth,\\nhuman + agent readable)\"] -->|docs/tools/build-docs.mjs| JSON[\"name.json\\n(structured, for tools/agents)\"]\n    MD -->|docs/tools/build-docs.mjs| HTML[\"name.html\\n(dark-HUD themed,\\nlive Mermaid render)\"]"
   ],
   "relatedDocs": [
@@ -114,6 +114,18 @@
     {
       "text": "Design System (HELIX)",
       "href": "16-design-system.md"
+    },
+    {
+      "text": "Phase 4-5 Full Potential",
+      "href": "17-phase-4-5-full-potential.md"
+    },
+    {
+      "text": "Agentic Missions",
+      "href": "18-agentic-missions.md"
+    },
+    {
+      "text": "Install & Usage Glossary",
+      "href": "19-glossary.md"
     },
     {
       "text": "`skills/`",
@@ -192,6 +204,18 @@
     {
       "text": "Design System (HELIX)",
       "href": "16-design-system.md"
+    },
+    {
+      "text": "Phase 4-5 Full Potential",
+      "href": "17-phase-4-5-full-potential.md"
+    },
+    {
+      "text": "Agentic Missions",
+      "href": "18-agentic-missions.md"
+    },
+    {
+      "text": "Install & Usage Glossary",
+      "href": "19-glossary.md"
     },
     {
       "text": "`skills/`",

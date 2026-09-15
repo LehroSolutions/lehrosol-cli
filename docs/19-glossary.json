@@ -1,0 +1,257 @@
+{
+  "title": "19 · Install & Usage Glossary",
+  "description": "A dictionary-style reference for the whole LehroSol surface — **how to install** the CLI and the Lehrosol Code desktop app, and **what every command, file, and concept means and how to use it**. Each entry gives the definition, the command(s) that exercise it, and a copy-paste example. If you know *what* you want but not *what it's called*, start at the letter.",
+  "sourceFile": "19-glossary.md",
+  "readingMinutes": 11,
+  "wordCount": 2232,
+  "sections": [
+    {
+      "level": 2,
+      "heading": "The journey at a glance",
+      "id": "the-journey-at-a-glance"
+    },
+    {
+      "level": 2,
+      "heading": "Part 1 — Installing the LehroSol CLI",
+      "id": "part-1-installing-the-lehrosol-cli"
+    },
+    {
+      "level": 3,
+      "heading": "Install paths",
+      "id": "install-paths"
+    },
+    {
+      "level": 3,
+      "heading": "Verify and first-run",
+      "id": "verify-and-first-run"
+    },
+    {
+      "level": 2,
+      "heading": "Part 2 — Installing Lehrosol Code (the Electron app)",
+      "id": "part-2-installing-lehrosol-code-the-electron-app"
+    },
+    {
+      "level": 2,
+      "heading": "Part 3 — Glossary, A → Z",
+      "id": "part-3-glossary-a-z"
+    },
+    {
+      "level": 3,
+      "heading": "A",
+      "id": "a"
+    },
+    {
+      "level": 3,
+      "heading": "B",
+      "id": "b"
+    },
+    {
+      "level": 3,
+      "heading": "C",
+      "id": "c"
+    },
+    {
+      "level": 3,
+      "heading": "D",
+      "id": "d"
+    },
+    {
+      "level": 3,
+      "heading": "E",
+      "id": "e"
+    },
+    {
+      "level": 3,
+      "heading": "F",
+      "id": "f"
+    },
+    {
+      "level": 3,
+      "heading": "G",
+      "id": "g"
+    },
+    {
+      "level": 3,
+      "heading": "H",
+      "id": "h"
+    },
+    {
+      "level": 3,
+      "heading": "I",
+      "id": "i"
+    },
+    {
+      "level": 3,
+      "heading": "J",
+      "id": "j"
+    },
+    {
+      "level": 3,
+      "heading": "L",
+      "id": "l"
+    },
+    {
+      "level": 3,
+      "heading": "M",
+      "id": "m"
+    },
+    {
+      "level": 3,
+      "heading": "O",
+      "id": "o"
+    },
+    {
+      "level": 3,
+      "heading": "P",
+      "id": "p"
+    },
+    {
+      "level": 3,
+      "heading": "Q",
+      "id": "q"
+    },
+    {
+      "level": 3,
+      "heading": "R",
+      "id": "r"
+    },
+    {
+      "level": 3,
+      "heading": "S",
+      "id": "s"
+    },
+    {
+      "level": 3,
+      "heading": "T",
+      "id": "t"
+    },
+    {
+      "level": 3,
+      "heading": "U",
+      "id": "u"
+    },
+    {
+      "level": 3,
+      "heading": "V",
+      "id": "v"
+    },
+    {
+      "level": 3,
+      "heading": "W",
+      "id": "w"
+    },
+    {
+      "level": 3,
+      "heading": "Z",
+      "id": "z"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
+    }
+  ],
+  "mermaidDiagrams": [
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    INSTALL[\"1 · INSTALL<br/>npm i -g lehrosol-cli<br/>(or bun / curl / install.ps1)\"] --> VERIFY\n    APP[\"Lehrosol Code (Electron)<br/>pnpm install → pnpm start\"] -->|\"shells out to lehrosol … --json\"| CLI_CORE[\"LehroSol CLI core<br/>(zero-dependency, Node 20+)\"]\n    CLI_CORE --> VERIFY[\"2 · VERIFY<br/>lehrosol doctor\"]\n    VERIFY -->|\"all green\"| PAIR[\"3 · PAIR<br/>vault + serve + models\"]\n    PAIR --> USE[\"4 · USE<br/>quick lane · loop · mission · tui · gui\"]\n    USE --> LEARN[\"5 · LEARN<br/>engrams · compact · report\"]"
+  ],
+  "relatedDocs": [
+    {
+      "text": "18 · Agentic Missions & Guided Onboarding",
+      "href": "18-agentic-missions.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "Skills index",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "ADR-0001",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "18 · Agentic Missions",
+      "href": "18-agentic-missions.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Skills index",
+      "href": "skills/README.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "18 · Agentic Missions & Guided Onboarding",
+      "href": "18-agentic-missions.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "Skills index",
+      "href": "skills/README.md"
+    },
+    {
+      "text": "Part 1",
+      "href": "#part-1--installing-the-lehrosol-cli"
+    },
+    {
+      "text": "Bench",
+      "href": "#b"
+    },
+    {
+      "text": "ADR-0001",
+      "href": "12-adr.md"
+    },
+    {
+      "text": "10 · How to Use This",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "18 · Agentic Missions",
+      "href": "18-agentic-missions.md"
+    },
+    {
+      "text": "08 · Agent Adapters",
+      "href": "08-agent-adapters.md"
+    },
+    {
+      "text": "06 · MCP Control Plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "07 · GUI Dashboard",
+      "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "15 · Terminal GUI",
+      "href": "15-terminal-gui.md"
+    },
+    {
+      "text": "Skills index",
+      "href": "skills/README.md"
+    }
+  ]
+}

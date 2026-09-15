@@ -30,6 +30,7 @@ First public open-beta. Focus: open-source readiness, Windows first-class suppor
 - CI now runs the full suite on **both ubuntu and windows** runners (Windows is a first-class target).
 
 ### Fixed
+- `npm run docs:build` hangs forever on any CRLF-checked-out `.md`: the md→html heading regex `^(#{1,6})\s+(.*)$` never matches when a line ends with `\r` (JS `.` does not match `\r`, so `$` cannot anchor before it). The builder now normalizes CRLF → LF when reading docs, so Windows-first checkouts build identically.
 - The CLI banner still advertised `GPL-3.0-or-later` after the Apache-2.0 relicense. The displayed license is now derived from `package.json`'s `license` field (same single-source-of-truth pattern as the version string), so it can never drift again.
 - `npm run check` used `find | xargs`, a Unix-only pipeline — it silently skipped the syntax gate on Windows. Replaced with a dependency-free Node script (`scripts/check-syntax.mjs`) that checks every `.js`/`.mjs` under `bin/`, `src/`, `docs/tools/`, and `scripts/` on any OS.
 - Adapter readiness probes (`where`/`which` per binary) are now memoized per binary for 60s inside a process; the loop engine and MCP server re-probed the same adapters repeatedly, wasting whole minutes on Windows (fix_plan.md item).

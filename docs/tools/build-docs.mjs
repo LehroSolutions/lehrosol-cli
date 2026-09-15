@@ -567,9 +567,14 @@ function orderCatalog(catalog) {
 
 function main() {
   const files = walk(DOCS_ROOT).sort();
+  // Normalize CRLF → LF on read: the md→html regexes use `$`-anchored patterns
+  // like /^(#{1,6})\s+(.*)$/, and `.` does not match `\r` — so on a CRLF
+  // checkout (Windows-first project!) every heading would silently fail to
+  // parse and mdToHtml would loop forever on the first heading line.
+  const readDoc = (f) => fs.readFileSync(f, "utf8").replace(/\r\n/g, "\n");
   let catalog = files.map((f) => {
     const rel = path.relative(DOCS_ROOT, f);
-    const content = fs.readFileSync(f, "utf8");
+    const content = readDoc(f);
     const model = parseModel(content);
     return { file: f, rel, title: model.title };
   });
@@ -577,7 +582,7 @@ function main() {
 
   for (let idx = 0; idx < catalog.length; idx++) {
     const f = catalog[idx].file;
-    const content = fs.readFileSync(f, "utf8");
+    const content = readDoc(f);
     const model = parseModel(content);
     const jsonOut = {
       title: model.title,

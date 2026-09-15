@@ -23,6 +23,11 @@ flowchart TD
     README --> AUDIT["14 · Audit Report"]
     README --> TUI["15 · Terminal GUI"]
     README --> DS["16 · Design System (HELIX)"]
+    README --> P45["17 · Phase 4-5 Full Potential"]
+    README --> MISSIONS["18 · Agentic Missions"]
+    README --> GLOSS["19 · Install & Usage Glossary"]
+    HOWTO --> GLOSS
+    MISSIONS --> GLOSS
     ARCH --> LOOP
     ARCH --> HARN
     ARCH --> ORCH
@@ -82,6 +87,9 @@ flowchart TD
 | 14 | [Audit Report](14-audit-report.md) | Parser, persistence, policy, scanner, orchestration-schema, and regression-test hardening from the audit pass |
 | 15 | [Terminal GUI](15-terminal-gui.md) | The immersive **HELIX Console** cockpit: animations, keybindings, modes, panels, overlays, JSON snapshots, and how it differs from the web GUI |
 | 16 | [Design System (HELIX)](16-design-system.md) | The zero-dependency terminal design system: palette, gradients, glyphs, components, motion, and graceful degradation |
+| 17 | [Phase 4-5 Full Potential](17-phase-4-5-full-potential.md) | The plan for reaching full potential: marketplace, signing, distribution |
+| 18 | [Agentic Missions](18-agentic-missions.md) | Autonomous goal → plan → execute → verify → adapt missions, autonomy policy, and guided onboarding |
+| 19 | [Install & Usage Glossary](19-glossary.md) | Dictionary-style install guide and A→Z glossary of every command, file, and concept — CLI and Lehrosol Code app |
 
 Also see: [`skills/`](skills/README.md) for task-scoped workflow skills any agent can be pointed at, and [`claude/AGENTS.md`](claude/AGENTS.md) for the Claude-Code-specific deep dive.
 
