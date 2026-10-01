@@ -3,7 +3,7 @@
   "description": "LehroSol CLI (bins `lehrosol` + short alias `lehr-sol`) is one npm package built from Node.js builtins only in its core, so `npm i -g`, `bunx`, and `curl | bash` all work with zero install friction. It unifies three disciplines behind one MCP control plane, all wrapped in a rich terminal UI layer (`src/core/ui.js`) ported from the gidevo-api-tool blueprint:",
   "sourceFile": "01-architecture.md",
   "readingMinutes": 4,
-  "wordCount": 820,
+  "wordCount": 825,
   "sections": [
     {
       "level": 2,
@@ -73,6 +73,10 @@
     {
       "text": "GUI",
       "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "ADR-0012",
+      "href": "12-adr.md"
     },
     {
       "text": "Real agent adapters",
@@ -159,6 +163,10 @@
     {
       "text": "GUI",
       "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "ADR-0012",
+      "href": "12-adr.md"
     },
     {
       "text": "Real agent adapters",

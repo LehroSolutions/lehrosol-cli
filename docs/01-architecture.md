@@ -100,7 +100,7 @@ sequenceDiagram
 
 | Phase | Scope | Status |
 | --- | --- | --- |
-| 0 | Core, CLI, MCP server, harness policy + OWASP scope stub, loop engine with a `local` dry-run adapter, git-worktree orchestrator, `doctor`/`init` UX, curl/npm/bun install path, GPL-3.0 licensing | **Done** |
+| 0 | Core, CLI, MCP server, harness policy + OWASP scope stub, loop engine with a `local` dry-run adapter, git-worktree orchestrator, `doctor`/`init` UX, curl/npm/bun install path, initial licensing (later relicensed — see [ADR-0012](12-adr.md)) | **Done** |
 | 1 | [Real agent adapters](08-agent-adapters.md) — Claude Code, Codex CLI, OpenCode, Gemini CLI, Aider, Goose, Hermes Agent, behind one shared contract | **Done** |
 | 2 | [Full OWASP rule packs + heuristic scanner](04-harness-engineering.md), SQLite session/checkpoint persistence | **Done** |
 | 3 | [GUI dashboard](07-gui-dashboard.md) sharing the MCP HTTP endpoint | **Done** (needs `cd gui && npm install` on a machine with internet access) |

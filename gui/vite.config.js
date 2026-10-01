@@ -8,6 +8,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    // gui/src/lib/license.js reads the root package.json, which sits above the Vite root.
+    fs: { allow: ['..'] },
     proxy: {
       '/rpc': {
         target: process.env.LEHRO_CONTROL_PLANE_URL || 'http://localhost:4177',

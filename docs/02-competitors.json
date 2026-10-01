@@ -3,7 +3,7 @@
   "description": "| Tool | License | Focus | Gap LehroSol fills |",
   "sourceFile": "02-competitors.md",
   "readingMinutes": 2,
-  "wordCount": 377,
+  "wordCount": 390,
   "sections": [
     {
       "level": 2,
@@ -66,6 +66,10 @@
       "href": "07-gui-dashboard.md"
     },
     {
+      "text": "ADR-0012",
+      "href": "12-adr.md"
+    },
+    {
       "text": "09 · Agents & Skills Map",
       "href": "09-agents-and-skills.md"
     },
@@ -122,6 +126,10 @@
     {
       "text": "GUI dashboard",
       "href": "07-gui-dashboard.md"
+    },
+    {
+      "text": "ADR-0012",
+      "href": "12-adr.md"
     },
     {
       "text": "09 · Agents & Skills Map",

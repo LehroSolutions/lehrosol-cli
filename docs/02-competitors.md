@@ -42,7 +42,7 @@ quadrantChart
 2. **Adapter, not replacement**: wraps existing agent CLIs (Claude Code, Codex, OpenCode, Hermes Agent, etc. — see [08 · Agent Adapters](08-agent-adapters.md)) via MCP instead of competing with them.
 3. **One control plane, two front ends**: the same [MCP endpoint](06-mcp-control-plane.md) drives the terminal and a [GUI dashboard](07-gui-dashboard.md), enabling mid-task handoff either direction.
 4. **Zero-dependency core** for instant `npm i -g` / `bunx` / `curl | bash` installs.
-5. **GPL-3.0-or-later**: fully free/copyleft, unlike the proprietary incumbents and unlike AGPL/mixed-license alternatives that complicate proprietary integration.
+5. **Apache-2.0** (since 3.2.0, [ADR-0012](12-adr.md)): permissive redistribution with attribution plus an explicit patent grant, so embedders can vendor LehroSol in proprietary products and CI images without a copyleft/license-compatibility review.
 6. **Agent-agnostic instruction files**: ships dedicated entry points for every major agent CLI (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md` — see [09 · Agents & Skills Map](09-agents-and-skills.md)) instead of assuming one vendor's agent.
 
 ## See also

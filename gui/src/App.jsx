@@ -5,6 +5,7 @@ import AdaptersPanel from './components/AdaptersPanel.jsx';
 import OrchestratePanel from './components/OrchestratePanel.jsx';
 import PolicyPanel from './components/PolicyPanel.jsx';
 import SessionsPanel from './components/SessionsPanel.jsx';
+import { LICENSE } from './lib/license.js';
 
 const TABS = [
   { id: 'doctor', label: 'Doctor' },
@@ -58,7 +59,7 @@ export default function App() {
       </main>
 
       <footer className="mt-8 text-xs text-center text-slate-600">
-        LehroSol CLI (alias lehr-sol) &middot; GPL-3.0-or-later &middot; free &amp; open agentic engineering
+        LehroSol CLI (alias lehr-sol) &middot; {LICENSE} &middot; free &amp; open agentic engineering
       </footer>
     </div>
   );
