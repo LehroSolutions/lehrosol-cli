@@ -10,6 +10,13 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 ### Changed
 - `engrams` now supports `--json` (machine-readable `{ ok, engrams, total }`), consumed by the Lehrosol Code memory panel.
 
+### Fixed
+- **The Apache-2.0 relicense was incomplete in every user-visible surface.** ADR-0012 and the 3.2.0-beta.1 entry below claim every SPDX identifier was updated in one sweep; that held only for `package.json`, the committed Homebrew formula, and the CLI banner. All 31 generated doc pages still footered `GPL-3.0` (hardcoded in `docs/tools/build-docs.mjs`), the GUI footered `GPL-3.0-or-later`, and both `source:'bundled'` first-party marketplace entries (VS Code companion, Homebrew generator) were labelled GPL-3.0-or-later. All now derive from `package.json`.
+- `lehrosol release formula` wrote a hardcoded `license "GPL-3.0-or-later"` into the generated Homebrew formula, silently overwriting the correct committed Apache-2.0 file. It now derives the license from `package.json`.
+
+### Added
+- `test/license-compliance.test.js` — regression guard sweeping every shipped surface for surviving GPL identifiers, so a future relicense cannot half-land again. The earlier guard pinned only `pkg.license`, which is exactly why the above survived. Deliberately exempts legal history (`docs/12-adr.md`, this changelog, README, SECURITY) and the competitor license table.
+
 ## [3.2.0-beta.1] — 2026-09-06
 
 First public open-beta. Focus: open-source readiness, Windows first-class support, and version consistency.
