@@ -40,7 +40,7 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/lehrosol-smoke" --ignore-scripts --no-audit --no-fund "./dist/${{ steps.metadata.outputs.artifact }}"
           node "$RUNNER_TEMP/lehrosol-smoke/node_modules/@lehrosolutions/cli/bin/lehrosol.js" --version
           node "$RUNNER_TEMP/lehrosol-smoke/node_modules/@lehrosolutions/cli/bin/lehrosol.js" --help
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-integrity
           path: dist/
