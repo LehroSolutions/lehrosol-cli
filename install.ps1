@@ -20,7 +20,7 @@ if ($nodeMajor -lt 20) { Fail "Node.js 20+ required, found $(node -v)." }
 
 if ($Global) {
   Log "Installing via npm (global)"
-  npm install -g lehrosol-cli
+  npm install -g @lehrosolutions/cli@beta
   if ($LASTEXITCODE -ne 0) { Fail "npm install failed." }
 } else {
   $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path

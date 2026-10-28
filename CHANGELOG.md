@@ -8,9 +8,13 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 - **Benchmark validity guard**: `arena` and `bench run` now sample background CPU load across the run (`cpuLoadSample`, `src/commands/quick.js`) and attach `cpuLoad` to their JSON payloads — with an explicit warning when load ≥ 60%, because a single runaway background process made a 9B model look 6x slower during live testing (see AGENTS.md notes). The GUI Test Bench in Lehrosol Code shows the same guard.
 
 ### Changed
+- Publish the CLI as `@lehrosolutions/cli` under the npm organization; executable names remain `lehrosol` and `lehr-sol`. Beta installation instructions use `@beta` explicitly.
 - `engrams` now supports `--json` (machine-readable `{ ok, engrams, total }`), consumed by the Lehrosol Code memory panel.
 
 ### Fixed
+- HTTP MCP rejects remote browser origins and DNS-rebinding hosts on loopback, requires authentication for network bindings, bounds request bodies, and preserves UTF-8 across network chunks.
+- Tests isolate state from the user's configuration and clean up worker state after SQLite handles close.
+- Release preparation runs on Windows, selects only the newly packed tarball, and verifies checksums beside the artifact. CI publishes that exact tarball using the appropriate beta or stable channel.
 - **The Apache-2.0 relicense was incomplete in every user-visible surface.** ADR-0012 and the 3.2.0-beta.1 entry below claim every SPDX identifier was updated in one sweep; that held only for `package.json`, the committed Homebrew formula, and the CLI banner. All 31 generated doc pages still footered `GPL-3.0` (hardcoded in `docs/tools/build-docs.mjs`), the GUI footered `GPL-3.0-or-later`, and both `source:'bundled'` first-party marketplace entries (VS Code companion, Homebrew generator) were labelled GPL-3.0-or-later. All now derive from `package.json`.
 - `lehrosol release formula` wrote a hardcoded `license "GPL-3.0-or-later"` into the generated Homebrew formula, silently overwriting the correct committed Apache-2.0 file. It now derives the license from `package.json`.
 

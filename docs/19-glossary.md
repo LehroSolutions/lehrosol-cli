@@ -9,7 +9,7 @@ A dictionary-style reference for the whole LehroSol surface — **how to install
 ```mermaid
 %%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%
 flowchart TD
-    INSTALL["1 · INSTALL<br/>npm i -g lehrosol-cli<br/>(or bun / curl / install.ps1)"] --> VERIFY
+    INSTALL["1 · INSTALL<br/>npm i -g @lehrosolutions/cli@beta<br/>(or bun / curl / install.ps1)"] --> VERIFY
     APP["Lehrosol Code (Electron)<br/>pnpm install → pnpm start"] -->|"shells out to lehrosol … --json"| CLI_CORE["LehroSol CLI core<br/>(zero-dependency, Node 20+)"]
     CLI_CORE --> VERIFY["2 · VERIFY<br/>lehrosol doctor"]
     VERIFY -->|"all green"| PAIR["3 · PAIR<br/>vault + serve + models"]
@@ -23,8 +23,8 @@ flowchart TD
 
 | Path | Command | When to use |
 | --- | --- | --- |
-| **npm (global)** | `npm i -g lehrosol-cli` | You have Node.js 20+ and npm — the standard path |
-| **Bun** | `bun install -g lehrosol-cli` (or run without installing: `bunx lehrosol-cli doctor`) | You prefer Bun's speed |
+| **npm (global)** | `npm i -g @lehrosolutions/cli@beta` | You have Node.js 20+ and npm — the standard path |
+| **Bun** | `bun install -g @lehrosolutions/cli@beta` (or run without installing: `bunx @lehrosolutions/cli@beta doctor`) | You prefer Bun's speed |
 | **curl (macOS/Linux)** | `curl -fsSL https://get.lehro.dev/install \| bash` | Fresh shell, no package manager configured yet — the script detects bun/npm, else symlinks `bin/lehrosol.js` |
 | **Windows installer** | `powershell -ExecutionPolicy Bypass -File install.ps1` (`-Global` for npm, otherwise a per-user launcher shim for a local clone) | Windows-first machines |
 | **From source** | `git clone https://github.com/LehroSolutions/lehrosol-cli.git` then `node bin/lehrosol.js --help` | Contributors and agents embedding the CLI |

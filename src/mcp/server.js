@@ -1,8 +1,9 @@
 // Production-hardened MCP control plane.
 // Supports JSON-RPC 2.0 over stdio (default) and a loopback HTTP transport for
 // GUI/local automation. HTTP defaults to 127.0.0.1, enforces a small body cap,
-// exposes GET /health, and can require Bearer auth via LEHRO_MCP_TOKEN.
+// exposes GET /health, and requires Bearer auth for network-facing bindings.
 import { createServer } from 'node:http';
+import { isIP } from 'node:net';
 import { listTools, executeTool, TOOL_DEFINITIONS } from './tools.js';
 import { CORE_VERSION } from '../core/index.js';
 
@@ -72,33 +73,59 @@ function authorized(req, token) {
   return req.headers.authorization === `Bearer ${token}`;
 }
 
+function isLoopbackHost(host) {
+  return host.toLowerCase() === 'localhost' || host === '::1'
+    || (isIP(host) === 4 && host.startsWith('127.'));
+}
+
 export function startHttpServer(options = {}) {
   const port = Number(options.port ?? 4177);
   const host = options.host || process.env.LEHRO_MCP_HOST || '127.0.0.1';
   const token = options.token || process.env.LEHRO_MCP_TOKEN || '';
+  const loopback = isLoopbackHost(host);
+  if (!loopback && !token) {
+    throw new Error('HTTP MCP requires --token or LEHRO_MCP_TOKEN when binding outside loopback.');
+  }
 
   const server = createServer((req, res) => {
+    if (loopback) {
+      // Reject DNS-rebinding hosts and browser requests from remote origins.
+      let requestHost;
+      let originHost;
+      try {
+        requestHost = new URL(`http://${req.headers.host}`).hostname;
+        if (req.headers.origin) originHost = new URL(req.headers.origin).hostname;
+      } catch { json(res, 403, { error: 'invalid host or origin' }); return; }
+      const localHost = (value) => isLoopbackHost(value === '[::1]' ? '::1' : value);
+      if (!localHost(requestHost) || (originHost && !localHost(originHost))) {
+        json(res, 403, { error: 'host or origin not allowed' }); return;
+      }
+    }
     if (req.method === 'GET' && req.url === '/health') {
       json(res, 200, { ok: true, name: 'lehrosol-cli', version: CORE_VERSION });
       return;
     }
     if (req.method !== 'POST') { json(res, 405, { error: 'POST only' }); return; }
     if (!authorized(req, token)) { json(res, 401, { error: 'unauthorized' }); return; }
+    if (!/^application\/json(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {
+      json(res, 415, { error: 'application/json required' }); return;
+    }
 
-    let body = '';
+    const chunks = [];
     let bytes = 0;
     req.on('data', (chunk) => {
       bytes += chunk.length;
       if (bytes > MAX_BODY_BYTES) {
-        req.destroy();
+        chunks.length = 0;
+        if (!res.headersSent) json(res, 413, { error: 'payload too large' });
         return;
       }
-      body += chunk;
+      chunks.push(chunk);
     });
     req.on('end', async () => {
-      if (bytes > MAX_BODY_BYTES) { json(res, 413, { error: 'payload too large' }); return; }
+      if (bytes > MAX_BODY_BYTES) return;
       let message;
-      try { message = JSON.parse(body || '{}'); }
+      try { message = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'); }
       catch { json(res, 400, { error: 'invalid JSON' }); return; }
       const response = await handleRpc(message);
       json(res, 200, response);

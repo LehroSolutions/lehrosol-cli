@@ -152,7 +152,7 @@
     }
   ],
   "mermaidDiagrams": [
-    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    INSTALL[\"1 · INSTALL<br/>npm i -g lehrosol-cli<br/>(or bun / curl / install.ps1)\"] --> VERIFY\n    APP[\"Lehrosol Code (Electron)<br/>pnpm install → pnpm start\"] -->|\"shells out to lehrosol … --json\"| CLI_CORE[\"LehroSol CLI core<br/>(zero-dependency, Node 20+)\"]\n    CLI_CORE --> VERIFY[\"2 · VERIFY<br/>lehrosol doctor\"]\n    VERIFY -->|\"all green\"| PAIR[\"3 · PAIR<br/>vault + serve + models\"]\n    PAIR --> USE[\"4 · USE<br/>quick lane · loop · mission · tui · gui\"]\n    USE --> LEARN[\"5 · LEARN<br/>engrams · compact · report\"]"
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    INSTALL[\"1 · INSTALL<br/>npm i -g @lehrosolutions/cli@beta<br/>(or bun / curl / install.ps1)\"] --> VERIFY\n    APP[\"Lehrosol Code (Electron)<br/>pnpm install → pnpm start\"] -->|\"shells out to lehrosol … --json\"| CLI_CORE[\"LehroSol CLI core<br/>(zero-dependency, Node 20+)\"]\n    CLI_CORE --> VERIFY[\"2 · VERIFY<br/>lehrosol doctor\"]\n    VERIFY -->|\"all green\"| PAIR[\"3 · PAIR<br/>vault + serve + models\"]\n    PAIR --> USE[\"4 · USE<br/>quick lane · loop · mission · tui · gui\"]\n    USE --> LEARN[\"5 · LEARN<br/>engrams · compact · report\"]"
   ],
   "relatedDocs": [
     {

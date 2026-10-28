@@ -10,8 +10,8 @@ A hands-on walkthrough from "never installed it" to "running a graded, orchestra
 %%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%
 flowchart TD
     START{"What do you have?"}
-    START -->|"Node.js 20+\nand npm"| NPM["npm i -g lehrosol-cli"]
-    START -->|"Bun installed"| BUN["bun install -g lehrosol-cli\n(or: bunx lehrosol-cli ...)"]
+    START -->|"Node.js 20+\nand npm"| NPM["npm i -g @lehrosolutions/cli@beta"]
+    START -->|"Bun installed"| BUN["bun install -g @lehrosolutions/cli@beta\n(or: bunx @lehrosolutions/cli@beta ...)"]
     START -->|"Just a shell,\nno package manager yet"| CURL["curl -fsSL <install-url> | bash\n(detects bun/npm, else symlinks bin/lehrosol.js)"]
     NPM --> VERIFY["lehrosol doctor"]
     BUN --> VERIFY

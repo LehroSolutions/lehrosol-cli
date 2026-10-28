@@ -1,9 +1,10 @@
+import './setup.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { readFile, stat } from 'node:fs/promises';
-import { createServer } from 'node:http';
+import { createServer, request } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,6 +33,7 @@ test('package is production version with executable bin', async () => {
   const pkg = JSON.parse(await readFile(join(ROOT, 'package.json'), 'utf8'));
   assert.match(pkg.version, /^\d+\.\d+\.\d+(-[\w.]+)?$/, 'version must be valid semver');
   assert.equal(pkg.license, 'Apache-2.0');
+  assert.equal(pkg.name, '@lehrosolutions/cli');
   assert.equal(pkg.bin.lehrosol, './bin/lehrosol.js');
   assert.ok(pkg.files.includes('bin'));
   assert.ok(pkg.files.includes('src'));
@@ -90,6 +92,35 @@ test('HTTP MCP requires bearer token when configured', async () => {
     assert.equal(health.status, 200);
     const h = await health.json();
     assert.equal(h.ok, true);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+});
+
+test('loopback HTTP MCP rejects browser-origin and DNS-rebinding attacks', async () => {
+  const server = startHttpServer({ port: 0, host: '127.0.0.1' });
+  await onceListening(server);
+  const url = `http://127.0.0.1:${server.address().port}`;
+  const rpc = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' });
+  try {
+    const plain = await fetch(url, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: rpc });
+    assert.equal(plain.status, 415);
+    const oversized = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: 'x'.repeat(1024 * 1024 + 1) });
+    assert.equal(oversized.status, 413);
+    const remoteOrigin = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', origin: 'https://attacker.example' }, body: rpc });
+    assert.equal(remoteOrigin.status, 403);
+    const reboundStatus = await new Promise((resolve, reject) => {
+      const req = request(url, { method: 'POST', headers: { 'content-type': 'application/json', host: 'attacker.example' } }, (res) => {
+        res.resume();
+        resolve(res.statusCode);
+      });
+      req.on('error', reject);
+      req.end(rpc);
+    });
+    assert.equal(reboundStatus, 403);
+    const dashboard = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://localhost:5173' }, body: rpc });
+    assert.equal(dashboard.status, 200);
+    assert.ok(Array.isArray((await dashboard.json()).result.tools));
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

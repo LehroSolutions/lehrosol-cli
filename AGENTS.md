@@ -53,6 +53,8 @@ Full explanation and diagram: `docs/09-agents-and-skills.md`. That page also cat
 
 ## Common commands
 
+Run the suite with `npm test`: its preload gives each test process an isolated temporary `LEHRO_HOME`, and the parent runner cleans up after workers exit. Use `npm test -- test/production-readiness.test.js` for a focused run or `npm test -- --test-name-pattern=pattern` to filter the suite. Direct `node --test` runs must also include `--import ./test/setup.mjs` to avoid modifying the user's state.
+
 ```bash
 node bin/lehrosol.js --help
 node bin/lehrosol.js doctor

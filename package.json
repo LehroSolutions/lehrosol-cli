@@ -1,5 +1,5 @@
 {
-  "name": "lehrosol-cli",
+  "name": "@lehrosolutions/cli",
   "version": "3.2.0-beta.1",
   "description": "LehroSol CLI v3 — truly agentic engineering console: autonomous goal→plan→execute→verify→adapt missions with recovery, guided onboarding, Grok/local model profiles, task-graph supervision, safe marketplace, release integrity, MCP, and the HELIX TUI.",
   "license": "Apache-2.0",
@@ -12,11 +12,17 @@
     "lehr-sol": "./bin/lehrosol.js"
   },
   "main": "./src/core/index.js",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "tag": "beta"
+  },
   "files": [
     "bin",
     "src",
     "docs",
     "README.md",
+    "RELEASING.md",
     "LICENSE",
     "NOTICE",
     "CHANGELOG.md",
@@ -30,7 +36,7 @@
     "mcp": "node bin/lehrosol.js mcp start",
     "gui": "node bin/lehrosol.js gui",
     "docs:build": "node docs/tools/build-docs.mjs",
-    "test": "node --test \"test/*.test.js\"",
+    "test": "node scripts/run-tests.mjs",
     "check": "node scripts/check-syntax.mjs",
     "prepack": "npm run check && npm test && npm run docs:build",
     "tui": "node bin/lehrosol.js tui --mode advanced",
@@ -59,7 +65,11 @@
   "author": "Lehro Solutions",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lehrosolutions/lehrosol-cli"
+    "url": "git+https://github.com/LehroSolutions/lehrosol-cli.git"
+  },
+  "homepage": "https://github.com/LehroSolutions/lehrosol-cli#readme",
+  "bugs": {
+    "url": "https://github.com/LehroSolutions/lehrosol-cli/issues"
   },
   "dependencies": {},
   "devDependencies": {}

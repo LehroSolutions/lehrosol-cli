@@ -39,7 +39,7 @@ export async function runGuiCommand(flags = {}, logger = console) {
   ], '12 JSON-RPC tools available');
 
   ui.nextSteps([
-    `Open the GUI dashboard (gui/) at http://localhost:${port}`,
+    'From a source checkout, run the dashboard separately: cd gui && npm install && npm run dev',
     'Or drive from any MCP-aware agent CLI',
     'Press t to switch to the terminal cockpit (control plane keeps running)',
     'Press q or Ctrl+C to stop the control plane',

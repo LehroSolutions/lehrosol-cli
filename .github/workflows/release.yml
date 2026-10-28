@@ -2,22 +2,49 @@ name: release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 permissions:
-  contents: write
-  id-token: write
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
-      - run: npm test
-      - run: node scripts/release.mjs dist
+      - name: Pin npm with trusted publishing support
+        run: npm install --global npm@11.6.2
+      - name: Validate version and select release channel
+        id: metadata
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const { name, version } = JSON.parse(readFileSync('package.json', 'utf8'));
+          if (!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(version)) throw new Error('Invalid release version');
+          if (process.env.GITHUB_REF_TYPE === 'tag' && process.env.GITHUB_REF_NAME !== `v${version}`) throw new Error('Git tag must match package.json version');
+          const artifact = `${name.replace(/^@/, '').replace('/', '-')}-${version}.tgz`;
+          appendFileSync(process.env.GITHUB_OUTPUT, `artifact=${artifact}\ntag=${version.includes('-') ? 'beta' : 'latest'}\n`);
+          NODE
+      - name: Test, build docs, pack, and verify checksums
+        run: npm run release:prepare
+      - name: Smoke-test the packed CLI
+        run: |
+          npm install --prefix "$RUNNER_TEMP/lehrosol-smoke" --ignore-scripts --no-audit --no-fund "./dist/${{ steps.metadata.outputs.artifact }}"
+          node "$RUNNER_TEMP/lehrosol-smoke/node_modules/@lehrosolutions/cli/bin/lehrosol.js" --version
+          node "$RUNNER_TEMP/lehrosol-smoke/node_modules/@lehrosolutions/cli/bin/lehrosol.js" --help
       - uses: actions/upload-artifact@v4
         with:
           name: release-integrity
           path: dist/
-      - run: npm publish --provenance --access public
+          if-no-files-found: error
+      - name: Publish the verified tarball using npm trusted publishing
+        if: startsWith(github.ref, 'refs/tags/')
+        run: npm publish "./dist/${{ steps.metadata.outputs.artifact }}" --ignore-scripts --access public --tag "${{ steps.metadata.outputs.tag }}"

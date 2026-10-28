@@ -30,7 +30,7 @@ elif command -v bun >/dev/null 2>&1; then
   bun install -g "$REPO"
 elif command -v npm >/dev/null 2>&1; then
   log "Installing via npm"
-  npm install -g "lehrosol-cli"
+  npm install -g "@lehrosolutions/cli@beta"
 else
   fail "Neither bun nor npm found. Install one of them, or clone the repo and run: bash install.sh --local"
 fi

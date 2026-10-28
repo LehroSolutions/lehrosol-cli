@@ -1,0 +1,60 @@
+# Publishing LehroSol CLI
+
+The npm package is `@lehrosolutions/cli`; its executables are `lehrosol` and `lehr-sol`.
+The web dashboard is currently a separate source-checkout client.
+
+## Prepare and verify
+
+Use Node 24 and npm 11.6.2 (the versions used by the release workflow).
+From a clean checkout of the intended release commit, run:
+
+```powershell
+npm run release:prepare
+```
+
+This runs the package's syntax, isolated test, and documentation gates, packs into
+a fresh staging directory, and writes the exact tarball, SHA256SUMS, and release
+metadata to `dist/`. Existing tarballs are never selected by filename sorting.
+The local provenance file is unsigned metadata; npm trusted publishing supplies
+registry provenance when the source repository and package are public.
+
+Install that exact tarball into a temporary prefix and check `--version` and
+`--help` before publishing. Keep the installation's LEHRO_HOME temporary too.
+
+## Bootstrap the npm package
+
+An npm organization role does not authenticate this machine. Use the authorized
+account interactively with `npm login`, and confirm it with `npm whoami`.
+Publish the verified tarball, not a newly packed working directory:
+
+```powershell
+npm publish ./dist/lehrosolutions-cli-3.2.0-beta.1.tgz --ignore-scripts --access public --tag beta
+```
+
+Complete any npm account/2FA challenge in your browser. Never put passwords,
+recovery codes, or tokens in repository files. Check the published version and
+dist-tags with `npm view @lehrosolutions/cli version dist-tags --json`.
+
+## Configure subsequent GitHub releases
+
+In the npm package's trusted-publishing settings, authorize:
+
+- GitHub organization: `LehroSolutions`
+- Repository: `lehrosol-cli`
+- Workflow filename: `release.yml`
+- Allow direct publishing (`npm publish`) for the workflow's publish step.
+
+Validate the new trusted publisher within npm's configuration expiry period.
+The workflow needs no long-lived npm secret. Public registry provenance requires
+a public source repository; making a private GitHub repository public is a
+separate owner decision.
+
+For each later release, increment package.json's version and update the changelog.
+Commit, push, then create a matching new `v<version>` tag. Do not move existing
+release tags. Tagged runs publish the verified tarball: prereleases use `beta`,
+stable versions use `latest`. The package's default publishConfig tag is `beta`
+to protect manual publication; stable manual releases must explicitly use
+`--tag latest`.
+
+A manual GitHub Actions run only builds and uploads the release candidate; it
+does not publish to npm. Download and verify its artifact before tagging.

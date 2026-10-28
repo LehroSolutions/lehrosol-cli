@@ -7,14 +7,14 @@ An open-source (**Apache-2.0**), zero-dependency-core Node.js CLI that unifies *
 ## Install
 
 ```bash
-npm install -g lehrosol-cli
+npm install -g @lehrosolutions/cli@beta
 # or
-bun install -g lehrosol-cli
+bun install -g @lehrosolutions/cli@beta
 # or (macOS / Linux)
 curl -fsSL https://get.lehro.dev/install | bash
 ```
 
-**Windows:** no curl needed — `npm install -g lehrosol-cli` works out of the box, or from a cloned repo:
+**Windows:** no curl needed — `npm install -g @lehrosolutions/cli@beta` works out of the box, or from a cloned repo:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File install.ps1
@@ -56,7 +56,9 @@ lehrosol gui                # starts the shared control plane on :4177
 cd gui && npm install && npm run dev   # Vite dev server on :5173
 ```
 
-The GUI (Doctor / Loop Engine / Adapters / Sessions / Orchestrator / Policy panels) is just another client of the same MCP tool registry the terminal and any MCP-connected agent CLI use, so a loop started in one shows up in the other. See `gui/README.md`.
+The dashboard is currently available from a source checkout; it is not included in the npm package. `lehrosol gui` starts the JSON-RPC control plane, while the separate Vite command starts the dashboard. The GUI (Doctor / Loop Engine / Adapters / Sessions / Orchestrator / Policy panels) is another client of the same MCP tool registry the terminal and any MCP-connected agent CLI use, so a loop started in one shows up in the other. See `gui/README.md`.
+
+The HTTP control plane binds to loopback by default and accepts JSON requests (`Content-Type: application/json`). Binding to a network interface with `mcp start --http --host …` requires `--token` or `LEHRO_MCP_TOKEN`; clients must send `Authorization: Bearer <token>`.
 
 ## Agent adapters
 
@@ -67,6 +69,8 @@ The GUI (Doctor / Loop Engine / Adapters / Sessions / Orchestrator / Policy pane
 See `AGENTS.md` for the project's own operating instructions, and `docs/01-architecture.md` and `docs/02-competitors.md` for the full architecture and competitive positioning.
 
 ## License
+
+Maintainers: see [RELEASING.md](RELEASING.md) for package verification, first publication, and npm trusted publishing.
 
 Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
