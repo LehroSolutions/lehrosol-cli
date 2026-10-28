@@ -36,6 +36,13 @@ Complete any npm account/2FA challenge in your browser. Never put passwords,
 recovery codes, or tokens in repository files. Check the published version and
 dist-tags with `npm view @lehrosolutions/cli@beta version dist-tags --json`.
 
+On this package's initial publication, npm created `latest` alongside `beta`
+despite the explicit beta tag, and rejected removing `latest` with HTTP 400.
+This matches the behavior reported in [npm/cli#8490](https://github.com/npm/cli/issues/8490).
+Do not publish a fake stable version to work around it. Keep installation
+instructions explicit about `@beta`; subsequent prereleases update only `beta`.
+The first actual stable release can deliberately advance `latest`.
+
 ## Configure subsequent GitHub releases
 
 In the npm package's trusted-publishing settings, authorize:
