@@ -1,7 +1,7 @@
 {
   "title": "Skill: Docs Authoring",
   "description": "**Use this skill when:** adding or updating any file under `docs/`, so it matches this design system and its `.json`/`.html` counterparts stay in sync.",
-  "sourceFile": "skills\\docs-authoring.skill.md",
+  "sourceFile": "skills/docs-authoring.skill.md",
   "readingMinutes": 2,
   "wordCount": 316,
   "sections": [

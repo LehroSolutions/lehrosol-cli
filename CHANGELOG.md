@@ -9,6 +9,7 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 - Attach verified CLI archives and integrity metadata to tagged GitHub Releases.
 - Check generated documentation in CI without rerunning the full test suite during the packaging preview.
 - Replace the Homebrew formula's placeholder artifact metadata and remove unverified hosted-installer instructions.
+- Generate portable documentation links and source paths consistently on Windows and Linux, with a CRLF and repeat-build regression check.
 
 ## [3.2.0-beta.2] — 2026-10-28
 

@@ -1,7 +1,7 @@
 {
   "title": "Skill: Loop Engineering",
   "description": "**Use this skill when:** you're adding or changing anything in `src/loop/`, tuning a loop run's behavior, or debugging why a loop stopped early/late.",
-  "sourceFile": "skills\\loop-engineering.skill.md",
+  "sourceFile": "skills/loop-engineering.skill.md",
   "readingMinutes": 1,
   "wordCount": 240,
   "sections": [

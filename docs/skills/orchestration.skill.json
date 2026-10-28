@@ -1,7 +1,7 @@
 {
   "title": "Skill: Orchestration",
   "description": "**Use this skill when:** working on `src/orchestrator/`, debugging a `git worktree` issue, or extending the supervisor's recovery strategies.",
-  "sourceFile": "skills\\orchestration.skill.md",
+  "sourceFile": "skills/orchestration.skill.md",
   "readingMinutes": 1,
   "wordCount": 218,
   "sections": [

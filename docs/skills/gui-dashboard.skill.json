@@ -1,7 +1,7 @@
 {
   "title": "Skill: GUI Dashboard",
   "description": "**Use this skill when:** adding a new panel to the GUI, or wiring a new MCP tool into it.",
-  "sourceFile": "skills\\gui-dashboard.skill.md",
+  "sourceFile": "skills/gui-dashboard.skill.md",
   "readingMinutes": 1,
   "wordCount": 264,
   "sections": [

@@ -1,7 +1,7 @@
 {
   "title": "Skills index",
   "description": "Each file here is a short, task-scoped workflow (a \"skill\") any agent can be pointed at to do one specific job in this repo end to end, without needing the full [`AGENTS.md`](../../AGENTS.md) re-read every time. All skills assume `AGENTS.md`'s ground rules are already in effect.",
-  "sourceFile": "skills\\README.md",
+  "sourceFile": "skills/README.md",
   "readingMinutes": 1,
   "wordCount": 104,
   "sections": [],

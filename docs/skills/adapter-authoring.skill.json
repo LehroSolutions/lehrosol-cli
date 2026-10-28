@@ -1,7 +1,7 @@
 {
   "title": "Skill: Adapter Authoring",
   "description": "**Use this skill when:** adding a new agent-CLI adapter (adapter #9 and beyond) to `src/loop/adapters/`.",
-  "sourceFile": "skills\\adapter-authoring.skill.md",
+  "sourceFile": "skills/adapter-authoring.skill.md",
   "readingMinutes": 1,
   "wordCount": 299,
   "sections": [

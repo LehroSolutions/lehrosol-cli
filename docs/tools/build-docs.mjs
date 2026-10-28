@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = path.resolve(__dirname, "..");
+const webPath = (value) => value.split(path.sep).join("/");
 
 // Single source of truth for the rendered license: package.json. Deriving it
 // keeps the page footer from drifting after a relicense.
@@ -419,16 +420,16 @@ const STYLE = `
 `;
 
 function docNumber(rel) {
-  const base = path.basename(rel);
+  const base = path.posix.basename(rel);
   if (/^readme\.md$/i.test(base)) return "⌂";
   const m = /^(\d+)/.exec(base);
   return m ? m[1] : "◆";
 }
 
 function groupOf(rel) {
-  const dir = path.dirname(rel);
+  const dir = path.posix.dirname(rel);
   if (dir === ".") return "Guide";
-  return dir.split(path.sep)[0];
+  return dir.split("/")[0];
 }
 
 function buildNav(catalog, currentFile) {
@@ -442,7 +443,7 @@ function buildNav(catalog, currentFile) {
   const parts = [];
   for (const g of groups) {
     const items = seen.get(g).map((c) => {
-      const rel = path.relative(path.dirname(currentFile), c.file).replace(/\.md$/, ".html");
+      const rel = webPath(path.relative(path.dirname(currentFile), c.file)).replace(/\.md$/, ".html");
       const active = c.file === currentFile ? " active" : "";
       const num = docNumber(c.rel);
       return `<a class="item${active}" href="${rel}" data-title="${escapeAttr(c.title.toLowerCase())}"><span class="num">${escapeHtml(num)}</span><span class="txt">${escapeHtml(c.title)}</span></a>`;
@@ -463,7 +464,7 @@ function buildToc(sections) {
 function buildPager(catalog, idx, currentFile) {
   const mk = (c, dir) => {
     if (!c) return '<span></span>';
-    const rel = path.relative(path.dirname(currentFile), c.file).replace(/\.md$/, ".html");
+    const rel = webPath(path.relative(path.dirname(currentFile), c.file)).replace(/\.md$/, ".html");
     return `<a class="${dir}" href="${rel}"><span class="dir">${dir === "next" ? "Next →" : "← Previous"}</span><span class="t">${escapeHtml(c.title)}</span></a>`;
   };
   const prev = idx > 0 ? catalog[idx - 1] : null;
@@ -566,11 +567,11 @@ function orderCatalog(catalog) {
   // README first, then top-level numbered docs, then subdir docs; alpha within.
   return catalog.slice().sort((a, b) => {
     const ra = a.rel, rb = b.rel;
-    const aReadme = /^readme\.md$/i.test(path.basename(ra)) && path.dirname(ra) === ".";
-    const bReadme = /^readme\.md$/i.test(path.basename(rb)) && path.dirname(rb) === ".";
+    const aReadme = /^readme\.md$/i.test(path.posix.basename(ra)) && path.posix.dirname(ra) === ".";
+    const bReadme = /^readme\.md$/i.test(path.posix.basename(rb)) && path.posix.dirname(rb) === ".";
     if (aReadme !== bReadme) return aReadme ? -1 : 1;
-    const aTop = path.dirname(ra) === ".";
-    const bTop = path.dirname(rb) === ".";
+    const aTop = path.posix.dirname(ra) === ".";
+    const bTop = path.posix.dirname(rb) === ".";
     if (aTop !== bTop) return aTop ? -1 : 1;
     return ra.localeCompare(rb);
   });
@@ -584,7 +585,7 @@ function main() {
   // parse and mdToHtml would loop forever on the first heading line.
   const readDoc = (f) => fs.readFileSync(f, "utf8").replace(/\r\n/g, "\n");
   let catalog = files.map((f) => {
-    const rel = path.relative(DOCS_ROOT, f);
+    const rel = webPath(path.relative(DOCS_ROOT, f));
     const content = readDoc(f);
     const model = parseModel(content);
     return { file: f, rel, title: model.title };
@@ -598,7 +599,7 @@ function main() {
     const jsonOut = {
       title: model.title,
       description: model.description,
-      sourceFile: path.relative(DOCS_ROOT, f),
+      sourceFile: webPath(path.relative(DOCS_ROOT, f)),
       readingMinutes: model.readingMinutes,
       wordCount: model.words,
       sections: model.sections,
