@@ -2,6 +2,10 @@
 
 **Short alias: `lehr-sol`**
 
+[CI](https://github.com/LehroSolutions/lehrosol-cli/actions/workflows/ci.yml) · [npm package](https://www.npmjs.com/package/@lehrosolutions/cli) · [GitHub releases](https://github.com/LehroSolutions/lehrosol-cli/releases) · [Release guide](RELEASING.md)
+
+The current release line is **3.2 beta**. Use the explicit `@beta` install command below; a stable release has not been promoted yet.
+
 An open-source (**Apache-2.0**), zero-dependency-core Node.js CLI that unifies **loop engineering** (Ralph-style self-improving loops), **harness engineering** (policy/OWASP verification gates with a built-in scanner), and **orchestration engineering** (git-worktree multi-agent supervision) behind one MCP control plane, so any existing coding agent (Claude Code, Codex CLI, Gemini CLI, OpenCode, Aider, Goose, Hermes Agent) can be driven, scored, and orchestrated from either the terminal or a GUI, with seamless handoff between the two.
 
 ## Install
@@ -10,11 +14,9 @@ An open-source (**Apache-2.0**), zero-dependency-core Node.js CLI that unifies *
 npm install -g @lehrosolutions/cli@beta
 # or
 bun install -g @lehrosolutions/cli@beta
-# or (macOS / Linux)
-curl -fsSL https://get.lehro.dev/install | bash
 ```
 
-**Windows:** no curl needed — `npm install -g @lehrosolutions/cli@beta` works out of the box, or from a cloned repo:
+**Windows:** use the same npm command, or run the installer script from a cloned repository:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File install.ps1

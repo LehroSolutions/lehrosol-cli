@@ -64,5 +64,9 @@ stable versions use `latest`. The package's default publishConfig tag is `beta`
 to protect manual publication; stable manual releases must explicitly use
 `--tag latest`.
 
+After npm publication succeeds, the tagged workflow attaches the same tarball,
+SHA256SUMS, release manifest, and SBOM to a matching GitHub Release. Beta versions
+are marked as prereleases and do not become GitHub's latest stable release.
+
 A manual GitHub Actions run only builds and uploads the release candidate; it
 does not publish to npm. Download and verify its artifact before tagging.

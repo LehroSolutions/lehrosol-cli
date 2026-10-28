@@ -3,7 +3,7 @@
   "description": "A dictionary-style reference for the whole LehroSol surface — **how to install** the CLI and the Lehrosol Code desktop app, and **what every command, file, and concept means and how to use it**. Each entry gives the definition, the command(s) that exercise it, and a copy-paste example. If you know *what* you want but not *what it's called*, start at the letter.",
   "sourceFile": "19-glossary.md",
   "readingMinutes": 11,
-  "wordCount": 2232,
+  "wordCount": 2204,
   "sections": [
     {
       "level": 2,
@@ -152,7 +152,7 @@
     }
   ],
   "mermaidDiagrams": [
-    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    INSTALL[\"1 · INSTALL<br/>npm i -g @lehrosolutions/cli@beta<br/>(or bun / curl / install.ps1)\"] --> VERIFY\n    APP[\"Lehrosol Code (Electron)<br/>pnpm install → pnpm start\"] -->|\"shells out to lehrosol … --json\"| CLI_CORE[\"LehroSol CLI core<br/>(zero-dependency, Node 20+)\"]\n    CLI_CORE --> VERIFY[\"2 · VERIFY<br/>lehrosol doctor\"]\n    VERIFY -->|\"all green\"| PAIR[\"3 · PAIR<br/>vault + serve + models\"]\n    PAIR --> USE[\"4 · USE<br/>quick lane · loop · mission · tui · gui\"]\n    USE --> LEARN[\"5 · LEARN<br/>engrams · compact · report\"]"
+    "%%{init: {'theme':'dark', 'themeVariables': {'primaryColor':'#0f1720','primaryTextColor':'#e6faff','primaryBorderColor':'#22d3ee','lineColor':'#22d3ee','secondaryColor':'#111827','tertiaryColor':'#05070a'}}}%%\nflowchart TD\n    INSTALL[\"1 · INSTALL<br/>npm i -g @lehrosolutions/cli@beta<br/>(or bun / source checkout)\"] --> VERIFY\n    APP[\"Lehrosol Code (Electron)<br/>pnpm install → pnpm start\"] -->|\"shells out to lehrosol … --json\"| CLI_CORE[\"LehroSol CLI core<br/>(zero-dependency, Node 20+)\"]\n    CLI_CORE --> VERIFY[\"2 · VERIFY<br/>lehrosol doctor\"]\n    VERIFY -->|\"all green\"| PAIR[\"3 · PAIR<br/>vault + serve + models\"]\n    PAIR --> USE[\"4 · USE<br/>quick lane · loop · mission · tui · gui\"]\n    USE --> LEARN[\"5 · LEARN<br/>engrams · compact · report\"]"
   ],
   "relatedDocs": [
     {

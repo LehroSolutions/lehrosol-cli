@@ -12,7 +12,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -48,3 +48,23 @@ jobs:
       - name: Publish the verified tarball using npm trusted publishing
         if: startsWith(github.ref, 'refs/tags/')
         run: npm publish "./dist/${{ steps.metadata.outputs.artifact }}" --ignore-scripts --access public --tag "${{ steps.metadata.outputs.tag }}"
+      - name: Publish matching GitHub release assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: LehroSol CLI ${{ github.ref_name }}
+          prerelease: ${{ steps.metadata.outputs.tag == 'beta' }}
+          make_latest: ${{ steps.metadata.outputs.tag == 'latest' && 'true' || 'false' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            dist/${{ steps.metadata.outputs.artifact }}
+            dist/SHA256SUMS
+            dist/release-manifest.json
+            dist/sbom.cdx.json
+          body: |
+            Install with `npm install -g @lehrosolutions/cli@${{ steps.metadata.outputs.tag }}`.
+            The command names are `lehrosol` and `lehr-sol`.
+            SHA256SUMS verifies the attached tarball. See RELEASING.md for the publishing process.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -5,8 +5,14 @@ dist/
 gui/node_modules/
 gui/dist/
 .env
+.env.*
+!.env.example
 .DS_Store
 *.gguf
 
 # Local agent-tool skill state (auto-generated)
 .agents/
+.worktrees/
+.playwright-mcp/
+*.pfx
+*.p12

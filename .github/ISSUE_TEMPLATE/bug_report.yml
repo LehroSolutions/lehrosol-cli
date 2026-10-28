@@ -1,0 +1,40 @@
+name: Bug report
+description: Report a reproducible problem with the CLI or control plane.
+title: "[bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "For security vulnerabilities, use the private reporting instructions in SECURITY.md. Redact credentials and private project data."
+  - type: input
+    id: version
+    attributes:
+      label: CLI version
+      description: Output of lehrosol --version.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node.js version, and installation method.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the exact command and flags, with secrets removed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted logs
+      render: text

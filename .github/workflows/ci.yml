@@ -2,6 +2,9 @@ name: ci
 on: [push, pull_request]
 permissions:
   contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     strategy:
@@ -11,6 +14,7 @@ jobs:
         # so the full suite + packaging must pass there, not just on Linux.
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,4 +22,6 @@ jobs:
           node-version: 22
       - run: npm test
       - run: npm run check
-      - run: npm pack --dry-run
+      - run: npm run docs:build
+      - run: git diff --exit-code -- docs
+      - run: npm pack --dry-run --ignore-scripts

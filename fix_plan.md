@@ -2,7 +2,7 @@
 
 Running backlog for the LehroSol Loop Engine. One item per line.
 
-- [ ] The committed Homebrew formula uses an example.com tarball URL; replace it with a verified release artifact and checksum before advertising Homebrew installation.
+- [x] Replace the committed Homebrew formula's placeholder URL and checksum with the verified npm beta.2 artifact. Homebrew installation itself still needs verification on a supported Homebrew host before that channel is advertised.
 - [ ] The published CLI package omits `gui/`, and `lehrosol gui` serves only JSON-RPC. The console output and README now explain the separate source-checkout dashboard. Decide how to distribute and serve the built dashboard, then verify the installed package end to end.
 - [ ] Loop exhausted budget for prompt: blank
 - [x] Local HTTP adapters aborted long local-model requests with an opaque "fetch failed". Root cause: undici's default 300 s headersTimeout fires before llama-server finishes a ~5-minute CPU prompt eval (1181-token prompt at ~4 t/s). fetch's dispatcher cannot be reconfigured without an npm dependency, so `makeHttpAdapter.js` now POSTs via a raw `node:http` request (no headers deadline, explicit timeoutMs, fresh socket per request, env override `LEHRO_HTTP_TIMEOUT_MS`). Live-verified against llama-server 0.4.0-dev with Qwen3.8-9B on an i5-8265U.

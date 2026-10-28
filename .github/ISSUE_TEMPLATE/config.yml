@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security reporting
+    url: https://github.com/LehroSolutions/lehrosol-cli/blob/main/SECURITY.md
+    about: Report vulnerabilities privately using the security policy.
+  - name: Questions and ideas
+    url: https://github.com/LehroSolutions/lehrosol-cli/discussions
+    about: Ask setup questions or discuss feature proposals.
+  - name: Desktop application issues
+    url: https://github.com/LehroSolutions/Lehrosol-Code/issues
+    about: Report desktop UI and installer problems in the desktop repository.

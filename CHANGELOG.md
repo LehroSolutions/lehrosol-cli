@@ -4,6 +4,12 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 
 ## [Unreleased]
 
+### Repository readiness
+- Add GitHub issue and pull-request templates, release-note categories, and dependency-update configuration.
+- Attach verified CLI archives and integrity metadata to tagged GitHub Releases.
+- Check generated documentation in CI without rerunning the full test suite during the packaging preview.
+- Replace the Homebrew formula's placeholder artifact metadata and remove unverified hosted-installer instructions.
+
 ## [3.2.0-beta.2] — 2026-10-28
 
 First release through npm trusted publishing for `@lehrosolutions/cli`, following

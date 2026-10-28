@@ -12,10 +12,10 @@ flowchart TD
     START{"What do you have?"}
     START -->|"Node.js 20+\nand npm"| NPM["npm i -g @lehrosolutions/cli@beta"]
     START -->|"Bun installed"| BUN["bun install -g @lehrosolutions/cli@beta\n(or: bunx @lehrosolutions/cli@beta ...)"]
-    START -->|"Just a shell,\nno package manager yet"| CURL["curl -fsSL <install-url> | bash\n(detects bun/npm, else symlinks bin/lehrosol.js)"]
+    START -->|"Contributing from source"| SOURCE["Clone the repository\nnode bin/lehrosol.js --help"]
     NPM --> VERIFY["lehrosol doctor"]
     BUN --> VERIFY
-    CURL --> VERIFY
+    SOURCE --> VERIFY
     VERIFY -->|"all green"| READY["Ready — try interactive mode!"]
     READY --> INT["lehrosol -i\n(guided wizard, no flags needed)"]
     VERIFY -->|"missing adapter binaries"| ADAPT["That's fine — see 08 · Agent Adapters.\n'local' adapter always works for a dry run."]

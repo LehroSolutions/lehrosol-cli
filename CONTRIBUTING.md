@@ -27,7 +27,7 @@ No `npm install` needed — the core is zero-runtime-dependency by design (Node 
 ## Testing your change
 
 - `node --check` every `.js` you touched (or just run `npm run check`).
-- Add or extend a regression test under `test/` for any bug fix — `node --test "test/*.test.js"` is plain Node, no test framework to install.
+- Add or extend a regression test under `test/` for a bug fix. Use `npm test` or `npm test -- test/production-readiness.test.js`; the runner isolates configuration and session state from your real user profile. No test framework installation is needed.
 - If you touched `src/loop/*` or `src/harness/*`, run `node bin/lehrosol.js doctor` and a smoke `node bin/lehrosol.js loop run --prompt "smoke test"`.
 
 ## License
