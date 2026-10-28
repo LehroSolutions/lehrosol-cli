@@ -1,6 +1,6 @@
 {
   "name": "@lehrosolutions/cli",
-  "version": "3.2.0-beta.1",
+  "version": "3.2.0-beta.2",
   "description": "LehroSol CLI v3 — truly agentic engineering console: autonomous goal→plan→execute→verify→adapt missions with recovery, guided onboarding, Grok/local model profiles, task-graph supervision, safe marketplace, release integrity, MCP, and the HELIX TUI.",
   "license": "Apache-2.0",
   "type": "module",

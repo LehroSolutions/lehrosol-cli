@@ -4,6 +4,12 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 
 ## [Unreleased]
 
+## [3.2.0-beta.2] — 2026-10-28
+
+First release through npm trusted publishing for `@lehrosolutions/cli`, following
+the initial scoped `3.2.0-beta.1` bootstrap publication. Executable names remain
+`lehrosol` and `lehr-sol`.
+
 ### Added
 - **Benchmark validity guard**: `arena` and `bench run` now sample background CPU load across the run (`cpuLoadSample`, `src/commands/quick.js`) and attach `cpuLoad` to their JSON payloads — with an explicit warning when load ≥ 60%, because a single runaway background process made a 9B model look 6x slower during live testing (see AGENTS.md notes). The GUI Test Bench in Lehrosol Code shows the same guard.
 

@@ -5,7 +5,7 @@ The web dashboard is currently a separate source-checkout client.
 
 ## Prepare and verify
 
-Use Node 24 and npm 11.6.2 (the versions used by the release workflow).
+Use Node 24 and npm 11.21.1 (the versions used by the release workflow).
 From a clean checkout of the intended release commit, run:
 
 ```powershell
@@ -28,12 +28,13 @@ account interactively with `npm login`, and confirm it with `npm whoami`.
 Publish the verified tarball, not a newly packed working directory:
 
 ```powershell
-npm publish ./dist/lehrosolutions-cli-3.2.0-beta.1.tgz --ignore-scripts --access public --tag beta
+$release = Get-Content ./dist/release-manifest.json -Raw | ConvertFrom-Json
+npm publish ("./dist/" + $release.artifacts[0].name) --ignore-scripts --access public --tag beta
 ```
 
 Complete any npm account/2FA challenge in your browser. Never put passwords,
 recovery codes, or tokens in repository files. Check the published version and
-dist-tags with `npm view @lehrosolutions/cli version dist-tags --json`.
+dist-tags with `npm view @lehrosolutions/cli@beta version dist-tags --json`.
 
 ## Configure subsequent GitHub releases
 

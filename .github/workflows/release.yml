@@ -21,7 +21,7 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
       - name: Pin npm with trusted publishing support
-        run: npm install --global npm@11.6.2
+        run: npm install --global npm@11.21.1
       - name: Validate version and select release channel
         id: metadata
         run: |
