@@ -18,6 +18,7 @@ import { request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import { toolSchemas, executeTool } from '../tools/registry.js';
 import { getAdapterConfig } from '../../core/config.js';
+import { recordUsage } from '../../core/usage.js';
 
 // POST JSON, return { status, text }. node:http instead of fetch: undici's
 // default 300 s headersTimeout aborts long local-model requests (≈5-minute
@@ -269,6 +270,7 @@ export function createHttpAdapter(options) {
         const timeoutMs = Number(ctx.timeoutMs) || eff.timeoutMs
           || Number(process.env.LEHRO_HTTP_TIMEOUT_MS)
           || (meta.local ? 600000 : 120000);
+        const requestStarted = Date.now();
         const res = await postJson(
           url,
           apiKey ? { authorization: `Bearer ${apiKey}` } : {},
@@ -294,6 +296,7 @@ export function createHttpAdapter(options) {
           };
         }
         const msg = data.choices && data.choices[0] && data.choices[0].message;
+        recordUsage({ model: data.model || model, source: `adapter:${meta.id}`, usage: data.usage, ms: Date.now() - requestStarted });
         if (!msg) {
           return {
             adapter: meta.id, available: true, error: true,

@@ -9,6 +9,7 @@
 //   lehrosol scan --path "D:\\AI Models"
 import { cpus } from 'node:os';
 import { createInterface } from 'node:readline/promises';
+import { recordUsage } from '../core/usage.js';
 
 // CPU busy-percentage sample (0-100) over a short window. Benchmark validity
 // guard: live testing (2026-09-07) showed a single runaway background process
@@ -117,11 +118,20 @@ export async function verifyChatAuth(baseUrl, apiKey, timeoutMs = 8000) {
 // real outages.
 export async function chatOnce(opts) {
   const first = await chatOnceAttempt(opts);
-  if (first.ok || !first.network) return first;
+  if (first.ok || !first.network) return withUsage(first, opts);
   await new Promise((resolve) => setTimeout(resolve, 300));
   const second = await chatOnceAttempt(opts);
   if (!second.ok) second.error = `${second.error} (after retry)`;
-  return second;
+  return withUsage(second, opts);
+}
+
+function withUsage(result, opts) {
+  if (result.ok) {
+    const tracked = readState();
+    const matches = tracked?.baseUrl === opts.baseUrl;
+    result.usageRecord = recordUsage({ model: opts.model || (matches && tracked.model) || result.model || 'local', source: opts.source || 'cli-chat', usage: result.usage, ms: result.ms });
+  }
+  return result;
 }
 
 async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], maxTokens = 512, temperature, timeoutMs = 600000 }) {
@@ -152,7 +162,7 @@ async function chatOnceAttempt({ baseUrl, apiKey, prompt, system, history = [], 
     const promptTokens = Number(json.usage?.prompt_tokens || 0);
     const totalTokens = Number(json.usage?.total_tokens || (promptTokens + tokens));
     const tokPerSec = ms > 0 ? Math.round((tokens / (ms / 1000)) * 10) / 10 : tokens;
-    return { ok: true, content, ms, tokens, completionTokens: tokens, promptTokens, totalTokens, tokPerSec, usage: json.usage || null };
+    return { ok: true, content, model: json.model, ms, tokens, completionTokens: tokens, promptTokens, totalTokens, tokPerSec, usage: json.usage || null };
   } catch (e) {
     if (/timed out/.test(String((e && e.message) || ''))) {
       return { ok: false, ms: Date.now() - started, error: String(e.message) };
@@ -311,10 +321,11 @@ export async function ensureServing({ model, port, apiKey, restart, showWarmup }
   // the 9B was hot on :8080 while `code` assumed :7000 — it launched a
   // duplicate IQ1_S engine, 401-flooded on a key mismatch, and squeezed free
   // RAM to 1.2 GB with two models resident. The tracked hot engine IS the
-  // user's model choice; reuse it before assuming any port.
+  // user's model choice; reuse its exact endpoint before assuming any port or
+  // hostname. External engines can be tracked without a process we own.
   if (!restart) {
     const tracked = readState();
-    if (tracked && tracked.baseUrl && Number(tracked.port) !== Number(port) && tracked.pid != null) {
+    if (tracked && tracked.baseUrl) {
       const tProbe = await probe(tracked.baseUrl, apiKey);
       const entry = model ? resolveVaultModel(String(model), ratedModels()) : null;
       const matches = runningMatches(tProbe.models, entry);

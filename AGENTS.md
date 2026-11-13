@@ -55,6 +55,12 @@ Full explanation and diagram: `docs/09-agents-and-skills.md`. That page also cat
 
 Run the suite with `npm test`: its preload gives each test process an isolated temporary `LEHRO_HOME`, and the parent runner cleans up after workers exit. Use `npm test -- test/production-readiness.test.js` for a focused run or `npm test -- --test-name-pattern=pattern` to filter the suite. Direct `node --test` runs must also include `--import ./test/setup.mjs` to avoid modifying the user's state.
 
+Release preparation records the current Git revision and dirty state. Local
+uncommitted candidates can be reviewed, but CI rejects source changes after the
+prepack documentation build. Release verification also checks any accompanying
+manifest's artifact names, byte counts and hashes; checksum-only directories
+remain supported. Requested artifacts must be regular files with unique names.
+
 ```bash
 node bin/lehrosol.js --help
 node bin/lehrosol.js doctor

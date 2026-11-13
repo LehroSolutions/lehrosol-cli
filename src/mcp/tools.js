@@ -17,8 +17,14 @@ import { analyzeSessions } from '../core/insights.js';
 import { listAdapterConfigs, saveAdapterConfig, removeAdapterConfig } from '../core/config.js';
 import { compactSessions, loadEngrams } from '../core/engrams.js';
 import { listLabRuns, loadRecommendations, recommendationFor } from '../bench/modelLab.js';
+import { readUsage } from '../core/usage.js';
 
 export const TOOL_DEFINITIONS = {
+  model_usage: {
+    name: 'model_usage',
+    description: 'Read per-model measured token usage for instrumented CLI and desktop inference. Unknown provider counts remain unknown; bounded reads may return partial totals.',
+    inputSchema: { type: 'object', properties: { days: { type: 'integer', minimum: 1, maximum: 30, default: 30 } } },
+  },
   doctor_check: {
     name: 'doctor_check',
     description: 'Read-only health check of the current project: runtime, config, plugins, path safety.',
@@ -262,6 +268,7 @@ export function listTools() {
 
 export async function executeTool(name, args = {}) {
   switch (name) {
+    case 'model_usage': return readUsage({ days: args.days });
     case 'doctor_check':
       return runDoctor(args);
     case 'policy_evaluate':

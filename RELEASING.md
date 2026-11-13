@@ -3,6 +3,10 @@
 The npm package is `@lehrosolutions/cli`; its executables are `lehrosol` and `lehr-sol`.
 The web dashboard is currently a separate source-checkout client.
 
+Windows npm adapter shims run through their JavaScript entrypoint. Custom
+`.cmd`/`.bat` adapter wrappers must be configured as a native executable or a
+`.js`/`.mjs` entrypoint; shell wrappers cannot preserve arbitrary prompts safely.
+
 ## Prepare and verify
 
 Use Node 24 and npm 11.21.1 (the versions used by the release workflow).
@@ -15,6 +19,12 @@ npm run release:prepare
 This runs the package's syntax, isolated test, and documentation gates, packs into
 a fresh staging directory, and writes the exact tarball, SHA256SUMS, and release
 metadata to `dist/`. Existing tarballs are never selected by filename sorting.
+Requested artifacts must exist as regular files and have distinct filenames.
+Verification also checks the manifest's artifact names, sizes and hashes against
+`SHA256SUMS`; malformed metadata or omitted artifacts fail the gate.
+The manifest records the Git revision and whether local changes are included.
+Local preparation may include uncommitted work for review. CI preparation rejects
+a dirty checkout, including documentation that changed during the build.
 The local provenance file is unsigned metadata; npm trusted publishing supplies
 registry provenance when the source repository and package are public.
 

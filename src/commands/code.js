@@ -57,11 +57,18 @@ export function resolveCodeBudget(flags = {}) {
 }
 
 function emit(result, flags, logger) {
+  if (flags.events) { codeEvent('result', result, flags, logger); return result; }
   if (flags.json) {
     if (logger && logger.json) logger.json(result);
     else console.log(JSON.stringify(result, null, 2));
   }
   return result;
+}
+
+function codeEvent(type, data, flags, logger) {
+  if (!flags.events) return;
+  const line = JSON.stringify({ version: 1, type, at: new Date().toISOString(), ...data });
+  (logger.log || console.log).call(logger, line);
 }
 
 function formatKb(bytes) {
@@ -340,6 +347,7 @@ export async function applyAction(action, ctx) {
 }
 
 export async function runCodeCommand(task, flags = {}, logger = console) {
+  if (flags.events) flags = { ...flags, json: true };
   const parsedRequest = parseSkillRequest(task || flags.task || flags.prompt || '');
   let goal = parsedRequest.task;
   // `lehrosol code --continue` re-runs the most recent journal task — handy
@@ -391,6 +399,12 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
     maxListChars: contextMode === 'compact' ? 700 : contextMode === 'expanded' ? 1800 : 1200,
     changed: [],
   };
+  codeEvent('start', { missionId: ctx.missionId, task: goal, model: serving.model, root: ctx.root, dryRun: ctx.dryRun, allowRun: ctx.allowRun, contextMode, resourceProfile, maxTokens, totalStepBudget }, flags, logger);
+  const request = async (opts, step) => {
+    const response = await chatOnce({ ...opts, model: serving.model, source: 'code' });
+    codeEvent('request', { missionId: ctx.missionId, step, ok: response.ok, ms: response.ms, usage: response.usage || null, error: response.error, maxTokens: opts.maxTokens }, flags, logger);
+    return response;
+  };
 
   if (!flags.json) {
     ui.sectionHeader(`LEHROSOL CODE — ${displayModelName(serving.model).toUpperCase()} ON :${port}${serving.reused ? ' (ALREADY HOT)' : ''}`);
@@ -426,9 +440,10 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
   const planDisabled = flags.plan === false || String(flags.plan) === 'false';
   const planWanted = !planDisabled && (flags.plan === true || String(flags.plan) === 'true' || skillSet.reasoning === 'deep');
   if (planWanted) {
-    const planRes = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt: `TASK: ${goal}\n\nWrite a numbered micro-plan (at most 3 short steps) for completing this task with list/read/write actions. Plan only — no JSON, no code.`, system: 'You are a concise planning assistant. Reply with at most 3 numbered steps, one line each.', history: [], maxTokens: 96, temperature, timeoutMs });
+    const planRes = await request({ baseUrl: serving.baseUrl, apiKey, prompt: `TASK: ${goal}\n\nWrite a numbered micro-plan (at most 3 short steps) for completing this task with list/read/write actions. Plan only — no JSON, no code.`, system: 'You are a concise planning assistant. Reply with at most 3 numbered steps, one line each.', history: [], maxTokens: 96, temperature, timeoutMs }, 0);
     if (planRes.ok && planRes.content) {
       planText = truncateText(String(planRes.content).trim(), 400);
+      codeEvent('plan', { text: planText }, flags, logger);
       if (!flags.json) console.log(`  [plan]\n${planText.split('\n').map((l) => `    ${l}`).join('\n')}`);
     }
   }
@@ -451,7 +466,7 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
   for (let step = 1; step <= totalStepBudget; step += 1) {
     stepsUsed = step;
     const stepStart = Date.now();
-    let res = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens, temperature, timeoutMs });
+    let res = await request({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens, temperature, timeoutMs }, step);
     // Self-healing: a context overflow shrinks observation budgets and retries
     // instead of killing the mission (the old behavior surfaced as HTTP 500).
     if (!res.ok && retries < 2 && /context|exceed|500/i.test(String(res.error || ''))) {
@@ -461,7 +476,8 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
       history = [];
       prompt = `TASK (unchanged): ${truncateText(goal, 300)}\n\n(The previous request overflowed the model context; observations are smaller now.) Continue with your next action.`;
       if (!flags.json) console.log(`  [${step}/${totalStepBudget}] context overflow — shrinking observations and retrying (${retries}/2)`);
-      res = await chatOnce({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens: Math.min(maxTokens, 256), temperature, timeoutMs });
+      codeEvent('recovery', { step, retries, text: 'Context overflow: shortened observations and retried.' }, flags, logger);
+      res = await request({ baseUrl: serving.baseUrl, apiKey, prompt, system, history, maxTokens: Math.min(maxTokens, 256), temperature, timeoutMs }, step);
     }
     if (!res.ok) {
       if (!flags.json) ui.error('Model call failed', res.error);
@@ -520,6 +536,7 @@ export async function runCodeCommand(task, flags = {}, logger = console) {
     }
 
     const out = await applyAction(action, ctx);
+    codeEvent('action', { step, total: totalStepBudget, action: String(action.action), path: action.path, label: out.label, ok: out.ok, observation: out.observation ? truncateText(out.observation, 4000) : undefined, ms: Date.now() - stepStart }, flags, logger);
     if (!flags.json) console.log(`  [${step}/${totalStepBudget}] ${out.label}${out.ok ? '' : '  ← refused'}  (${((Date.now() - stepStart) / 1000).toFixed(1)}s)`);
     if (out.done) {
       const summaryText = String(out.summary || '').trim();

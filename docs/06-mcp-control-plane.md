@@ -33,6 +33,7 @@ flowchart LR
 | Tool | Backing module | Mirrors CLI command |
 | --- | --- | --- |
 | `doctor_check` | `src/commands/doctorLogic.js` | `lehrosol doctor` |
+| `model_usage` | `src/core/usage.js` | `lehrosol usage --days 30 --json` |
 | `policy_evaluate` | `src/harness/policy.js`, `src/harness/owasp.js` | `lehrosol policy evaluate` |
 | `loop_run` | `src/loop/loop.js` | `lehrosol loop run` |
 | `adapters_list` | `src/loop/adapters/index.js` | `lehrosol adapters` |

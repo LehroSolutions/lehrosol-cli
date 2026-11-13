@@ -440,6 +440,8 @@ export async function runServeCommand(subcommand, flags = {}, logger = console) 
     const state = {
       engine: engine.id, bin, pid, port, baseUrl,
       model: resolvedModel, requestedModel: rawModel,
+      ctxSize: engine.id === 'llamacpp' ? ctxSize : undefined,
+      threads: flags.threads ? Number(flags.threads) : undefined,
       // Persist the key so `serve status|models` and IDE integrations can
       // authenticate against the engine they did not launch themselves.
       apiKey: apiKey || undefined,

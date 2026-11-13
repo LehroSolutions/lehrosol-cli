@@ -4,6 +4,37 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 
 ## [Unreleased]
 
+## [3.2.0-beta.3] — 2026-11-13
+
+### Added
+- `code --events` emits versioned newline-delimited mission start, plan, request,
+  action, recovery, and result records for desktop consumers.
+- `usage --days 30 --json` and the read-only `model_usage` MCP tool expose a local,
+  bounded ledger of measured provider token counts. Unknown counts stay unknown;
+  prompts, answers, and credentials are excluded.
+- GGUF native context metadata in vault entries and active context/thread settings
+  in tracked engine state for the desktop's usage and engine views.
+
+### Fixed
+- Reuse the exact tracked engine URL even on the requested port and when the
+  engine is externally managed. Avoid replacing a loopback address with
+  `localhost` and falling into model discovery when address-family probes fail.
+- Skip null usage-log rows without discarding later valid requests.
+- Reject empty checksum manifests, paths outside the release directory, and
+  missing or tampered artifacts during release verification.
+- Refuse missing, duplicate, reserved-name or symlink artifacts during release
+  preparation; verify manifest names, hashes and sizes against the release files.
+- Record release source revision and local changes; reject CI source changes
+  after documentation generation before preparing a publishable candidate.
+- Confine adapter Git change evidence and diffs to the mission's working folder;
+  preserve filenames containing whitespace instead of reporting parent changes.
+- Include root agent instructions, contribution and security guides referenced
+  by the bundled documentation in the npm archive.
+- Execute Windows npm adapter shims through Node with literal prompt arguments;
+  reject custom shell wrappers that cannot preserve those arguments safely.
+- Align the separate dashboard's React and React DOM peer versions; include its
+  lockfile for reproducible source-checkout builds.
+
 ### Repository readiness
 - Add GitHub issue and pull-request templates, release-note categories, and dependency-update configuration.
 - Attach verified CLI archives and integrity metadata to tagged GitHub Releases.
