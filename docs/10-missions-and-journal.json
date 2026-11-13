@@ -2,8 +2,8 @@
   "title": "Missions, the Journal, and Self-Tuning",
   "description": "Every `lehrosol code` run is a **mission**. Since v3.1.0 each mission is",
   "sourceFile": "10-missions-and-journal.md",
-  "readingMinutes": 1,
-  "wordCount": 239,
+  "readingMinutes": 2,
+  "wordCount": 417,
   "sections": [
     {
       "level": 2,
@@ -24,9 +24,69 @@
       "level": 2,
       "heading": "Plan-first mode",
       "id": "plan-first-mode"
+    },
+    {
+      "level": 2,
+      "heading": "Event output and measured usage (unreleased)",
+      "id": "event-output-and-measured-usage-unreleased"
+    },
+    {
+      "level": 2,
+      "heading": "See also",
+      "id": "see-also"
     }
   ],
   "mermaidDiagrams": [],
-  "relatedDocs": [],
-  "allLinks": []
+  "relatedDocs": [
+    {
+      "text": "10 · How to use",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "11 · Improving your workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "MCP control plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "How to use",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    }
+  ],
+  "allLinks": [
+    {
+      "text": "10 · How to use",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "Docs home",
+      "href": "README.md"
+    },
+    {
+      "text": "11 · Improving your workflow",
+      "href": "11-improving-your-workflow.md"
+    },
+    {
+      "text": "MCP control plane",
+      "href": "06-mcp-control-plane.md"
+    },
+    {
+      "text": "How to use",
+      "href": "10-how-to-use.md"
+    },
+    {
+      "text": "GUI dashboard",
+      "href": "07-gui-dashboard.md"
+    }
+  ]
 }

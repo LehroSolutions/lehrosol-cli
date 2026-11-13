@@ -4,6 +4,20 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 
 ## [Unreleased]
 
+## [3.2.0-beta.3] — 2026-11-13
+
+### Added
+- `code --events` emits versioned newline-delimited mission start, plan, request,
+  action, recovery, and result records for desktop consumers.
+- `usage --days 30 --json` and the read-only `model_usage` MCP tool expose a local,
+  bounded ledger of measured provider token counts. Unknown counts stay unknown;
+  prompts, answers, and credentials are excluded.
+- GGUF native context metadata in vault entries and active context/thread settings
+  in tracked engine state for the desktop's usage and engine views.
+
+### Fixed
+- Skip null usage-log rows without discarding later valid requests.
+
 ### Repository readiness
 - Add GitHub issue and pull-request templates, release-note categories, and dependency-update configuration.
 - Attach verified CLI archives and integrity metadata to tagged GitHub Releases.

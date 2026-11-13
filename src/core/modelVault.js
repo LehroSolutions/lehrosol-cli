@@ -14,6 +14,7 @@ import { join, dirname, basename, resolve, delimiter } from 'node:path';
 import { homedir } from 'node:os';
 import { loadConfig, saveConfig } from './config.js';
 import { resolveCommand } from '../loop/adapters/shared.js';
+import { readGgufContext } from './ggufMetadata.js';
 
 const GGUF_RE = /\.gguf$/i;
 const SHARD_RE = /-(\d{5})-of-(\d{5})\.gguf$/i;
@@ -132,6 +133,7 @@ export function scanVault({ roots } = {}) {
       shards: g.shards,
       quant: parseQuant(g.base) || parseQuant(basename(g.dir)),
       mmprojPath: mmprojByDir.get(g.dir) || null,
+      contextWindow: readGgufContext(g.path),
     });
   }
   entries.sort((a, b) => a.id.localeCompare(b.id));

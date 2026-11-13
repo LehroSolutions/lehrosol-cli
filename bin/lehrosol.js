@@ -47,6 +47,7 @@ import { runMissionsCommand } from '../src/commands/missions.js';
 import { runSupportCommand } from '../src/commands/support.js';
 import { runBenchCommand } from '../src/commands/bench.js';
 import { runModelLabCommand } from '../src/commands/modelLab.js';
+import { runUsageCommand } from '../src/commands/usage.js';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -181,6 +182,7 @@ ${ui.box('LehroSol CLI — Unified Agentic Engineering', { title: 'LehroSol CLI 
     ${ui.filePath('learn report')}                   Session-derived improvement intelligence
     ${ui.filePath('bench run|report|history|weights|forget|note')}  Internal scorecard for loop + agentic + graph engineering, with persistent user-tuned weights and corrections
     ${ui.filePath('model-lab run|tune|history|recommend')}              Measure and tune local-model quality per token
+    ${ui.filePath('usage [--days 30]')}               Per-model measured usage across CLI and desktop requests
     ${ui.filePath('support create')}                 Redacted diagnostic support bundle
     ${ui.filePath('sessions list|show')}             Inspect persisted Loop Engine sessions/checkpoints
     ${ui.filePath('orchestrate spawn|list|remove')}  Manage git-worktree agent workers
@@ -254,6 +256,7 @@ ${ui.box('LehroSol CLI — Unified Agentic Engineering', { title: 'LehroSol CLI 
     --foreground         Run the engine in the foreground instead of detaching
 
   ${ui.highlight('Local code-lane flags:')}
+    --events             Versioned JSON-lines mission activity for IDE integrations
     --maxSteps <n>       Tool steps per pass (default 24; max 160)
     --maxExtensions <n>  Automatic continuation passes after a budget checkpoint (default 3)
     --noAutoContinue     Stop after one pass instead of continuing automatically
@@ -370,7 +373,7 @@ async function main() {
     return;
   }
 
-  if (!flags.json && !flags.quiet && command !== 'mcp') {
+  if (!flags.json && !flags.events && !flags.quiet && command !== 'mcp') {
     if (command === 'up' || command === 'try' || command === 'arena' || command === 'ask' || command === 'code') ui.showLogoBanner(VERSION);
     else ui.showCompactBanner(VERSION);
   }
@@ -448,6 +451,7 @@ async function main() {
     case 'scan': await runScanCommand(flags, logger); break;
     case 'bench': await runBenchCommand(subcommand || 'run', flags, logger); break;
     case 'model-lab': await runModelLabCommand(subcommand || 'run', flags, logger); break;
+    case 'usage': runUsageCommand(flags, logger); break;
     case 'sessions':
       runSessionsCommand(subcommand, flags, logger);
       break;
