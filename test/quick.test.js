@@ -178,6 +178,46 @@ test('verifyChatAuth flags a key-protected engine that rejects our key', async (
   assert.equal(res.unauthorized, true, 'ensureServing relies on this flag to replace a key-rejecting hot engine');
 });
 
+test('ensureServing reuses the exact tracked endpoint on the requested port without requiring process ownership', async (t) => {
+  const { ensureServing } = await import('../src/commands/quick.js');
+  const { rmSync } = await import('node:fs');
+  const home = mkdtempSync(join(tmpdir(), 'lehro-tracked-endpoint-'));
+  const previousHome = process.env.LEHRO_HOME;
+  process.env.LEHRO_HOME = home;
+  const paths = [];
+  const server = createServer((req, res) => {
+    paths.push(req.url);
+    assert.equal(req.headers.authorization, 'Bearer fixture-key');
+    res.setHeader('content-type', 'application/json');
+    if (req.url === '/fixture/v1/models') {
+      res.end(JSON.stringify({ data: [{ id: 'tracked-fixture' }] }));
+    } else if (req.url === '/fixture/v1/chat/completions') {
+      req.resume();
+      req.on('end', () => res.end(JSON.stringify({ choices: [{ message: { content: 'ok' } }] })));
+    } else {
+      res.statusCode = 404;
+      res.end('{}');
+    }
+  });
+  t.after(async () => {
+    process.env.LEHRO_HOME = previousHome;
+    server.closeAllConnections?.();
+    await new Promise((done) => server.close(done));
+    assert.ok(home.startsWith(join(tmpdir(), 'lehro-tracked-endpoint-')));
+    rmSync(home, { recursive: true, force: true });
+  });
+  await new Promise((done) => server.listen(0, '127.0.0.1', done));
+  const port = server.address().port;
+  const baseUrl = `http://127.0.0.1:${port}/fixture/v1`;
+  writeFileSync(join(home, 'serve.json'), JSON.stringify({ model: 'tracked-fixture', port, baseUrl }));
+  const result = await ensureServing({ port, apiKey: 'fixture-key', restart: false, showWarmup: false }, { json: true }, console);
+  assert.equal(result.ok, true);
+  assert.equal(result.reused, true);
+  assert.equal(result.baseUrl, baseUrl);
+  assert.equal(result.model, 'tracked-fixture');
+  assert.deepEqual(paths, ['/fixture/v1/models', '/fixture/v1/chat/completions']);
+});
+
 test('a slow warm-up is not treated as a launch failure', async () => {
   const { isLaunchFailure } = await import('../src/commands/quick.js');
   assert.equal(isLaunchFailure({ ok: false, reason: 'port-in-use' }), true);

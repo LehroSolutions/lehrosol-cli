@@ -321,10 +321,11 @@ export async function ensureServing({ model, port, apiKey, restart, showWarmup }
   // the 9B was hot on :8080 while `code` assumed :7000 — it launched a
   // duplicate IQ1_S engine, 401-flooded on a key mismatch, and squeezed free
   // RAM to 1.2 GB with two models resident. The tracked hot engine IS the
-  // user's model choice; reuse it before assuming any port.
+  // user's model choice; reuse its exact endpoint before assuming any port or
+  // hostname. External engines can be tracked without a process we own.
   if (!restart) {
     const tracked = readState();
-    if (tracked && tracked.baseUrl && Number(tracked.port) !== Number(port) && tracked.pid != null) {
+    if (tracked && tracked.baseUrl) {
       const tProbe = await probe(tracked.baseUrl, apiKey);
       const entry = model ? resolveVaultModel(String(model), ratedModels()) : null;
       const matches = runningMatches(tProbe.models, entry);

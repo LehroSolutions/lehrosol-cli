@@ -16,6 +16,9 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
   in tracked engine state for the desktop's usage and engine views.
 
 ### Fixed
+- Reuse the exact tracked engine URL even on the requested port and when the
+  engine is externally managed. Avoid replacing a loopback address with
+  `localhost` and falling into model discovery when address-family probes fail.
 - Skip null usage-log rows without discarding later valid requests.
 - Reject empty checksum manifests, paths outside the release directory, and
   missing or tampered artifacts during release verification.

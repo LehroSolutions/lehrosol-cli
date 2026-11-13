@@ -2,7 +2,8 @@
 
 Running backlog for the LehroSol Loop Engine. One item per line.
 
-- [ ] 2026-11-13 follow-up release review: the `code --events` integration test passes in isolation but failed twice in the full local suite under load (initial engine probe rejected the fixture or timed out and entered model startup). Bind the fixture and engine probe consistently, and prevent integration fixtures from falling through to real model discovery. Repeated missing-adapter Windows PATH probes also made the TUI hotkey worker take many minutes. Do not publish beta.3 until the package prepack gate passes on the intended source.
+- [x] 2026-11-13 follow-up release review: engine reuse now respects the exact tracked base URL on the requested port, including externally managed engines without an owned PID. This avoids rewriting a fixture's IPv4 loopback URL to localhost and falling into real-model discovery. The focused quick-lane/usage run passed all 24 tests, including a new exact-endpoint regression. Earlier full local runs each passed 178/179 and are retained in dist; final CI/package checks cover the fix separately.
+- [ ] Repeated missing-adapter Windows PATH probes made the local TUI hotkey worker take many minutes. Bound/cache UI availability probes while preserving fresh command discovery; verify on a host with slow PATH entries.
 
 - [ ] 2026-11-13 release preparation: adapter change evidence is now confined to the mission folder, but comparison with HEAD still includes pre-existing changes inside that folder. Add a per-run baseline before claiming that every reported file was changed by the mission.
 
