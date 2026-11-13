@@ -19,6 +19,16 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 - Skip null usage-log rows without discarding later valid requests.
 - Reject empty checksum manifests, paths outside the release directory, and
   missing or tampered artifacts during release verification.
+- Refuse missing, duplicate, reserved-name or symlink artifacts during release
+  preparation; verify manifest names, hashes and sizes against the release files.
+- Record release source revision and local changes; reject CI source changes
+  after documentation generation before preparing a publishable candidate.
+- Confine adapter Git change evidence and diffs to the mission's working folder;
+  preserve filenames containing whitespace instead of reporting parent changes.
+- Include root agent instructions, contribution and security guides referenced
+  by the bundled documentation in the npm archive.
+- Execute Windows npm adapter shims through Node with literal prompt arguments;
+  reject custom shell wrappers that cannot preserve those arguments safely.
 - Align the separate dashboard's React and React DOM peer versions; include its
   lockfile for reproducible source-checkout builds.
 

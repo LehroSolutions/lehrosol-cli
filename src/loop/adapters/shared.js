@@ -2,7 +2,8 @@
 // change tracking, and lightweight security heuristics used to build a
 // policyInput for the harness Score Agent after an adapter runs.
 import { execFileSync } from 'node:child_process';
-import { statSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
+import { dirname, resolve, sep } from 'node:path';
 
 export function commandExists(bin) {
   return resolveCommand(bin).ok;
@@ -46,11 +47,13 @@ export function resolveCommand(bin) {
   try {
     const out = execFileSync(lookup, [bin], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
     const candidates = out.split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
-    const command = candidates[0] || bin;
+    const command = process.platform === 'win32'
+      ? candidates.find((candidate) => /\.exe$/i.test(candidate)) || candidates.find((candidate) => /\.(cmd|bat)$/i.test(candidate)) || candidates[0] || bin
+      : candidates[0] || bin;
     const lower = command.toLowerCase();
     // Windows npm shims are often .cmd/.bat files. execFile('opencode') can
     // report ENOENT even after `where opencode` succeeds; launch the resolved
-    // shim through cmd.exe so readiness matches actual runtime behavior.
+    // shim's Node entrypoint so arguments are not reparsed by a shell.
     if (process.platform === 'win32' && (/\.(cmd|bat)$/.test(lower) || !/\.exe$/.test(lower))) {
       value = { ok: true, command, launcher: 'cmd' };
     } else {
@@ -63,21 +66,24 @@ export function resolveCommand(bin) {
   }
 }
 
-function cmdQuote(s) {
-  return '"' + String(s).replace(/"/g, '\\"') + '"';
-}
-
 export function launchSpec(bin, args = []) {
   const resolved = resolveCommand(bin);
   if (!resolved.ok) return { ok: false, file: bin, args };
   if (resolved.launcher === 'cmd') {
-    return {
-      ok: true,
-      file: 'cmd.exe',
-      args: ['/d', '/s', '/c', [cmdQuote(resolved.command), ...args.map(cmdQuote)].join(' ')],
-      resolvedCommand: resolved.command,
-    };
+    let entry;
+    try {
+      const shim = readFileSync(resolved.command, 'utf8');
+      const match = shim.match(/"%dp0%[\\/](node_modules[\\/][\w@.\\/ -]+\.[cm]?js)"\s+%\*/i);
+      if (match) {
+        const base = resolve(dirname(resolved.command));
+        const candidate = resolve(base, match[1].replace(/[\\/]/g, sep));
+        if (candidate.startsWith(base + sep) && statSync(candidate).isFile()) entry = candidate;
+      }
+    } catch {}
+    if (!entry) throw new Error('Custom Windows shell wrappers cannot safely preserve adapter arguments. Configure a native executable or a Node.js entrypoint instead.');
+    return { ok: true, file: process.execPath, args: [entry, ...args], resolvedCommand: resolved.command };
   }
+  if (/\.[cm]?js$/i.test(resolved.command || '')) return { ok: true, file: process.execPath, args: [resolved.command, ...args], resolvedCommand: resolved.command };
   return { ok: true, file: resolved.command || bin, args, resolvedCommand: resolved.command || bin };
 }
 
@@ -94,9 +100,9 @@ export function isGitRepo(cwd) {
 export function changedFilesSince(cwd, ref) {
   if (!isGitRepo(cwd)) return [];
   try {
-    const tracked = execFileSync('git', ['diff', '--name-only', ref || 'HEAD'], { cwd: cwd, encoding: 'utf8' });
-    const untracked = execFileSync('git', ['ls-files', '--others', '--exclude-standard'], { cwd: cwd, encoding: 'utf8' });
-    const files = (tracked + '\n' + untracked).split('\n').map((s) => s.trim()).filter(Boolean);
+    const tracked = execFileSync('git', ['diff', '--relative', '--name-only', '-z', ref || 'HEAD', '--', '.'], { cwd: cwd, encoding: 'utf8' });
+    const untracked = execFileSync('git', ['ls-files', '--others', '--exclude-standard', '-z', '--', '.'], { cwd: cwd, encoding: 'utf8' });
+    const files = (tracked + untracked).split('\0').filter(Boolean);
     return Array.from(new Set(files));
   } catch {
     return [];
@@ -106,7 +112,7 @@ export function changedFilesSince(cwd, ref) {
 export function diffText(cwd, ref) {
   if (!isGitRepo(cwd)) return '';
   try {
-    return execFileSync('git', ['diff', ref || 'HEAD'], { cwd: cwd, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+    return execFileSync('git', ['diff', '--relative', ref || 'HEAD', '--', '.'], { cwd: cwd, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
   } catch {
     return '';
   }

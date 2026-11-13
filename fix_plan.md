@@ -2,6 +2,10 @@
 
 Running backlog for the LehroSol Loop Engine. One item per line.
 
+- [ ] 2026-11-13 follow-up release review: the `code --events` integration test passes in isolation but failed twice in the full local suite under load (initial engine probe rejected the fixture or timed out and entered model startup). Bind the fixture and engine probe consistently, and prevent integration fixtures from falling through to real model discovery. Repeated missing-adapter Windows PATH probes also made the TUI hotkey worker take many minutes. Do not publish beta.3 until the package prepack gate passes on the intended source.
+
+- [ ] 2026-11-13 release preparation: adapter change evidence is now confined to the mission folder, but comparison with HEAD still includes pre-existing changes inside that folder. Add a per-run baseline before claiming that every reported file was changed by the mission.
+
 - [x] 2026-11-13 release review: aligned the separate dashboard's React peer version with upstream `react-dom@19.3.1`. Dependency installation and production build passed; this does not certify its full runtime workflow.
 
 - [x] Replace the committed Homebrew formula's placeholder URL and checksum with the verified npm beta.2 artifact. Homebrew installation itself still needs verification on a supported Homebrew host before that channel is advertised.
