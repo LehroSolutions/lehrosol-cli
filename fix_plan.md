@@ -2,7 +2,7 @@
 
 Running backlog for the LehroSol Loop Engine. One item per line.
 
-- [ ] 2026-11-13 release review: upstream `origin/main` has merged `react-dom@19.3.1` while the separate dashboard still uses `react@18.3.1`. Align those peer versions and verify the dashboard before releasing that separate client. The installed CLI/Code compatibility checks do not cover it.
+- [x] 2026-11-13 release review: aligned the separate dashboard's React peer version with upstream `react-dom@19.3.1`. Dependency installation and production build passed; this does not certify its full runtime workflow.
 
 - [x] Replace the committed Homebrew formula's placeholder URL and checksum with the verified npm beta.2 artifact. Homebrew installation itself still needs verification on a supported Homebrew host before that channel is advertised.
 - [ ] The published CLI package omits `gui/`, and `lehrosol gui` serves only JSON-RPC. The console output and README now explain the separate source-checkout dashboard. Decide how to distribute and serve the built dashboard, then verify the installed package end to end.

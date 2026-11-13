@@ -17,6 +17,10 @@ All notable changes to LehroSol CLI are documented here. Format based on [Keep a
 
 ### Fixed
 - Skip null usage-log rows without discarding later valid requests.
+- Reject empty checksum manifests, paths outside the release directory, and
+  missing or tampered artifacts during release verification.
+- Align the separate dashboard's React and React DOM peer versions; include its
+  lockfile for reproducible source-checkout builds.
 
 ### Repository readiness
 - Add GitHub issue and pull-request templates, release-note categories, and dependency-update configuration.
